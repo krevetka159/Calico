@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class Class1
+    internal class Hra
     {
     }
 }
