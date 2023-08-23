@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class Dilek
+    internal class Game
     {
+        public Bag Bag;
+
+        public Game(int numOfPlayers) { }
+
     }
 }
