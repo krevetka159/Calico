@@ -13,7 +13,5 @@ namespace Calico
         private int id;
         private GameBoard board;
         private int score;
-
-
     }
 }
