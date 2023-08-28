@@ -8,22 +8,33 @@ namespace Calico
 {
     internal class Bag
 
-        // TODO random generátor dalšího dílku
     {
-        private List<GamePiece> pieces;
+        private List<GamePiece> Pieces;
+        private Random random;
 
         public Bag()
         {
-            pieces = new List<GamePiece>();
+            random = new Random();
+            Pieces = new List<GamePiece>();
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 6; j++)
                 {
-                    pieces.Add(new GamePiece(i, j));
-                    pieces.Add(new GamePiece(i, j));
-                    pieces.Add(new GamePiece(i, j));
+                    Pieces.Add(new GamePiece(i+1, j+1));
+                    Pieces.Add(new GamePiece(i+1, j+1));
+                    Pieces.Add(new GamePiece(i+1, j+1));
                 }
             }
         }
+
+        public GamePiece Next()
+        {
+            int randInt = random.Next(0, Pieces.Count());
+            GamePiece next = Pieces[randInt];
+            Pieces.RemoveAt(randInt);
+
+            return next;
+        }
     }
+
 }
