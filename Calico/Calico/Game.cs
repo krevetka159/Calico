@@ -8,9 +8,32 @@ namespace Calico
 {
     internal class Game
     {
-        public Bag Bag;
+        private Bag Bag;
+        private Player Player;
+        //private (GamePiece, GamePiece, GamePiece) PossiblePieces;
 
-        public Game(int numOfPlayers) { }
+        public Game(int numOfPlayers) 
+        { 
+            Bag = new Bag();
+        }
+
+
+        public void SinglePlay()
+        {
+            Player = new Player();
+
+            //print empty
+
+            for (int i = 0; i < 25; i++)
+            {
+                // ask for command
+                // make move, update points
+                // print board and points
+                
+            }
+
+            // print stats
+        }
 
     }
 }
