@@ -8,8 +8,8 @@ namespace Calico
 {
     internal class GamePiece
     {
-        private int Color;
-        private int Pattern;
+        public int Color;
+        public int Pattern;
         private int ID;
 
         public GamePiece(int color, int pattern)

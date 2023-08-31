@@ -74,8 +74,20 @@ namespace Calico
 
         }
 
+        public int AddPiece(GamePiece piece, int x, int y)
+        {
+            if (board[x][y].Color == 0 && board[x][y].Pattern == 0) //can only add to an empty space
+            {
+                board[x][y] = piece;
+                return 0;
+            }
+            return 1;
+        }
+
         public void PrintBoard()
         {
+            // funkce pro print dílku?
+            // všechny switche tu?
 
         }
     }
