@@ -17,6 +17,14 @@ namespace MyApp // Note: actual namespace depends on the project name.
             if (numOfPlayers == "1") { Console.WriteLine("ANO"); }
             else { Console.WriteLine("NE"); }
 
+
+            while (true) {
+                string a = Console.ReadLine();
+                Console.WriteLine(" 1a | 2b | 3c |");
+                Console.WriteLine("| 1a | 2a | 3a");
+                Console.WriteLine(" 5s | 4a | 3d |");
+            }
+
         }
         static void Main(string[] args)
         {
