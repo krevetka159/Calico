@@ -12,6 +12,7 @@ namespace Calico
         private Random random;
         private GamePiece empty = new GamePiece(0, 0);
         private GamePiece blocked = new GamePiece(-1, -1);
+        private int size = 7;
 
 
         public GameBoard()
@@ -19,7 +20,7 @@ namespace Calico
             random = new Random();
 
             int randId = random.Next(0, 4);
-            // TODO generování okrajů boardu podle id
+            // generování okrajů boardu podle id - 4 možnosti
 
             switch (randId)
             {
@@ -88,6 +89,35 @@ namespace Calico
         {
             // funkce pro print dílku?
             // všechny switche tu?
+            Console.WriteLine("      1    2    3    4    5    6    7");
+            Console.WriteLine("   ------------------------------------");
+            for (int i = 0; i < size; i++) 
+            {
+
+                Console.Write(i+1);
+                if (i % 2 == 0) Console.Write("  ");
+                Console.Write(" |");
+                for (int j = 0; j < size; j++)
+                {
+                    GamePiece p = board[i][j];
+                    switch (p.Type)
+                    {
+                        case 0:
+                            Console.Write(" -- |");
+                            break;
+                        case -1:
+                            Console.Write(" XX |");
+                            break;
+                        case 1:
+                            Console.Write($" {p.Color}{(char)(64+p.Pattern)} |");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                Console.Write("\n");
+                Console.WriteLine("   ------------------------------------");
+            }
 
         }
     }
