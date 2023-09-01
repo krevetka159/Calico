@@ -32,7 +32,7 @@ namespace Calico
                 
             }
 
-            // print stats
+            PrintStats();
         }
 
         private void PrintState()
@@ -48,6 +48,11 @@ namespace Calico
             //neměl by být void
             // řeknu si o command
             // checknu jestli legit
+        }
+
+        private void PrintStats()
+        {
+            // finální výsledky
         }
     }
 }
