@@ -10,8 +10,22 @@ namespace Calico
 
         // TODO unionfind na knoflíky a kočičky
     {
-        private int id;
+        //private int id;
         private GameBoard board;
         private int score;
+
+
+        public Player()
+        {
+            board = new GameBoard();
+            score = 0;
+        }
+
+        public void MakeMove(GamePiece gamePiece, int x, int y)
+        {
+            board.AddPiece(gamePiece, x, y); //TODO vyřešit ty exit kódy
+            //spočítat body
+            
+        }
     }
 }

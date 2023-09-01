@@ -75,14 +75,11 @@ namespace Calico
 
         }
 
-        public int AddPiece(GamePiece piece, int x, int y)
+        public void AddPiece(GamePiece piece, int x, int y)
         {
-            if (board[x][y].Color == 0 && board[x][y].Pattern == 0) //can only add to an empty space
-            {
-                board[x][y] = piece;
-                return 0;
-            }
-            return 1;
+                board[x][y] = piece;   
+            
+            
         }
 
         public void PrintBoard()
@@ -119,6 +116,11 @@ namespace Calico
                 Console.WriteLine("   ------------------------------------");
             }
 
+        }
+
+        public bool IsEmpty(int x, int y)
+        {
+            return (board[x][y].Type == 0);
         }
     }
 }

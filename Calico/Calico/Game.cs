@@ -24,16 +24,30 @@ namespace Calico
 
             //print empty
 
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < 22; i++)
             {
-                // ask for command
+                GetCommand();
                 // make move, update points
-                // print board and points
+                PrintState();
                 
             }
 
             // print stats
         }
 
+        private void PrintState()
+        {
+            // dílky volné k použití
+            // přehled kočiček
+            // skore
+            // board
+        }
+
+        private void GetCommand()
+        {
+            //neměl by být void
+            // řeknu si o command
+            // checknu jestli legit
+        }
     }
 }
