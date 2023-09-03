@@ -26,8 +26,11 @@ namespace MyApp // Note: actual namespace depends on the project name.
                 //Console.WriteLine("  | 1a | 2a | 3a |");
                 //Console.WriteLine("| 5s | 4a | 3d |");
 
-                GameBoard gameBoard = new GameBoard();
-                gameBoard.PrintBoard();
+                //GameBoard gameBoard = new GameBoard();
+                //gameBoard.PrintBoard();
+
+                Game game = new Game(1);
+                game.SinglePlay();
 
             }
 

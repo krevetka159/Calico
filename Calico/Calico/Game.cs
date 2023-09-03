@@ -33,6 +33,7 @@ namespace Calico
             Player = new Player();
 
             //print empty
+            Player.board.PrintBoard();
 
             for (int i = 0; i < 22; i++)
             {
@@ -49,29 +50,32 @@ namespace Calico
         {
             // dílky volné k použití -> print v gamepiece fci?
             // přehled kočiček
-            // skore
-            // board
+            
+            Console.WriteLine(" Skóre: " + Player.score);
+            Player.board.PrintBoard();
         }
 
         private void GetCommand()
         {
             // TODO legit checking
-            int next = 0;
-            int row = -1;
-            int col = -1;
+            int next;
+            int row;
+            int col;
+
+            Console.Write("Choose gamepiece to add: ");
+            next = Convert.ToInt32(Console.ReadLine());
+
             do
             {
-                Console.Write("Choose gamepiece to add: ");
-                next = Convert.ToInt32(Console.ReadLine());
                 Console.Write("Choose row: ");
                 row = Convert.ToInt32(Console.ReadLine());
                 Console.Write("Choose column: ");
                 col = Convert.ToInt32(Console.ReadLine());
 
-            } while (! Player.board.IsEmpty(row, col));
+            } while (! Player.board.IsEmpty(row-1, col - 1));
 
             // TODO potřebuju mít seznam možných dílků
-            Player.MakeMove(Opts[next - 1], row, col);
+            Player.MakeMove(Opts[next - 1], row-1, col-1);
 
             Opts[next - 1] = Bag.Next();
         }

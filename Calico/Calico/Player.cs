@@ -12,7 +12,7 @@ namespace Calico
     {
         //private int id;
         public GameBoard board;
-        private int score;
+        public int score;
 
 
         public Player()
