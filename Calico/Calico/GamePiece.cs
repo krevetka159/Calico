@@ -24,5 +24,10 @@ namespace Calico
             // TODO check správného předání color, pattern
             //ID = id;
         }
+
+        public void Print()
+        {
+            // TODO
+        }
     }
 }

@@ -10,11 +10,21 @@ namespace Calico
     {
         private Bag Bag;
         private Player Player;
+        private GamePiece[] Opts = new GamePiece[3];
         //private (GamePiece, GamePiece, GamePiece) PossiblePieces;
 
         public Game(int numOfPlayers) 
         { 
             Bag = new Bag();
+            Player = new Player();
+            for (int i = 0; i < 3; i++)
+            {
+                Opts[i] = Bag.Next();
+            }
+            //for (int i = 0; i < numOfPlayers; i++)
+            //{
+
+            //}
         }
 
 
@@ -37,7 +47,7 @@ namespace Calico
 
         private void PrintState()
         {
-            // dílky volné k použití
+            // dílky volné k použití -> print v gamepiece fci?
             // přehled kočiček
             // skore
             // board
@@ -45,9 +55,25 @@ namespace Calico
 
         private void GetCommand()
         {
-            //neměl by být void
-            // řeknu si o command
-            // checknu jestli legit
+            // TODO legit checking
+            int next = 0;
+            int row = -1;
+            int col = -1;
+            do
+            {
+                Console.Write("Choose gamepiece to add: ");
+                next = Convert.ToInt32(Console.ReadLine());
+                Console.Write("Choose row: ");
+                row = Convert.ToInt32(Console.ReadLine());
+                Console.Write("Choose column: ");
+                col = Convert.ToInt32(Console.ReadLine());
+
+            } while (! Player.board.IsEmpty(row, col));
+
+            // TODO potřebuju mít seznam možných dílků
+            Player.MakeMove(Opts[next - 1], row, col);
+
+            Opts[next - 1] = Bag.Next();
         }
 
         private void PrintStats()

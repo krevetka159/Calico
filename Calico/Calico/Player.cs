@@ -11,7 +11,7 @@ namespace Calico
         // TODO unionfind na knoflíky a kočičky
     {
         //private int id;
-        private GameBoard board;
+        public GameBoard board;
         private int score;
 
 
