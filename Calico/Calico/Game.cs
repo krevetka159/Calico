@@ -33,7 +33,7 @@ namespace Calico
             Player = new Player();
 
             //print empty
-            Player.board.PrintBoard();
+            PrintState();
 
             for (int i = 0; i < 22; i++)
             {
@@ -48,11 +48,20 @@ namespace Calico
 
         private void PrintState()
         {
-            // dílky volné k použití -> print v gamepiece fci?
+            Console.WriteLine();
+            Console.Write("Dílky k použití: ");
+            for (int i = 0;i < 3;i++)
+            {
+                Console.Write($" {i + 1}: | {Opts[i].Color}{(char)(64 +Opts[i].Pattern)} | ");
+            }
+
+            Console.WriteLine();
+
             // přehled kočiček
             
-            Console.WriteLine(" Skóre: " + Player.score);
+            Console.WriteLine("Skóre: " + Player.score);
             Player.board.PrintBoard();
+            Console.WriteLine();
         }
 
         private void GetCommand()
@@ -61,20 +70,26 @@ namespace Calico
             int next;
             int row;
             int col;
-
+            
             Console.Write("Choose gamepiece to add: ");
             next = Convert.ToInt32(Console.ReadLine());
+            
+            Console.Write("Choose row: ");
+            row = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Choose column: ");
+            col = Convert.ToInt32(Console.ReadLine());
 
-            do
+            while (!Player.board.IsEmpty(row - 1, col - 1)) 
             {
+                Console.WriteLine("Na vybranou pozici dílek nelze umístit, vyberte prosím jinou pozici.");
+
                 Console.Write("Choose row: ");
                 row = Convert.ToInt32(Console.ReadLine());
                 Console.Write("Choose column: ");
                 col = Convert.ToInt32(Console.ReadLine());
 
-            } while (! Player.board.IsEmpty(row-1, col - 1));
+            }
 
-            // TODO potřebuju mít seznam možných dílků
             Player.MakeMove(Opts[next - 1], row-1, col-1);
 
             Opts[next - 1] = Bag.Next();
@@ -83,6 +98,7 @@ namespace Calico
         private void PrintStats()
         {
             // finální výsledky
+            Console.WriteLine("Finální skóre: " + Player.score);
         }
     }
 }
