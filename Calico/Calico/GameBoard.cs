@@ -10,8 +10,8 @@ namespace Calico
     {
         private List<List<GamePiece>> board;
         private Random random;
-        private GamePiece empty = new GamePiece(0, 0);
-        private GamePiece blocked = new GamePiece(-1, -1);
+        private static GamePiece empty = new GamePiece(Type.Empty);
+        private static GamePiece blocked = new GamePiece(Type.Blocked);
         private int size = 7;
 
 
@@ -26,46 +26,46 @@ namespace Calico
             {
                 case 0:
                     board = new List<List<GamePiece>>() { 
-                        new List<GamePiece>() { new GamePiece(6, 5), new GamePiece(1, 2), new GamePiece(3, 5), new GamePiece(6, 3), new GamePiece(5, 6), new GamePiece(1, 4), new GamePiece(2, 2) },
-                        new List<GamePiece>() { new GamePiece(2, 4), empty, empty, empty, empty, empty, new GamePiece(4, 1) },
-                        new List<GamePiece>() { new GamePiece(4, 6), empty, empty, blocked, empty, empty, new GamePiece(5, 5) },
-                        new List<GamePiece>() { new GamePiece(3, 3), empty, empty, empty, blocked, empty, new GamePiece(1, 3) },
-                        new List<GamePiece>() { new GamePiece(5, 2), empty, blocked, empty, empty, empty, new GamePiece(2, 6) },
-                        new List<GamePiece>() { new GamePiece(1, 1), empty, empty, empty, empty, empty, new GamePiece(4, 4) },
-                        new List<GamePiece>() { new GamePiece(5, 4), new GamePiece(3, 6), new GamePiece(6, 4), new GamePiece(4, 3), new GamePiece(2, 5), new GamePiece(6, 1), new GamePiece(3, 2) }
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), new GamePiece(Color.Yellow, Pattern.Stripes), new GamePiece(Color.Cyan, Pattern.Vines), new GamePiece(Color.Pink, Pattern.Fern), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Yellow, Pattern.Flowers), new GamePiece(Color.Green, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Dots) },
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, blocked, empty, empty, new GamePiece(Color.Purple, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Fern), empty, empty, empty, blocked, empty, new GamePiece(Color.Yellow, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Stripes), empty, blocked, empty, empty, empty, new GamePiece(Color.Green, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Flowers) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Flowers), new GamePiece(Color.Cyan, Pattern.Quatrefoil), new GamePiece(Color.Pink, Pattern.Flowers), new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Green, Pattern.Vines), new GamePiece(Color.Pink, Pattern.Dots), new GamePiece(Color.Cyan, Pattern.Stripes) }
                     };
                     break;
                 case 1:
                     board = new List<List<GamePiece>>() {
-                        new List<GamePiece>() { new GamePiece(4, 3), new GamePiece(1, 5), new GamePiece(2, 3), new GamePiece(4, 2), new GamePiece(5, 6), new GamePiece(1, 1), new GamePiece(3, 5) },
-                        new List<GamePiece>() { new GamePiece(5, 1), empty, empty, empty, empty, empty, new GamePiece(6, 4) },
-                        new List<GamePiece>() { new GamePiece(6, 6), empty, empty, blocked, empty, empty, new GamePiece(5, 3) },
-                        new List<GamePiece>() { new GamePiece(3, 2), empty, empty, empty, blocked, empty, new GamePiece(1, 2) },
-                        new List<GamePiece>() { new GamePiece(1, 4), empty, blocked, empty, empty, empty, new GamePiece(3, 6) },
-                        new List<GamePiece>() { new GamePiece(5, 2), empty, empty, empty, empty, empty, new GamePiece(6, 1) },
-                        new List<GamePiece>() { new GamePiece(2, 2), new GamePiece(4, 1), new GamePiece(2, 6), new GamePiece(5, 2), new GamePiece(3, 3), new GamePiece(4, 4), new GamePiece(2, 5) }
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Vines), new GamePiece(Color.Green, Pattern.Fern), new GamePiece(Color.Blue, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Yellow, Pattern.Dots), new GamePiece(Color.Cyan, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Flowers) },
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Quatrefoil), empty, empty, blocked, empty, empty, new GamePiece(Color.Purple, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Stripes), empty, empty, empty, blocked, empty, new GamePiece(Color.Yellow, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), empty, blocked, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Dots) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Stripes), new GamePiece(Color.Blue, Pattern.Dots), new GamePiece(Color.Green, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Stripes), new GamePiece(Color.Cyan, Pattern.Fern), new GamePiece(Color.Blue, Pattern.Flowers), new GamePiece(Color.Green, Pattern.Vines) }
                     };
                     break;
                 case 2:
                     board = new List<List<GamePiece>>() {
-                        new List<GamePiece>() { new GamePiece(1, 4), new GamePiece(5, 1), new GamePiece(6, 4), new GamePiece(1, 3), new GamePiece(3, 2), new GamePiece(5, 6), new GamePiece(2, 1) },
-                        new List<GamePiece>() { new GamePiece(3, 6), empty, empty, empty, empty, empty, new GamePiece(4, 5) },
-                        new List<GamePiece>() { new GamePiece(4, 2), empty, empty, blocked, empty, empty, new GamePiece(3, 4) },
-                        new List<GamePiece>() { new GamePiece(2, 3), empty, empty, empty, blocked, empty, new GamePiece(6, 3) },
-                        new List<GamePiece>() { new GamePiece(6, 5), empty, blocked, empty, empty, empty, new GamePiece(2, 2) },
-                        new List<GamePiece>() { new GamePiece(3, 1), empty, empty, empty, empty, empty, new GamePiece(4, 6) },
-                        new List<GamePiece>() { new GamePiece(5, 3), new GamePiece(1, 6), new GamePiece(5, 2), new GamePiece(4, 3), new GamePiece(2, 4), new GamePiece(1, 6), new GamePiece(5, 1) }
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), new GamePiece(Color.Purple, Pattern.Dots), new GamePiece(Color.Pink, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Fern), new GamePiece(Color.Cyan, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Green, Pattern.Dots) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Quatrefoil), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Stripes), empty, empty, blocked, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Fern), empty, empty, empty, blocked, empty, new GamePiece(Color.Pink, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), empty, blocked, empty, empty, empty, new GamePiece(Color.Green, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Stripes), new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Green, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Dots) }
                     };
                     break;
                 case 3:
                     board = new List<List<GamePiece>>() {
-                        new List<GamePiece>() { new GamePiece(2, 6), new GamePiece(4, 4), new GamePiece(1, 2), new GamePiece(5, 1), new GamePiece(4, 5), new GamePiece(2, 3), new GamePiece(6, 6) },
-                        new List<GamePiece>() { new GamePiece(6, 3), empty, empty, empty, empty, empty, new GamePiece(3, 4) },
-                        new List<GamePiece>() { new GamePiece(5, 5), empty, empty, blocked, empty, empty, new GamePiece(4, 2) },
-                        new List<GamePiece>() { new GamePiece(1, 1), empty, empty, empty, blocked, empty, new GamePiece(2, 1) },
-                        new List<GamePiece>() { new GamePiece(2, 4), empty, blocked, empty, empty, empty, new GamePiece(6, 5) },
-                        new List<GamePiece>() { new GamePiece(4, 6), empty, empty, empty, empty, empty, new GamePiece(3, 3) },
-                        new List<GamePiece>() { new GamePiece(3, 5), new GamePiece(5, 3), new GamePiece(1, 5), new GamePiece(3, 1), new GamePiece(6, 2), new GamePiece(5, 4), new GamePiece(1, 6) }
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Quatrefoil), new GamePiece(Color.Blue, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Dots), new GamePiece(Color.Blue, Pattern.Vines), new GamePiece(Color.Green, Pattern.Fern), new GamePiece(Color.Pink, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Fern), empty, empty, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, blocked, empty, empty, new GamePiece(Color.Blue, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, blocked, empty, new GamePiece(Color.Green, Pattern.Dots) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, blocked, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Vines), new GamePiece(Color.Purple, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Vines), new GamePiece(Color.Cyan, Pattern.Dots), new GamePiece(Color.Pink, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Quatrefoil) }
                     };
                     break;
                 default:
@@ -97,20 +97,7 @@ namespace Calico
                 for (int j = 0; j < size; j++)
                 {
                     GamePiece p = board[i][j];
-                    switch (p.Type)
-                    {
-                        case 0:
-                            Console.Write(" -- |");
-                            break;
-                        case -1:
-                            Console.Write(" XX |");
-                            break;
-                        case 1:
-                            Console.Write($" {p.Color}{(char)(64+p.Pattern)} |");
-                            break;
-                        default:
-                            break;
-                    }
+                    Console.Write($"{p.Print}|");
                 }
                 Console.Write("\n");
                 Console.WriteLine("   ------------------------------------");

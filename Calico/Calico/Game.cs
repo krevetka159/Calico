@@ -52,7 +52,7 @@ namespace Calico
             Console.Write("Dílky k použití: ");
             for (int i = 0;i < 3;i++)
             {
-                Console.Write($" {i + 1}: | {Opts[i].Color}{(char)(64 +Opts[i].Pattern)} | ");
+                Console.Write($" {i + 1}: |{Opts[i].Print}| ");
             }
 
             Console.WriteLine();
