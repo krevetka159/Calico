@@ -46,11 +46,112 @@ namespace Calico
             PrintStats();
         }
 
+
+// ----------------------------------------------- GET COMMAND ------------------------------------------------------------
+
+
+        private void GetCommand()
+        {
+   
+            int next = ChooseGamePiece() - 1;
+            
+            (int row, int col) = GetPosition();
+
+            Player.MakeMove(Opts[next], row-1, col-1);
+
+            Opts[next - 1] = Bag.Next();
+        }
+
+        private static int ChooseGamePiece()
+        {
+            int gamepiece;
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Choose gamepiece to add: ");
+                    gamepiece = Convert.ToInt32(Console.ReadLine());
+                    switch (gamepiece)
+                    {
+                        case 1: return 1;
+                        case 2: return 2;
+                        case 3: return 3;
+                        default:
+                            {
+                                Console.WriteLine("Choose of of the three pieces (1/2/3).");
+                                break;
+                            }
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Choose of of the three pieces (1/2/3).");
+                }
+            }
+        }
+
+
+        private (int, int) GetPosition()
+        {
+            int row;
+            int col;
+            while (true)
+            {
+                while (true)
+                {
+                    try
+                    {
+                        Console.Write("Choose row: ");
+                        row = Convert.ToInt32(Console.ReadLine());
+
+                        if (1 <= row && row <= 7)
+                        {
+                            break;
+                        }
+                        Console.WriteLine("Row must be an integer between 1 and 7");
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Row must be an integer");
+                    }
+                }
+
+                while (true)
+                {
+                    try
+                    {
+                        Console.Write("Choose column: ");
+                        col = Convert.ToInt32(Console.ReadLine());
+
+                        if (1 <= col && col <= 7)
+                        {
+                            break;
+                        }
+                        Console.WriteLine("Column must be an integer between 1 and 7");
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Column must be an integer");
+                    }
+                }
+                
+                if (Player.board.IsEmpty(row - 1, col - 1))
+                {
+                    return (row , col);
+                }
+            }
+
+        }
+
+
+
+// ----------------------------------------------- PRINT ------------------------------------------------------------------
+
         private void PrintState()
         {
             Console.WriteLine();
             Console.Write("Dílky k použití: ");
-            for (int i = 0;i < 3;i++)
+            for (int i = 0; i < 3; i++)
             {
                 Console.Write($" {i + 1}: |{Opts[i].Print}| ");
             }
@@ -58,42 +159,13 @@ namespace Calico
             Console.WriteLine();
 
             // přehled kočiček
-            
+
             Console.WriteLine("Skóre: " + Player.score);
             Player.board.PrintBoard();
             Console.WriteLine();
         }
 
-        private void GetCommand()
-        {
-            // TODO legit checking
-            int next;
-            int row;
-            int col;
-            
-            Console.Write("Choose gamepiece to add: ");
-            next = Convert.ToInt32(Console.ReadLine());
-            
-            Console.Write("Choose row: ");
-            row = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Choose column: ");
-            col = Convert.ToInt32(Console.ReadLine());
 
-            while (!Player.board.IsEmpty(row - 1, col - 1)) 
-            {
-                Console.WriteLine("Na vybranou pozici dílek nelze umístit, vyberte prosím jinou pozici.");
-
-                Console.Write("Choose row: ");
-                row = Convert.ToInt32(Console.ReadLine());
-                Console.Write("Choose column: ");
-                col = Convert.ToInt32(Console.ReadLine());
-
-            }
-
-            Player.MakeMove(Opts[next - 1], row-1, col-1);
-
-            Opts[next - 1] = Bag.Next();
-        }
 
         private void PrintStats()
         {
