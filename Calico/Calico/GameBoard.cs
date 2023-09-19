@@ -12,8 +12,7 @@ namespace Calico
         private Random random;
         private static GamePiece empty = new GamePiece(Type.Empty);
         private static GamePiece blocked = new GamePiece(Type.Blocked);
-        private int size = 7;
-
+        public int size = 7;
 
         public GameBoard()
         {
