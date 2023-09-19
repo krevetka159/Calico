@@ -12,13 +12,16 @@ namespace Calico
         private List<GamePiece> Pieces;
         private Random random;
 
+        private static int NumOfPatterns = 6;
+        private static int NumOfColors = 6;
+
         public Bag()
         {
             random = new Random();
             Pieces = new List<GamePiece>();
-            for (int i = 1; i <= 6; i++)
+            for (int i = 1; i <= NumOfColors; i++)
             {
-                for (int j = 1; j <= 6; j++)
+                for (int j = 1; j <= NumOfPatterns; j++)
                 {
                     Pieces.Add(new GamePiece((Color)i, (Pattern)j));
                     Pieces.Add(new GamePiece((Color)i, (Pattern)j));
