@@ -20,7 +20,6 @@ namespace Calico
                 // TODO verze pro 2 hráče
 
                 Game game = new Game(1);
-                game.SinglePlay();
 
             }
 
