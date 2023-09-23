@@ -83,7 +83,7 @@ namespace Calico
 
             // přehled kočiček
 
-            Console.WriteLine("Skóre: " + Player.board._score);
+            Console.WriteLine("Skóre: " + Player.board._scoreCounter.GetScore());
             Player.board.PrintBoard();
             Console.WriteLine();
         }
@@ -93,7 +93,7 @@ namespace Calico
         private void PrintStats()
         {
             // finální výsledky
-            Console.WriteLine("Finální skóre: " + Player.score);
+            Console.WriteLine("Finální skóre: " + Player.board._scoreCounter.GetScore());
         }
     }
 }

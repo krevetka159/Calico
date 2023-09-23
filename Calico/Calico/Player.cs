@@ -13,13 +13,10 @@ namespace Calico
     {
         //private int id;
         public GameBoard board;
-        public int score;
-
 
         public Player()
         {
             board = new GameBoard();
-            score = 0;
         }
 
         public void MakeMove(GamePiece gamePiece, int x, int y)

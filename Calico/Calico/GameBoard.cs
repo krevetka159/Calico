@@ -18,7 +18,8 @@ namespace Calico
         private int _colorClusterSize = 3;
         private UnionFindWithArray<GamePiece> patternClusters;
         private Dictionary<Pattern, int> _patternClusterSizes;
-        public int _score;
+
+        public ScoreCounter _scoreCounter;
 
         public GameBoard()
         {
@@ -26,7 +27,8 @@ namespace Calico
 
             colorClusters = new UnionFindWithArray<GamePiece>();
             patternClusters = new UnionFindWithArray<GamePiece>();
-            _score = 0;
+
+            _scoreCounter = new ScoreCounter();
 
             int randId = random.Next(0, 4);
             // generování okrajů boardu podle id - 4 možnosti
@@ -87,8 +89,7 @@ namespace Calico
         public void AddPiece(GamePiece piece, int x, int y)
         {
             board[x][y] = piece;
-            colorClusters.Add(piece);
-
+            _scoreCounter.AddToUF(piece);
             CheckNeighbors(piece, x, y);
             
         }
@@ -101,24 +102,8 @@ namespace Calico
             {
                 if (IsOccupied(r, c))
                 {
-                    if (board[r][c].Color == piece.Color)
-                    {
-                        
-                        if (! colorClusters.Find(board[r][c], piece))
-                        {
-                            _score -= colorClusters.CountScore(board[r][c]) / _colorClusterSize;
-                            _score -= colorClusters.CountScore(piece) / _colorClusterSize;
+                    _scoreCounter.EvaluateNew(piece, board[r][c]);
 
-                            colorClusters.Union(board[r][c], piece);
-
-                            _score += colorClusters.CountScore(board[r][c]) / _colorClusterSize;
-                        }
-  
-                    }
-                    if (board[r][c].Pattern == piece.Pattern)
-                    {
-
-                    }
                 }
             }
         }
@@ -131,17 +116,15 @@ namespace Calico
                 {
                     for (int col = 0; col < size; col++)
                     {
-                        colorClusters.Add(board[row][col]);
-                        patternClusters.Add(board[row][col]);
+                        _scoreCounter.AddToUF(board[row][col]);
+
                     }
                 }
                 else
                 {
-                    colorClusters.Add(board[row][0]);
-                    patternClusters.Add(board[row][0]);
+                    _scoreCounter.AddToUF(board[row][0]);
 
-                    colorClusters.Add(board[row][size-1]);
-                    patternClusters.Add(board[row][size - 1]);
+                    _scoreCounter.AddToUF(board[row][size-1]);
                 }
             }
         }
