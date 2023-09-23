@@ -23,6 +23,8 @@ namespace Calico
             _score = 0;
             _colorUF = new UnionFindWithArray<GamePiece>();
             _patternUF = new UnionFindWithArray<GamePiece>();
+
+            // randomly rozdělit patterny na clustersizes a bodíky
         }
 
         public void AddToUF(GamePiece piece)

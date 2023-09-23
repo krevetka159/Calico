@@ -73,6 +73,7 @@ namespace Calico
         private void PrintState()
         {
             Console.WriteLine();
+            
             Console.Write("Dílky k použití: ");
             for (int i = 0; i < 3; i++)
             {
