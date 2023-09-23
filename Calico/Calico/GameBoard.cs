@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Sources;
 
 namespace Calico
 {
@@ -13,14 +14,22 @@ namespace Calico
         private static GamePiece empty = new GamePiece(Type.Empty);
         private static GamePiece blocked = new GamePiece(Type.Blocked);
         public int size = 7;
+        private UnionFindWithArray<GamePiece> colorClusters;
+        private int _colorClusterSize = 3;
+        private UnionFindWithArray<GamePiece> patternClusters;
+        private Dictionary<Pattern, int> _patternClusterSizes;
+        public int _score;
 
         public GameBoard()
         {
             random = new Random();
 
+            colorClusters = new UnionFindWithArray<GamePiece>();
+            patternClusters = new UnionFindWithArray<GamePiece>();
+            _score = 0;
+
             int randId = random.Next(0, 4);
             // generování okrajů boardu podle id - 4 možnosti
-
             switch (randId)
             {
                 case 0:
@@ -71,14 +80,70 @@ namespace Calico
                     board = new List<List<GamePiece>>();
                     break;
             }
+            CornerUF();
 
         }
 
         public void AddPiece(GamePiece piece, int x, int y)
         {
-                board[x][y] = piece;   
+            board[x][y] = piece;
+            colorClusters.Add(piece);
+
+            CheckNeighbors(piece, x, y);
             
-            
+        }
+
+        public void CheckNeighbors(GamePiece piece,int row, int col)
+        {
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+
+            foreach ((int r, int c) in neighbors) 
+            {
+                if (IsOccupied(r, c))
+                {
+                    if (board[r][c].Color == piece.Color)
+                    {
+                        
+                        if (! colorClusters.Find(board[r][c], piece))
+                        {
+                            _score -= colorClusters.CountScore(board[r][c]) / _colorClusterSize;
+                            _score -= colorClusters.CountScore(piece) / _colorClusterSize;
+
+                            colorClusters.Union(board[r][c], piece);
+
+                            _score += colorClusters.CountScore(board[r][c]) / _colorClusterSize;
+                        }
+  
+                    }
+                    if (board[r][c].Pattern == piece.Pattern)
+                    {
+
+                    }
+                }
+            }
+        }
+
+        public void CornerUF()
+        {
+            for (int row = 0; row < size; row++) 
+            {
+                if (row == 0 ||  row == size - 1)
+                {
+                    for (int col = 0; col < size; col++)
+                    {
+                        colorClusters.Add(board[row][col]);
+                        patternClusters.Add(board[row][col]);
+                    }
+                }
+                else
+                {
+                    colorClusters.Add(board[row][0]);
+                    patternClusters.Add(board[row][0]);
+
+                    colorClusters.Add(board[row][size-1]);
+                    patternClusters.Add(board[row][size - 1]);
+                }
+            }
         }
 
         public void PrintBoard()
@@ -104,9 +169,13 @@ namespace Calico
 
         }
 
-        public bool IsEmpty(int x, int y)
+        public bool IsEmpty(int row, int col)
         {
-            return (board[x][y].Type == 0);
+            return (board[row][col].Type == Type.Empty);
+        }
+        public bool IsOccupied(int row, int col)
+        {
+            return (board[row][col].Type == Type.PatchTile);
         }
     }
 }

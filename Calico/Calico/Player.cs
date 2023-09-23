@@ -9,6 +9,7 @@ namespace Calico
     internal class Player
 
         // TODO unionfind na knoflíky a kočičky
+        // todo AI class co dědí z Player -> jiné pick next a position
     {
         //private int id;
         public GameBoard board;
@@ -23,7 +24,7 @@ namespace Calico
 
         public void MakeMove(GamePiece gamePiece, int x, int y)
         {
-            board.AddPiece(gamePiece, x, y); //TODO vyřešit ty exit kódy
+            board.AddPiece(gamePiece, x, y);
             //spočítat body
             
         }

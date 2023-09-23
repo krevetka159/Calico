@@ -63,7 +63,7 @@ namespace Calico
 
             Player.MakeMove(Opts[next], row-1, col-1);
 
-            Opts[next - 1] = Bag.Next();
+            Opts[next] = Bag.Next();
         }
 
 
@@ -83,7 +83,7 @@ namespace Calico
 
             // přehled kočiček
 
-            Console.WriteLine("Skóre: " + Player.score);
+            Console.WriteLine("Skóre: " + Player.board._score);
             Player.board.PrintBoard();
             Console.WriteLine();
         }

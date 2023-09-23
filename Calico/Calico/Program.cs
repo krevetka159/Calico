@@ -60,8 +60,7 @@ namespace Calico
         }
         static void Main(string[] args)
         {
-
-            NewGame();
+            NewGame(); 
         }
     }
 }
