@@ -10,6 +10,10 @@ namespace Calico
     {
         Random random = new Random();
 
+        public RandomAgent(Scoring scoring) : base(scoring)
+        {
+        }
+
         public override int ChooseGamePiece(GamePiece[] Opts)
         {
             return random.Next(1, Opts.Length);
@@ -27,6 +31,23 @@ namespace Calico
             }
 
             return (row +1, col +1);
+        }
+    }
+
+    public class ColorAgent : Player
+    {
+        public ColorAgent(Scoring scoring) : base(scoring)
+        {
+        }
+        public override int ChooseGamePiece(GamePiece[] Opts)
+        {
+            return 0;
+        }
+
+        public override (int, int) ChoosePosition()
+        { 
+
+            return (0,0);
         }
     }
 }

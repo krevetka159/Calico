@@ -13,15 +13,14 @@ namespace Calico
         //private int id;
         public GameBoard board;
 
-        public Player()
+        public Player(Scoring scoring)
         {
-            board = new GameBoard();
+            board = new GameBoard(scoring);
         }
 
         public void MakeMove(GamePiece gamePiece, int x, int y)
         {
             board.AddPiece(gamePiece, x, y);
-            //spočítat body
             
         }
 
