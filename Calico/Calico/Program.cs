@@ -15,24 +15,28 @@ namespace Calico
                 Console.WriteLine("");
 
 
-                int numOfPlayers = GetNumOfPlayers();
+                int mode = GetGameMode();
 
-                // TODO verze pro 2 hráče
-
-                Game game = new Game(1);
-
+                Game game = new Game(mode);
             }
 
         }
 
-        private static int GetNumOfPlayers()
+        private static int GetGameMode()
         {
             int numOfPlayers;
             while (true)
             {
                 try
                 {
-                    Console.Write("Number of players: ");
+                    Console.WriteLine("Mode options: ");
+                    Console.WriteLine("   1. Single player");
+                    Console.WriteLine("   2. 2 players (vs. computer)");
+                    Console.WriteLine("   3. Agent testing (with state print");
+                    Console.WriteLine("   4. Agent testing (without state print");
+
+                    Console.Write("Choose game mode: ");
+
                     numOfPlayers = Convert.ToInt32(Console.ReadLine());
                     switch (numOfPlayers)
                     {
@@ -44,9 +48,17 @@ namespace Calico
                             {
                                 return 2;
                             }
+                        case 3:
+                            {
+                                return 3;
+                            }
+                        case 4:
+                            {
+                                return 4;
+                            }
                         default:
                             {
-                                Console.WriteLine("1 or 2");
+                                Console.WriteLine( numOfPlayers + " is not a mode option");
                                 break;
                             }
                     }
