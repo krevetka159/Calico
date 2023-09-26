@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class Player
+    public class Player
 
-        // TODO unionfind na knoflíky a kočičky
         // todo AI class co dědí z Player -> jiné pick next a position
     {
         //private int id;
@@ -26,7 +25,7 @@ namespace Calico
             
         }
 
-        public int ChooseGamePiece(GamePiece[] Opts)
+        public virtual int ChooseGamePiece(GamePiece[] Opts)
         {
             int gamepiece;
             while (true)
@@ -54,7 +53,7 @@ namespace Calico
             }
         }
 
-        public (int, int) ChoosePosition()
+        public virtual (int, int) ChoosePosition()
         {
             int row;
             int col;

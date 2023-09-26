@@ -12,8 +12,8 @@ namespace Calico
         private List<GamePiece> Pieces;
         private Random random;
 
-        private static int NumOfPatterns = 6;
-        private static int NumOfColors = 6;
+        public static int NumOfPatterns = 6;
+        public static int NumOfColors = 6;
 
         public Bag()
         {

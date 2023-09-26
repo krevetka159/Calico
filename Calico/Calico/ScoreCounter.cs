@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class ScoreCounter
+    public class ScoreCounter
     {
         private int _colorClusterScore = 3;
         private Dictionary<Pattern, int> _patternClusterScores;

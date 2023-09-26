@@ -7,7 +7,7 @@ using System.Threading.Tasks.Sources;
 
 namespace Calico
 {
-    internal class GameBoard
+    public class GameBoard
     {
         private List<List<GamePiece>> board;
         private Random random;

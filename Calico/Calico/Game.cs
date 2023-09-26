@@ -30,7 +30,9 @@ namespace Calico
 
         public void SinglePlayer()
         {
-            Player = new Player();
+            //Player = new Player();
+
+            Player = new RandomAgent();
 
             //print empty
             PrintState();

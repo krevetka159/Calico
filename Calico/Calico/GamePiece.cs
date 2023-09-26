@@ -35,25 +35,13 @@ namespace Calico
         Blocked,
         PatchTile
     }
-    internal class GamePiece
+    public class GamePiece
     {
         public Color Color;
         public Pattern Pattern;
         private int ID;
         public Type Type;
         public string Print;
-
-        //public GamePiece(int color, int pattern)
-        //{
-        //    Color = color;
-        //    Pattern = pattern;
-
-        //    if (pattern == 0 && color == 0) Type = 0;
-        //    else if (pattern == -1 && color == -1) Type = -1;
-        //    else Type = 1;
-        //    // TODO check správného předání color, pattern
-        //    //ID = id;
-        //}
 
 
         public GamePiece(Type t)
