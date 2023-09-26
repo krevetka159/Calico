@@ -9,7 +9,7 @@ namespace Calico
 {
     public class GameBoard
     {
-        private List<List<GamePiece>> board;
+        public List<List<GamePiece>> board;
         private Random random;
         private static GamePiece empty = new GamePiece(Type.Empty);
         private static GamePiece blocked = new GamePiece(Type.Blocked);
@@ -21,14 +21,14 @@ namespace Calico
 
         public ScoreCounter _scoreCounter;
 
-        public GameBoard()
+        public GameBoard(Scoring scoring)
         {
             random = new Random();
 
             colorClusters = new UnionFindWithArray<GamePiece>();
             patternClusters = new UnionFindWithArray<GamePiece>();
 
-            _scoreCounter = new ScoreCounter();
+            _scoreCounter = new ScoreCounter(scoring);
 
             int randId = random.Next(0, 4);
             // generování okrajů boardu podle id - 4 možnosti
@@ -131,8 +131,6 @@ namespace Calico
 
         public void PrintBoard()
         {
-            // funkce pro print dílku?
-            // všechny switche tu?
             Console.WriteLine("      1    2    3    4    5    6    7");
             Console.WriteLine("   ------------------------------------");
             for (int i = 0; i < size; i++) 
