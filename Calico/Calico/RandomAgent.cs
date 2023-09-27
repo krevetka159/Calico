@@ -150,20 +150,127 @@ namespace Calico
         }
     }
 
-    public class ColorAgent : Player
+    public class RandomAgent21 : Player
     {
-        public ColorAgent(Scoring scoring) : base(scoring)
+        Random random = new Random();
+
+        public RandomAgent21(Scoring scoring) : base(scoring)
         {
         }
+
         public override int ChooseGamePiece(GamePiece[] Opts)
         {
-            return 0;
+            return random.Next(1, Opts.Length);
         }
 
-        public override (int, int) ChoosePosition()
-        { 
+        public override (int, int) ChoosePosition(GamePiece gp)
+        {
+            int max = 0;
+            (int, int) maxPosition = (2,2) ;
 
-            return (0,0);
+            for (int i = 1; i < board.size - 1; i++)
+            {
+                for (int j = 1; j < board.size - 1; j++)
+                {
+                    if (board.EvaluateNeighborsColor(gp, i, j) > max)
+                    {
+                        max = board.EvaluateNeighborsColor(gp, i, j);
+                        maxPosition = (i + 1, j + 1);
+                    }
+                }
+            }
+
+            if (max > 0) return maxPosition;
+
+            int row = random.Next(0, board.size - 1);
+            int col = random.Next(0, board.size - 1);
+
+            while (!board.IsEmpty(row, col))
+            {
+                row = random.Next(0, board.size - 1);
+                col = random.Next(0, board.size - 1);
+            }
+
+            return (row + 1, col + 1);
         }
     }
+    public class RandomAgent31 : Player
+    {
+        Random random = new Random();
+
+        public RandomAgent31(Scoring scoring) : base(scoring)
+        {
+        }
+
+        public override int ChooseGamePiece(GamePiece[] Opts)
+        {
+            return random.Next(1, Opts.Length);
+        }
+
+        public override (int, int) ChoosePosition(GamePiece gp)
+        {
+            for (int i = 1; i < board.size - 1; i++)
+            {
+                for (int j = 1; j < board.size - 1; j++)
+                {
+                    if (board.CheckNeighbors(gp.Pattern, i, j))
+                    {
+                        return (i + 1, j + 1);
+                    }
+                }
+            }
+
+            int row = random.Next(0, board.size - 1);
+            int col = random.Next(0, board.size - 1);
+
+            while (!board.IsEmpty(row, col))
+            {
+                row = random.Next(0, board.size - 1);
+                col = random.Next(0, board.size - 1);
+            }
+
+            return (row + 1, col + 1);
+        }
+    }
+
+    public class RandomAgent41 : Player
+    {
+        Random random = new Random();
+
+        public RandomAgent41(Scoring scoring) : base(scoring)
+        {
+        }
+
+        public override int ChooseGamePiece(GamePiece[] Opts)
+        {
+            return random.Next(1, Opts.Length);
+        }
+
+        public override (int, int) ChoosePosition(GamePiece gp)
+        {
+            for (int i = 1; i < board.size - 1; i++)
+            {
+                for (int j = 1; j < board.size - 1; j++)
+                {
+                    if (board.CheckNeighbors(gp, i, j))
+                    {
+                        return (i + 1, j + 1);
+                    }
+                }
+            }
+
+            int row = random.Next(0, board.size - 1);
+            int col = random.Next(0, board.size - 1);
+
+            while (!board.IsEmpty(row, col))
+            {
+                row = random.Next(0, board.size - 1);
+                col = random.Next(0, board.size - 1);
+            }
+
+            return (row + 1, col + 1);
+        }
+    }
+
+
 }

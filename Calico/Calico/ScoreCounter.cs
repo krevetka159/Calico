@@ -67,6 +67,21 @@ namespace Calico
 
         }
 
+        public bool CheckColorUnion(GamePiece p, GamePiece n)
+        {
+            return _colorUF.Find(p, n);
+        }
+
+        public bool CheckPatternUnion(GamePiece p, GamePiece n)
+        {
+            return _patternUF.Find(p, n);
+        }
+
+        public int GetColorCount(GamePiece p)
+        {
+            return _colorUF.CountScore(p);
+        }
+
         public int GetScore()
         {
             return _score;

@@ -132,7 +132,7 @@ namespace Calico
                 {
                     Opts[i] = Bag.Next();
                 }
-                Agent = new RandomAgent4(scoring);
+                Agent = new RandomAgent2(scoring);
 
                 if (withPrint) PrintStateSingle();
 

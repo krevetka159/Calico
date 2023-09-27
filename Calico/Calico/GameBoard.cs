@@ -172,23 +172,49 @@ namespace Calico
 
 // ----------------------------------------------- COUNT SIMILAR NEIGHBORS -----------------------------------------------------
 
-        public int EvaluateNeighbors(Color color, int row, int col)
+        public int EvaluateNeighborsColor(GamePiece gp, int row, int col)
         {
-            int sum = 0;
+
+            int score = 0;
+            int count = 0;
             List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
 
-            foreach ((int r, int c) in neighbors)
+            for (int i = 0; i < neighbors.Count; i++)
             {
-                if (board[r][c].Color == color)
+                
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Color == gp.Color)
                 {
-                    sum++;
-                    
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (_scoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        count += _scoreCounter.GetColorCount(board[row_i][col_i]);
+                        score += (_scoreCounter.GetColorCount(board[row_i][col_i]) / 3) * 3;
+                    }
                 }
+
             }
 
-            return sum;
+            int newScore = ((count + 1) / 3) * 3;
+
+            
+            if (count == 0) return 0;
+
+
+            return (newScore - score + 1);
         }
-        public int EvaluateNeighbors(Pattern pattern, int row, int col)
+        public int EvaluateNeighborsPattern(Pattern pattern, int row, int col)
         {
             int sum = 0;
             List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
