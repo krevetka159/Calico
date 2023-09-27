@@ -103,5 +103,9 @@ namespace Calico
             }
 
         }
+        public virtual (int, int) ChoosePosition(GamePiece gp)
+        {
+            return (0, 0);
+        }
     }
 }

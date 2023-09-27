@@ -20,14 +20,14 @@ namespace Calico
 
         public Game(int mode) 
         { 
-            Bag = new Bag();
+            //Bag = new Bag();
 
-            scoring = new Scoring();
+            //scoring = new Scoring();
 
-            for (int i = 0; i < 3; i++)
-            {
-                Opts[i] = Bag.Next();
-            }
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    Opts[i] = Bag.Next();
+            //}
             
             switch (mode)
             {
@@ -58,6 +58,14 @@ namespace Calico
 // ----------------------------------------------- SINGLEPLAYER ------------------------------------------------------------
         public void SinglePlayer()
         {
+            Bag = new Bag();
+
+            scoring = new Scoring();
+
+            for (int i = 0; i < 3; i++)
+            {
+                Opts[i] = Bag.Next();
+            }
             Player = new Player(scoring);
 
             //print empty
@@ -77,6 +85,15 @@ namespace Calico
 // ----------------------------------------------- MULTIPLAYER ------------------------------------------------------------
         public void MultiPlayer() 
         {
+            Bag = new Bag();
+
+            scoring = new Scoring();
+
+            for (int i = 0; i < 3; i++)
+            {
+                Opts[i] = Bag.Next();
+            }
+
             Player = new Player(scoring);
             Agent = new RandomAgent(scoring);
 
@@ -102,21 +119,38 @@ namespace Calico
 
         public void TestGame(bool withPrint)
         {
-            Player = new RandomAgent(scoring);
-
-            if (withPrint) PrintStateSingle();
-            
-            
-
-            for (int i = 0; i < 22; i++)
+            int sum = 0;
+            for (int j = 0; j < 50; j++)
             {
-                MakeMove(Player);
-                
+
+
+                Bag = new Bag();
+
+                scoring = new Scoring();
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Opts[i] = Bag.Next();
+                }
+                Agent = new RandomAgent4(scoring);
+
                 if (withPrint) PrintStateSingle();
 
+
+
+                for (int i = 0; i < 22; i++)
+                {
+                    MakeTestMove(Agent);
+
+                    if (withPrint) PrintStateSingle();
+
+                }
+
+                PrintStats(Agent);
+                sum += Agent.board._scoreCounter.GetScore();
             }
 
-            PrintStats(Player);
+            Console.WriteLine(" Mean: " + (sum / 50));
         }
 
         // ----------------------------------------------- GET COMMAND ------------------------------------------------------------
@@ -134,9 +168,21 @@ namespace Calico
             Opts[next] = Bag.Next();
         }
 
+        private void MakeTestMove(Player p)
+        {
+
+            int next = p.ChooseGamePiece(Opts) - 1;
+
+            (int row, int col) = p.ChoosePosition(Opts[next]);
+
+            p.MakeMove(Opts[next], row - 1, col - 1);
+
+            Opts[next] = Bag.Next();
+        }
 
 
-// ----------------------------------------------- PRINT ------------------------------------------------------------------
+
+        // ----------------------------------------------- PRINT ------------------------------------------------------------------
 
         private void PrintStateSingle()
         {

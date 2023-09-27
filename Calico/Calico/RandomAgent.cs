@@ -47,7 +47,7 @@ namespace Calico
             return random.Next(1, Opts.Length);
         }
 
-        public (int, int) ChoosePosition(GamePiece gp)
+        public override (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1;i<board.size-1;i++)
             {
@@ -85,7 +85,7 @@ namespace Calico
             return random.Next(1, Opts.Length);
         }
 
-        public (int, int) ChoosePosition(GamePiece gp)
+        public override (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1; i < board.size - 1; i++)
             {
@@ -124,7 +124,7 @@ namespace Calico
             return random.Next(1, Opts.Length);
         }
 
-        public (int, int) ChoosePosition(GamePiece gp)
+        public override (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1; i < board.size - 1; i++)
             {
