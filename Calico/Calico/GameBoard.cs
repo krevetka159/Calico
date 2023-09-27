@@ -14,19 +14,12 @@ namespace Calico
         private static GamePiece empty = new GamePiece(Type.Empty);
         private static GamePiece blocked = new GamePiece(Type.Blocked);
         public int size = 7;
-        private UnionFindWithArray<GamePiece> colorClusters;
-        private int _colorClusterSize = 3;
-        private UnionFindWithArray<GamePiece> patternClusters;
-        private Dictionary<Pattern, int> _patternClusterSizes;
 
         public ScoreCounter _scoreCounter;
 
         public GameBoard(Scoring scoring)
         {
             random = new Random();
-
-            colorClusters = new UnionFindWithArray<GamePiece>();
-            patternClusters = new UnionFindWithArray<GamePiece>();
 
             _scoreCounter = new ScoreCounter(scoring);
 
