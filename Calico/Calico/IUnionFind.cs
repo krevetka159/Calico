@@ -53,19 +53,19 @@ namespace Calico
             return cnt;
         }
 
-        //public int CountScore(int xCluster)
-        //{
-        //    int cnt = 0;
-        //    foreach ((T z, int zCluster) in _clusters)
-        //    {
-        //        if (zCluster == xCluster)
-        //        {
-        //            cnt++;
-        //        }
-        //    }
+        public int CountScore(int xCluster)
+        {
+            int cnt = 0;
+            foreach ((T z, int zCluster) in _clusters)
+            {
+                if (zCluster == xCluster)
+                {
+                    cnt++;
+                }
+            }
 
-        //    return cnt;
-        //}
+            return cnt;
+        }
         //public int Score()
         //{
         //    return _score;
@@ -93,6 +93,11 @@ namespace Calico
             //_score += CountScore(xCluster);
         }
 
+        public int GetCluster(T x)
+        {
+            return _clusters[x];
+        }
+
         public override string ToString()
         {
             StringBuilder sb = new();
@@ -103,6 +108,8 @@ namespace Calico
             }
             return sb.ToString();
         }
+
+
     }
 
 

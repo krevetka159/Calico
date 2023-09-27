@@ -17,6 +17,7 @@ namespace Calico
 
         public ScoreCounter _scoreCounter;
 
+// ----------------------------------------------- INIT ------------------------------------------------------------
         public GameBoard(Scoring scoring)
         {
             random = new Random();
@@ -78,16 +79,38 @@ namespace Calico
             CornerUF();
 
         }
+        public void CornerUF()
+        {
+            for (int row = 0; row < size; row++)
+            {
+                if (row == 0 || row == size - 1)
+                {
+                    for (int col = 0; col < size; col++)
+                    {
+                        _scoreCounter.AddToUF(board[row][col]);
+
+                    }
+                }
+                else
+                {
+                    _scoreCounter.AddToUF(board[row][0]);
+
+                    _scoreCounter.AddToUF(board[row][size - 1]);
+                }
+            }
+        }
+
+// ----------------------------------------------- ADD PIECE ------------------------------------------------------------
 
         public void AddPiece(GamePiece piece, int x, int y)
         {
             board[x][y] = piece;
             _scoreCounter.AddToUF(piece);
-            CheckNeighbors(piece, x, y);
+            UnionWithNeighbors(piece, x, y);
             
         }
 
-        public void CheckNeighbors(GamePiece piece,int row, int col)
+        public void UnionWithNeighbors(GamePiece piece,int row, int col)
         {
             List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
 
@@ -101,26 +124,104 @@ namespace Calico
             }
         }
 
-        public void CornerUF()
+// ----------------------------------------------- CHECK FOR SIMILAR NEIGHBORS ------------------------------------------------------------
+
+        public bool CheckNeighbors(Color color, int row, int col)
         {
-            for (int row = 0; row < size; row++) 
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+
+            foreach ((int r, int c) in neighbors)
             {
-                if (row == 0 ||  row == size - 1)
+                if (board[r][c].Color == color)
                 {
-                    for (int col = 0; col < size; col++)
-                    {
-                        _scoreCounter.AddToUF(board[row][col]);
-
-                    }
-                }
-                else
-                {
-                    _scoreCounter.AddToUF(board[row][0]);
-
-                    _scoreCounter.AddToUF(board[row][size-1]);
+                    return true;
                 }
             }
+
+            return false;
         }
+        public bool CheckNeighbors(Pattern pattern, int row, int col)
+        {
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+
+            foreach ((int r, int c) in neighbors)
+            {
+                if (board[r][c].Pattern == pattern)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool CheckNeighbors(GamePiece gp, int row, int col)
+        {
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+
+            foreach ((int r, int c) in neighbors)
+            {
+                if (board[r][c].Color == gp.Color || board[r][c].Pattern == gp.Pattern)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+// ----------------------------------------------- COUNT SIMILAR NEIGHBORS -----------------------------------------------------
+
+        public int EvaluateNeighbors(Color color, int row, int col)
+        {
+            int sum = 0;
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+
+            foreach ((int r, int c) in neighbors)
+            {
+                if (board[r][c].Color == color)
+                {
+                    sum++;
+                    
+                }
+            }
+
+            return sum;
+        }
+        public int EvaluateNeighbors(Pattern pattern, int row, int col)
+        {
+            int sum = 0;
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+
+            foreach ((int r, int c) in neighbors)
+            {
+                if (board[r][c].Pattern == pattern)
+                {
+                    sum++;
+                }
+            }
+
+            return sum;
+        }
+
+        public int EvaluateNeighbors(GamePiece gp, int row, int col)
+        {
+            int sum = 0;
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+
+            foreach ((int r, int c) in neighbors)
+            {
+                if (board[r][c].Color == gp.Color || board[r][c].Pattern == gp.Pattern)
+                {
+                    sum++;  
+                }
+            }
+
+            return sum;
+        }
+
+
+ // ----------------------------------------------- PRINT ------------------------------------------------------------
 
         public void PrintBoard()
         {
@@ -143,6 +244,7 @@ namespace Calico
 
         }
 
+// ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
         public bool IsEmpty(int row, int col)
         {
             return (board[row][col].Type == Type.Empty);
