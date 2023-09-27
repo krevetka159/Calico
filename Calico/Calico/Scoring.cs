@@ -16,6 +16,8 @@ namespace Calico
         public int _colorClusterSize = 3;
         public Dictionary<Pattern, int> _patternClusterSizes;
 
+        public StringBuilder patternScoring;
+
         public Scoring() 
         {
             random = new Random();
@@ -37,24 +39,31 @@ namespace Calico
             _patternClusterScores = new Dictionary<Pattern, int>();
             _patternClusterSizes = new Dictionary<Pattern, int>();
 
+            patternScoring = new StringBuilder();
+
             foreach ((int size, int score) in patternProps)
             {
+                patternScoring.Append(size + " : ");
                 for (int i = 0; i < 2; i++)
                 {
                     int randInt = random.Next(patterns.Count);
                     _patternClusterSizes[patterns[randInt]] = size;
                     _patternClusterScores[patterns[randInt]] = score;
 
-                    Console.WriteLine(patterns[randInt]);
+                    patternScoring.Append(patterns[randInt]);
+                    patternScoring.Append(", ");
+                    //Console.WriteLine(patterns[randInt]);
                     patterns.RemoveAt(randInt);
                 }
             }
 
-            foreach ((Pattern p, int size) in _patternClusterSizes)
-            {
-                Console.WriteLine(p);
-                Console.WriteLine(size);
-            }
+            //foreach ((Pattern p, int size) in _patternClusterSizes)
+            //{
+            //    Console.WriteLine(p);
+            //    Console.WriteLine(size);
+            //}
+
+
 
         }
     }

@@ -21,8 +21,10 @@ namespace Calico
         public Game(int mode) 
         { 
             Bag = new Bag();
-            Scoring scoring = new Scoring();
-            
+
+            scoring = new Scoring();
+            Console.WriteLine(scoring.patternScoring);
+
             for (int i = 0; i < 3; i++)
             {
                 Opts[i] = Bag.Next();
@@ -108,7 +110,8 @@ namespace Calico
 
             Console.WriteLine();
 
-            // přehled kočiček
+            // TODO proč to kurva nefunguje >:(
+            //Console.WriteLine(scoring.patternScoring);
 
             Console.WriteLine("Skóre: " + Player.board._scoreCounter.GetScore());
             Player.board.PrintBoard();
@@ -128,14 +131,14 @@ namespace Calico
             Console.WriteLine("");
             Console.WriteLine();
 
-            // přehled kočiček
+            Console.WriteLine(scoring.patternScoring);
 
             //Console.WriteLine("Hráč skóre: " + Player.board._scoreCounter.GetScore());
             //Player.board.PrintBoard();
             //Console.WriteLine("Agent skóre: " + Player.board._scoreCounter.GetScore());
             //Agent.board.PrintBoard();
 
-           
+
             Console.WriteLine("      1    2    3    4    5    6    7" + "        " + "      1    2    3    4    5    6    7");
             Console.WriteLine("   ------------------------------------" + "        " + "   ------------------------------------");
             for (int i = 0; i < Player.board.size; i++)
