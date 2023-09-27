@@ -9,63 +9,23 @@ namespace Calico
 {
     public class ScoreCounter
     {
-        //private int _colorClusterScore = 3;
-        //private Dictionary<Pattern, int> _patternClusterScores;
         public int _score;
 
-        //private int _colorClusterSize = 3;
-        //private Dictionary<Pattern, int> _patternClusterSizes;
 
         private UnionFindWithArray<GamePiece> _colorUF;
         private UnionFindWithArray<GamePiece> _patternUF;
 
-        private Random random;
 
         private Scoring _scoring;
 
         public ScoreCounter(Scoring scoring) 
         {
-            //random = new Random();
+            
             _score = 0;
             _scoring = scoring;
             _colorUF = new UnionFindWithArray<GamePiece>();
             _patternUF = new UnionFindWithArray<GamePiece>();
 
-            //List<(int,int)> patternProps = new List<(int, int)>() { (3,3),(4,5),(5,7)};
-
-            //// randomly rozdělit patterny na clustersizes a bodíky
-
-            //List<Pattern> patterns = new List<Pattern>();
-
-            //foreach (Pattern i in Enum.GetValues(typeof(Pattern)))
-            //{
-            //   if(i != Pattern.None)
-            //    {
-            //        patterns.Add(i);
-            //    }
-            //}
-
-            //_patternClusterScores = new Dictionary<Pattern, int>();
-            //_patternClusterSizes = new Dictionary<Pattern, int>();
-
-            //foreach ((int size, int score) in patternProps)
-            //{
-            //    for (int i = 0;  i < 2; i++)
-            //    {
-            //        int randInt = random.Next(patterns.Count);
-            //        _patternClusterSizes[patterns[randInt]] = size;
-            //        _patternClusterScores[patterns[randInt]] = score;
-
-            //        Console.WriteLine(patterns[randInt]);
-            //        patterns.RemoveAt(randInt);
-            //    }
-            //}
-
-            //foreach((Pattern p, int size) in _patternClusterSizes)
-            //{
-            //    Console.WriteLine(p);
-            //    Console.WriteLine(size);
-            //}
         }
 
         public void AddToUF(GamePiece piece)
