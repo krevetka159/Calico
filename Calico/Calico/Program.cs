@@ -25,7 +25,7 @@ namespace Calico
                 while (true)
                 {
                     Console.WriteLine();
-                    Console.Write("Start a new game (y/n): ");
+                    Console.Write(" Start a new game (y/n): ");
                     newGame = Console.ReadLine();
 
                     if (newGame == "n")
@@ -36,7 +36,7 @@ namespace Calico
                     else if (newGame == "y") { break; }
                     else
                     {
-                        Console.WriteLine("Neplatný výraz");
+                        Console.WriteLine(" Neplatný výraz");
                     }
                 }
             
@@ -52,12 +52,12 @@ namespace Calico
             {
                 try
                 {
-                    Console.WriteLine("Mode options: ");
+                    Console.WriteLine(" Mode options: ");
                     Console.WriteLine("   1. Single player");
                     Console.WriteLine("   2. 2 players (vs. computer)");
                     Console.WriteLine("   3. Agent testing");
 
-                    Console.Write("Choose game mode: ");
+                    Console.Write(" Choose game mode: ");
 
                     numOfPlayers = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine();
@@ -80,7 +80,7 @@ namespace Calico
                         
                         default:
                             {
-                                Console.WriteLine( numOfPlayers + " is not a mode option");
+                                Console.WriteLine(" " + numOfPlayers + " is not a mode option");
                                 break;
                             }
                     }
@@ -90,7 +90,7 @@ namespace Calico
                 }
                 catch
                 {
-                    Console.WriteLine("Number of players must be an integer.");
+                    Console.WriteLine(" Number of players must be an integer.");
                 }
             }
 
