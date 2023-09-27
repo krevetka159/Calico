@@ -43,18 +43,19 @@ namespace Calico
 
             foreach ((int size, int score) in patternProps)
             {
-                patternScoring.Append(size + " : ");
+                patternScoring.Append(" " + size + " : ");
                 for (int i = 0; i < 2; i++)
                 {
                     int randInt = random.Next(patterns.Count);
                     _patternClusterSizes[patterns[randInt]] = size;
                     _patternClusterScores[patterns[randInt]] = score;
 
-                    patternScoring.Append(patterns[randInt]);
+                    patternScoring.Append((char)(64+(int)patterns[randInt]));
                     patternScoring.Append(", ");
                     //Console.WriteLine(patterns[randInt]);
                     patterns.RemoveAt(randInt);
                 }
+                patternScoring.Append("\n");
             }
 
             //foreach ((Pattern p, int size) in _patternClusterSizes)

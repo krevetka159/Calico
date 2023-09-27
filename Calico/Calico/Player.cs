@@ -31,7 +31,7 @@ namespace Calico
             {
                 try
                 {
-                    Console.Write("Choose gamepiece to add: ");
+                    Console.Write(" Choose gamepiece to add: ");
                     gamepiece = Convert.ToInt32(Console.ReadLine());
                     switch (gamepiece)
                     {
@@ -40,14 +40,14 @@ namespace Calico
                         case 3: return 3;
                         default:
                             {
-                                Console.WriteLine("Choose of of the three pieces (1/2/3).");
+                                Console.WriteLine(" Choose of of the three pieces (1/2/3).");
                                 break;
                             }
                     }
                 }
                 catch
                 {
-                    Console.WriteLine("Choose of of the three pieces (1/2/3).");
+                    Console.WriteLine(" Choose of of the three pieces (1/2/3).");
                 }
             }
         }
@@ -62,18 +62,18 @@ namespace Calico
                 {
                     try
                     {
-                        Console.Write("Choose row: ");
+                        Console.Write(" Choose row: ");
                         row = Convert.ToInt32(Console.ReadLine());
 
                         if (1 <= row && row <= board.size)
                         {
                             break;
                         }
-                        Console.WriteLine("Row must be an integer between 1 and 7");
+                        Console.WriteLine(" Row must be an integer between 1 and 7");
                     }
                     catch
                     {
-                        Console.WriteLine("Row must be an integer");
+                        Console.WriteLine(" Row must be an integer");
                     }
                 }
 
@@ -81,18 +81,18 @@ namespace Calico
                 {
                     try
                     {
-                        Console.Write("Choose column: ");
+                        Console.Write(" Choose column: ");
                         col = Convert.ToInt32(Console.ReadLine());
 
                         if (1 <= col && col <= board.size)
                         {
                             break;
                         }
-                        Console.WriteLine("Column must be an integer between 1 and 7");
+                        Console.WriteLine(" Column must be an integer between 1 and 7");
                     }
                     catch
                     {
-                        Console.WriteLine("Column must be an integer");
+                        Console.WriteLine(" Column must be an integer");
                     }
                 }
 

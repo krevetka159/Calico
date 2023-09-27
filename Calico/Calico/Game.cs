@@ -23,16 +23,36 @@ namespace Calico
             Bag = new Bag();
 
             scoring = new Scoring();
-            Console.WriteLine(scoring.patternScoring);
 
             for (int i = 0; i < 3; i++)
             {
                 Opts[i] = Bag.Next();
             }
             
+            switch (mode)
+            {
+                case 1:
+                    {
+                        SinglePlayer();
+                        break;
+                    }
+                case 2:
+                    {
+                        MultiPlayer();
+                        break;
+                    }
+                case 3:
+                    {
+                        TestGame(false);
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
 
-            if (mode == 1) { SinglePlayer(); }
-            else { MultiPlayer(); }
+            
         }
 
 // ----------------------------------------------- SINGLEPLAYER ------------------------------------------------------------
@@ -41,13 +61,13 @@ namespace Calico
             Player = new Player(scoring);
 
             //print empty
-            PrintState();
+            PrintStateSingle();
 
             for (int i = 0; i < 22; i++)
             {
                 MakeMove(Player);
                 // update points
-                PrintState();
+                PrintStateSingle();
                 
             }
 
@@ -66,8 +86,8 @@ namespace Calico
             for (int i = 0; i < 22; i++)
             {
                 MakeMove(Player);
-                // update points
-                PrintState();
+                
+                PrintStateMulti();
 
                 MakeMove(Agent);
                 PrintStateMulti();
@@ -78,8 +98,28 @@ namespace Calico
             PrintStats(Agent);
         }
 
+        // ----------------------------------------------- TESTING ------------------------------------------------------------
 
-// ----------------------------------------------- GET COMMAND ------------------------------------------------------------
+        public void TestGame(bool withPrint)
+        {
+            Player = new RandomAgent(scoring);
+
+            if (withPrint) PrintStateSingle();
+            
+            
+
+            for (int i = 0; i < 22; i++)
+            {
+                MakeMove(Player);
+                
+                if (withPrint) PrintStateSingle();
+
+            }
+
+            PrintStats(Player);
+        }
+
+        // ----------------------------------------------- GET COMMAND ------------------------------------------------------------
 
 
         private void MakeMove(Player p)
@@ -98,22 +138,23 @@ namespace Calico
 
 // ----------------------------------------------- PRINT ------------------------------------------------------------------
 
-        private void PrintState()
+        private void PrintStateSingle()
         {
             Console.WriteLine();
             
-            Console.Write("Dílky k použití: ");
+            Console.Write(" Dílky k použití: ");
             for (int i = 0; i < 3; i++)
             {
                 Console.Write($" {i + 1}: |{Opts[i].Print}| ");
             }
 
             Console.WriteLine();
+            Console.WriteLine();
 
-            // TODO proč to kurva nefunguje >:(
-            //Console.WriteLine(scoring.patternScoring);
+            Console.WriteLine(scoring.patternScoring);
 
-            Console.WriteLine("Skóre: " + Player.board._scoreCounter.GetScore());
+            Console.WriteLine(" Skóre: " + Player.board._scoreCounter.GetScore());
+            Console.WriteLine();
             Player.board.PrintBoard();
             Console.WriteLine();
         }
@@ -122,29 +163,29 @@ namespace Calico
         {
             Console.WriteLine();
 
-            Console.Write("Dílky k použití: ");
+            Console.Write(" Dílky k použití: ");
             for (int i = 0; i < 3; i++)
             {
                 Console.Write($" {i + 1}: |{Opts[i].Print}| ");
             }
 
             Console.WriteLine("");
-            Console.WriteLine();
+            Console.WriteLine("");
 
             Console.WriteLine(scoring.patternScoring);
 
-            //Console.WriteLine("Hráč skóre: " + Player.board._scoreCounter.GetScore());
-            //Player.board.PrintBoard();
-            //Console.WriteLine("Agent skóre: " + Player.board._scoreCounter.GetScore());
-            //Agent.board.PrintBoard();
+            Console.WriteLine(" Hráč skóre: " + Player.board._scoreCounter.GetScore());
+            Player.board.PrintBoard();
+            Console.WriteLine(" Agent skóre: " + Player.board._scoreCounter.GetScore());
+            Agent.board.PrintBoard();
 
 
-            Console.WriteLine("      1    2    3    4    5    6    7" + "        " + "      1    2    3    4    5    6    7");
-            Console.WriteLine("   ------------------------------------" + "        " + "   ------------------------------------");
+            Console.WriteLine("       1    2    3    4    5    6    7" + "        " + "      1    2    3    4    5    6    7");
+            Console.WriteLine("    ------------------------------------" + "        " + "   ------------------------------------");
             for (int i = 0; i < Player.board.size; i++)
             {
 
-                Console.Write(i + 1);
+                Console.Write(" " + (i + 1));
                 if (i % 2 == 0) Console.Write("  ");
                 Console.Write(" |");
                 for (int j = 0; j < Player.board.size; j++)
@@ -162,7 +203,7 @@ namespace Calico
                     Console.Write($"{p.Print}|");
                 }
                 Console.Write("\n");
-                Console.WriteLine("   ------------------------------------" + "        " + "   ------------------------------------");
+                Console.WriteLine("    ------------------------------------" + "        " + "   ------------------------------------");
             }
 
             
@@ -174,7 +215,7 @@ namespace Calico
         private void PrintStats(Player p)
         {
             // finální výsledky
-            Console.WriteLine("Finální skóre: " + p.board._scoreCounter.GetScore());
+            Console.WriteLine(" Finální skóre: " + p.board._scoreCounter.GetScore());
         }
     }
 }

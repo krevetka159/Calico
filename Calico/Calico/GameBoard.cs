@@ -131,12 +131,12 @@ namespace Calico
 
         public void PrintBoard()
         {
-            Console.WriteLine("      1    2    3    4    5    6    7");
-            Console.WriteLine("   ------------------------------------");
+            Console.WriteLine("       1    2    3    4    5    6    7");
+            Console.WriteLine("    ------------------------------------");
             for (int i = 0; i < size; i++) 
             {
 
-                Console.Write(i+1);
+                Console.Write(" " + (i+1));
                 if (i % 2 == 0) Console.Write("  ");
                 Console.Write(" |");
                 for (int j = 0; j < size; j++)
@@ -145,7 +145,7 @@ namespace Calico
                     Console.Write($"{p.Print}|");
                 }
                 Console.Write("\n");
-                Console.WriteLine("   ------------------------------------");
+                Console.WriteLine("    ------------------------------------");
             }
 
         }
