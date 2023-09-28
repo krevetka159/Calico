@@ -96,7 +96,7 @@ namespace Calico
 
                 if (board.IsEmpty(row - 1, col - 1))
                 {
-                    return (row, col);
+                    return (row - 1, col - 1);
                 }
             }
 

@@ -290,7 +290,7 @@ namespace Calico
             
             (int row, int col) = p.ChoosePosition();
 
-            p.MakeMove(Opts[next], row-1, col-1);
+            p.MakeMove(Opts[next], row, col);
 
             Opts[next] = Bag.Next();
         }
@@ -300,7 +300,7 @@ namespace Calico
 
             (int next, (int row, int col)) = p.ChooseNextMove(Opts);
 
-            p.MakeMove(Opts[next], row - 1, col - 1);
+            p.MakeMove(Opts[next], row, col);
 
             Opts[next] = Bag.Next();
         }

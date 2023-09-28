@@ -32,7 +32,7 @@ namespace Calico
                 col = random.Next(0, board.size - 1);
             }
 
-            return (row +1, col +1);
+            return (row, col);
         }
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
@@ -56,9 +56,9 @@ namespace Calico
             for (int i = 0; i < Opts.Length; i++)
             {
                 
-                    if (board.EvaluateNeighbors(Opts[i], x - 1, y - 1) > max)
+                    if (board.EvaluateNeighbors(Opts[i], x, y) > max)
                     {
-                        max = board.EvaluateNeighbors(Opts[i], x - 1, y - 1);
+                        max = board.EvaluateNeighbors(Opts[i], x, y);
                         opt = i;
                     }
                 
@@ -77,11 +77,11 @@ namespace Calico
 
             for (int i = 0;i<Opts.Length; i++)
             {
-                if (board.IsEmpty(x - 1, y - 1))
+                if (board.IsEmpty(x, y))
                 {
-                    if (board.EvaluateNeighbors(Opts[i], x - 1, y - 1) > max)
+                    if (board.EvaluateNeighbors(Opts[i], x, y) > max)
                     {
-                        max = board.EvaluateNeighbors(Opts[i], x - 1, y - 1);
+                        max = board.EvaluateNeighbors(Opts[i], x, y);
                         opt = i;
                     }
                 }
@@ -112,7 +112,7 @@ namespace Calico
                     {
                         if (board.CheckNeighbors(gp.Color, i, j))
                         {
-                            return (i + 1, j + 1);
+                            return (i, j);
                         }
                     }
                     
@@ -146,7 +146,7 @@ namespace Calico
                     {
                         if (board.CheckNeighbors(gp.Pattern, i, j))
                         {
-                            return (i + 1, j + 1);
+                            return (i, j);
                         }
                     }
                     
@@ -181,7 +181,7 @@ namespace Calico
                     {
                         if (board.CheckNeighbors(gp, i, j))
                         {
-                            return (i + 1, j + 1);
+                            return (i, j);
                         }
                     }
                     
@@ -229,7 +229,7 @@ namespace Calico
                             {
                                 maxPieceIndex = o;
                                 max = board.EvaluateNeighborsColor(gp, i, j);
-                                maxPosition = (i + 1, j + 1);
+                                maxPosition = (i, j);
                             }
                         }
                         
@@ -248,7 +248,7 @@ namespace Calico
                 col = random.Next(0, board.size - 1);
             }
 
-            return (maxPieceIndex,(row + 1, col + 1));
+            return (maxPieceIndex,(row, col));
             
         }
     }
@@ -279,7 +279,7 @@ namespace Calico
                             {
                                 maxPieceIndex = o;
                                 max = board.EvaluateNeighborsPattern(gp, i, j);
-                                maxPosition = (i + 1, j + 1);
+                                maxPosition = (i, j);
                             }
 
                         }
@@ -299,7 +299,7 @@ namespace Calico
                 col = random.Next(0, board.size - 1);
             }
 
-            return (maxPieceIndex, (row + 1, col + 1));
+            return (maxPieceIndex, (row, col));
 
         }
     }
@@ -331,7 +331,7 @@ namespace Calico
                             {
                                 maxPieceIndex = o;
                                 max = board.EvaluateNeighbors(gp, i, j);
-                                maxPosition = (i + 1, j + 1);
+                                maxPosition = (i, j);
                             }
                         }
                         
@@ -350,7 +350,7 @@ namespace Calico
                 col = random.Next(0, board.size - 1);
             }
 
-            return (maxPieceIndex, (row + 1, col + 1));
+            return (maxPieceIndex, (row, col));
 
         }
     }
