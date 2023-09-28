@@ -8,11 +8,11 @@ namespace Calico
 {
 // ----------------------------------------------- RANDOM AGENT ------------------------------------------------------------
 
-    public class RandomAgent : Player
+    public class Agent : Player
     {
         Random random = new Random();
 
-        public RandomAgent(Scoring scoring) : base(scoring)
+        public Agent(Scoring scoring) : base(scoring)
         {
         }
 
@@ -41,7 +41,7 @@ namespace Calico
         }
     }
 
-    public class RandomAgent2 : RandomAgent
+    public class RandomAgent2 : Agent
     {
 
         public RandomAgent2(Scoring scoring) : base(scoring)
@@ -95,7 +95,7 @@ namespace Calico
 
     // ----------------------------------------------- FIND NEIGHBOR ------------------------------------------------------------
 
-    public class RandomAgentColor : RandomAgent
+    public class RandomAgentColor : Agent
     {
 
         public RandomAgentColor(Scoring scoring) : base(scoring)
@@ -129,7 +129,7 @@ namespace Calico
             return (RandomGamePiece(Opts), ChoosePosition(Opts[opt]));
         }
     }
-    public class RandomAgentPattern : RandomAgent
+    public class RandomAgentPattern : Agent
     {
 
         public RandomAgentPattern(Scoring scoring) : base(scoring)
@@ -164,7 +164,7 @@ namespace Calico
         }
     }
 
-    public class RandomAgentComplet : RandomAgent
+    public class RandomAgentComplet : Agent
     {
         public RandomAgentComplet(Scoring scoring) : base(scoring)
         {
@@ -202,7 +202,7 @@ namespace Calico
 
 // ----------------------------------------------- FIND LARGEST SCORE CHANGE ------------------------------------------------------------
 
-    public class AgentColor : RandomAgent
+    public class AgentColor : Agent
     {
         Random random = new Random();
 
@@ -252,7 +252,7 @@ namespace Calico
             
         }
     }
-    public class AgentPattern : RandomAgent
+    public class AgentPattern : Agent
     {
         Random random = new Random();
 
@@ -304,7 +304,7 @@ namespace Calico
         }
     }
 
-    public class AgentComplet : RandomAgent
+    public class AgentComplet : Agent
     {
         Random random = new Random();
 

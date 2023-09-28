@@ -194,7 +194,7 @@ namespace Calico
                 {
                     case 1:
                         {
-                            Agent = new RandomAgent(scoring);
+                            Agent = new Agent(scoring);
                             break;
                         }
                     case 2:
