@@ -98,6 +98,10 @@ namespace Calico
                 {
                     return (row - 1, col - 1);
                 }
+                else
+                {
+                    Console.WriteLine(" This position is occupied, choose another");
+                }
             }
 
         }

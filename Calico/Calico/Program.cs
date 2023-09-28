@@ -36,7 +36,7 @@ namespace Calico
                     else if (newGame == "y") { break; }
                     else
                     {
-                        Console.WriteLine(" Neplatný výraz");
+                        Console.WriteLine(" Invalid expression");
                     }
                 }
             

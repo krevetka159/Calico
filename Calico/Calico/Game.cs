@@ -158,7 +158,7 @@ namespace Calico
                             }
                             else
                             {
-                                Console.WriteLine(" Neplatný výraz");
+                                Console.WriteLine(" Invalid expression");
                             }
                         }
                         break;
@@ -314,7 +314,7 @@ namespace Calico
         {
             Console.WriteLine();
             
-            Console.Write(" Dílky k použití: ");
+            Console.Write(" Patch tiles to use: ");
             for (int i = 0; i < 3; i++)
             {
                 Console.Write($" {i + 1}: |{Opts[i].Print}| ");
@@ -325,7 +325,7 @@ namespace Calico
 
             Console.WriteLine(scoring.patternScoring);
 
-            Console.WriteLine(" Skóre: " + p.Board.ScoreCounter.GetScore());
+            Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
             Console.WriteLine();
             p.Board.PrintBoard();
             Console.WriteLine();
@@ -335,7 +335,7 @@ namespace Calico
         {
             Console.WriteLine();
 
-            Console.Write(" Dílky k použití: ");
+            Console.Write(" Patch tiles to use: ");
             for (int i = 0; i < 3; i++)
             {
                 Console.Write($" {i + 1}: |{Opts[i].Print}| ");
@@ -346,9 +346,9 @@ namespace Calico
 
             Console.WriteLine(scoring.patternScoring);
 
-            Console.WriteLine(" Hráč skóre: " + Player.Board.ScoreCounter.GetScore());
+            Console.WriteLine(" Player score: " + Player.Board.ScoreCounter.GetScore());
             
-            Console.WriteLine(" Agent skóre: " + Agent.Board.ScoreCounter.GetScore());
+            Console.WriteLine(" Agent score: " + Agent.Board.ScoreCounter.GetScore());
 
             Console.WriteLine();
             Console.WriteLine("                   Player                                        Agent");
@@ -388,7 +388,7 @@ namespace Calico
         private void PrintStats(Player p)
         {
             // finální výsledky
-            Console.WriteLine(" Finální skóre: " + p.Board.ScoreCounter.GetScore());
+            Console.WriteLine(" Final score: " + p.Board.ScoreCounter.GetScore());
         }
     }
 }
