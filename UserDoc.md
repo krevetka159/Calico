@@ -26,6 +26,10 @@ Možnosti dílků k přiložení jsou pro hráče i agenta stejné.
 Pro spuštění a ovládání hry postupujte podle instrukcí v konzoli.
 Všechny instrukce zadávejte ve formě celých čísel, (popř "y"/"n", pokud vás o to instrukce žádá).
 
+Barvy jsou kódovány čísly 1-6, vzory velkými písmeny A-F.
+Prázdná políčka jsou označena "--".
+Políčka označená "XX" jsou blokovaná a nelze je obsadit.
+
 ## Pravidla pro získávání bodů
 
 Za každou trojici sousedících stejnobarevných dílků hráč získává 3 body.
@@ -34,3 +38,4 @@ Vzory jsou náhodně rozděleny do 3 dvojic s následujícím bodováním:
 1. Sousedící trojice se stejným vzorem = 3 body
 2. Sousedící čtveřice se stejným vzorem = 5 bodů
 3. Sousedící pětice se stejným vzorem = 7 bodů
+(v rámci stavu hry se do konzole tiskne i které vzory odpovídají jak velkým clusterům)
