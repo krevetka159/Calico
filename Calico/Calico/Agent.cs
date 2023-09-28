@@ -10,6 +10,8 @@ namespace Calico
 
     public class Agent : Player
     {
+        // basic random agent
+
         public Random random = new Random();
 
         public Agent(Scoring scoring) : base(scoring)
@@ -43,7 +45,7 @@ namespace Calico
 
     public class RandomPositionAgent : Agent
     {
-
+        // random position, then looks for best possible patch tile
         public RandomPositionAgent(Scoring scoring) : base(scoring)
         {
         }
@@ -76,7 +78,7 @@ namespace Calico
 
     public class RandomAgentColor : Agent
     {
-
+        // random path tile, finds firt position with same color neighbor
         public RandomAgentColor(Scoring scoring) : base(scoring)
         {
         }
@@ -110,7 +112,7 @@ namespace Calico
     }
     public class RandomAgentPattern : Agent
     {
-
+        // random path tile, finds firt position with same pattern neighbor
         public RandomAgentPattern(Scoring scoring) : base(scoring)
         {
         }
@@ -145,6 +147,7 @@ namespace Calico
 
     public class RandomAgentComplet : Agent
     {
+        // random path tile, finds firt position with same color or pattern neighbor
         public RandomAgentComplet(Scoring scoring) : base(scoring)
         {
         }
@@ -183,7 +186,8 @@ namespace Calico
 
     public class AgentColor : Agent
     {
-
+        // picks pathtile and position that increases color score the most
+        // -> first that does or first neighbor if it can't increase score
         public AgentColor(Scoring scoring) : base(scoring)
         {
         }
@@ -221,7 +225,8 @@ namespace Calico
     }
     public class AgentPattern : Agent
     {
-
+        // picks pathtile and position that increases pattern score the most
+        // -> first that does or first neighbor if it can't increase score
         public AgentPattern(Scoring scoring) : base(scoring)
         {
         }
@@ -261,7 +266,8 @@ namespace Calico
 
     public class AgentComplet : Agent
     {
-
+        // picks pathtile and position that increases score the most
+        // -> first that does or first neighbor if it can't increase score
         public AgentComplet(Scoring scoring) : base(scoring)
         {
         }
@@ -299,6 +305,9 @@ namespace Calico
 
         public class AgentCompletWithProb : Agent
         {
+            // picks pathtile and position that increases score the most
+            // -> first that does or first neighbor if it can't increase score
+            // with a small probability make random move
 
             public AgentCompletWithProb(Scoring scoring) : base(scoring)
             {
