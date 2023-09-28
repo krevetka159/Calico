@@ -252,7 +252,7 @@ namespace Calico
                 }
 
                 if(allResults) PrintStats(Agent);
-                sum += Agent.board._scoreCounter.GetScore();
+                sum += Agent.Board.ScoreCounter.GetScore();
             }
             Console.WriteLine();
             if (iterations > 1) Console.WriteLine(" Mean: " + (sum / iterations));
@@ -324,9 +324,9 @@ namespace Calico
 
             Console.WriteLine(scoring.patternScoring);
 
-            Console.WriteLine(" Skóre: " + p.board._scoreCounter.GetScore());
+            Console.WriteLine(" Skóre: " + p.Board.ScoreCounter.GetScore());
             Console.WriteLine();
-            p.board.PrintBoard();
+            p.Board.PrintBoard();
             Console.WriteLine();
         }
 
@@ -345,33 +345,33 @@ namespace Calico
 
             Console.WriteLine(scoring.patternScoring);
 
-            Console.WriteLine(" Hráč skóre: " + Player.board._scoreCounter.GetScore());
+            Console.WriteLine(" Hráč skóre: " + Player.Board.ScoreCounter.GetScore());
             
-            Console.WriteLine(" Agent skóre: " + Agent.board._scoreCounter.GetScore());
+            Console.WriteLine(" Agent skóre: " + Agent.Board.ScoreCounter.GetScore());
 
             Console.WriteLine();
             Console.WriteLine("                   Player                                        Agent");
 
             Console.WriteLine("       1    2    3    4    5    6    7" + "        " + "      1    2    3    4    5    6    7");
             Console.WriteLine("    ------------------------------------" + "        " + "   ------------------------------------");
-            for (int i = 0; i < Player.board.size; i++)
+            for (int i = 0; i < Player.Board.Size; i++)
             {
 
                 Console.Write(" " + (i + 1));
                 if (i % 2 == 0) Console.Write("  ");
                 Console.Write(" |");
-                for (int j = 0; j < Player.board.size; j++)
+                for (int j = 0; j < Player.Board.Size; j++)
                 {
-                    GamePiece p = Player.board.board[i][j];
+                    GamePiece p = Player.Board.board[i][j];
                     Console.Write($"{p.Print}|");
                 }
                 Console.Write("        ");
                 Console.Write(i + 1);
                 if (i % 2 == 0) Console.Write("  ");
                 Console.Write(" |");
-                for (int j = 0; j < Agent.board.size; j++)
+                for (int j = 0; j < Agent.Board.Size; j++)
                 {
-                    GamePiece p = Agent.board.board[i][j];
+                    GamePiece p = Agent.Board.board[i][j];
                     Console.Write($"{p.Print}|");
                 }
                 Console.Write("\n");
@@ -387,7 +387,7 @@ namespace Calico
         private void PrintStats(Player p)
         {
             // finální výsledky
-            Console.WriteLine(" Finální skóre: " + p.board._scoreCounter.GetScore());
+            Console.WriteLine(" Finální skóre: " + p.Board.ScoreCounter.GetScore());
         }
     }
 }

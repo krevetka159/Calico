@@ -9,7 +9,7 @@ namespace Calico
     internal class Bag
 
     {
-        private List<GamePiece> Pieces;
+        private List<GamePiece> pieces;
         private Random random;
 
         public static int NumOfPatterns = 6;
@@ -18,23 +18,23 @@ namespace Calico
         public Bag()
         {
             random = new Random();
-            Pieces = new List<GamePiece>();
+            pieces = new List<GamePiece>();
             for (int i = 1; i <= NumOfColors; i++)
             {
                 for (int j = 1; j <= NumOfPatterns; j++)
                 {
-                    Pieces.Add(new GamePiece((Color)i, (Pattern)j));
-                    Pieces.Add(new GamePiece((Color)i, (Pattern)j));
-                    Pieces.Add(new GamePiece((Color)i, (Pattern)j));
+                    pieces.Add(new GamePiece((Color)i, (Pattern)j));
+                    pieces.Add(new GamePiece((Color)i, (Pattern)j));
+                    pieces.Add(new GamePiece((Color)i, (Pattern)j));
                 }
             }
         }
 
         public GamePiece Next()
         {
-            int randInt = random.Next(0, Pieces.Count());
-            GamePiece next = Pieces[randInt];
-            Pieces.RemoveAt(randInt);
+            int randInt = random.Next(0, pieces.Count());
+            GamePiece next = pieces[randInt];
+            pieces.RemoveAt(randInt);
 
             return next;
         }

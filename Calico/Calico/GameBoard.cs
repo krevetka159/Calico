@@ -13,16 +13,16 @@ namespace Calico
         private Random random;
         private static GamePiece empty = new GamePiece(Type.Empty);
         private static GamePiece blocked = new GamePiece(Type.Blocked);
-        public int size = 7;
+        public int Size = 7;
 
-        public ScoreCounter _scoreCounter;
+        public ScoreCounter ScoreCounter { get; private set; }
 
 // ----------------------------------------------- INIT ------------------------------------------------------------
         public GameBoard(Scoring scoring)
         {
             random = new Random();
 
-            _scoreCounter = new ScoreCounter(scoring);
+            ScoreCounter = new ScoreCounter(scoring);
 
             int randId = random.Next(0, 4);
             // generování okrajů boardu podle id - 4 možnosti
@@ -81,21 +81,21 @@ namespace Calico
         }
         public void CornerUF()
         {
-            for (int row = 0; row < size; row++)
+            for (int row = 0; row < Size; row++)
             {
-                if (row == 0 || row == size - 1)
+                if (row == 0 || row == Size - 1)
                 {
-                    for (int col = 0; col < size; col++)
+                    for (int col = 0; col < Size; col++)
                     {
-                        _scoreCounter.AddToUF(board[row][col]);
+                        ScoreCounter.AddToUF(board[row][col]);
 
                     }
                 }
                 else
                 {
-                    _scoreCounter.AddToUF(board[row][0]);
+                    ScoreCounter.AddToUF(board[row][0]);
 
-                    _scoreCounter.AddToUF(board[row][size - 1]);
+                    ScoreCounter.AddToUF(board[row][Size - 1]);
                 }
             }
         }
@@ -105,7 +105,7 @@ namespace Calico
         public void AddPiece(GamePiece piece, int x, int y)
         {
             board[x][y] = piece;
-            _scoreCounter.AddToUF(piece);
+            ScoreCounter.AddToUF(piece);
             UnionWithNeighbors(piece, x, y);
             
         }
@@ -117,7 +117,7 @@ namespace Calico
             {
                 if (IsOccupied(r, c))
                 {
-                    _scoreCounter.EvaluateNew(piece, board[r][c]);
+                    ScoreCounter.EvaluateNew(piece, board[r][c]);
 
                 }
             }
@@ -187,7 +187,7 @@ namespace Calico
                     for (int j = 0; j < i; j++)
                     {
                         (int row_j, int col_j) = neighbors[j];
-                        if (_scoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
+                        if (ScoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
                         {
                             separate = false;
                         };
@@ -195,14 +195,14 @@ namespace Calico
 
                     if (separate)
                     {
-                        count += _scoreCounter.GetColorCount(board[row_i][col_i]);
-                        score += _scoreCounter.GetColorScore(board[row_i][col_i]);
+                        count += ScoreCounter.GetColorCount(board[row_i][col_i]);
+                        score += ScoreCounter.GetColorScore(board[row_i][col_i]);
                     }
                 }
 
             }
 
-            int newScore = _scoreCounter.CountColorScore(count + 1);
+            int newScore = ScoreCounter.CountColorScore(count + 1);
 
             
             if (count == 0) return 0;
@@ -228,7 +228,7 @@ namespace Calico
                     for (int j = 0; j < i; j++)
                     {
                         (int row_j, int col_j) = neighbors[j];
-                        if (_scoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
                         {
                             separate = false;
                         };
@@ -236,14 +236,14 @@ namespace Calico
 
                     if (separate)
                     {
-                        count += _scoreCounter.GetPatternCount(board[row_i][col_i]);
-                        score += _scoreCounter.GetPatternScore(board[row_i][col_i]);
+                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
+                        score += ScoreCounter.GetPatternScore(board[row_i][col_i]);
                     }
                 }
 
             }
 
-            int newScore = _scoreCounter.CountPatternScore(count + 1, gp.Pattern);
+            int newScore = ScoreCounter.CountPatternScore(count + 1, gp.Pattern);
 
 
             if (count == 0) return 0;
@@ -272,7 +272,7 @@ namespace Calico
                     for (int j = 0; j < i; j++)
                     {
                         (int row_j, int col_j) = neighbors[j];
-                        if (_scoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
+                        if (ScoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
                         {
                             separateColor = false;
                         };
@@ -280,8 +280,8 @@ namespace Calico
 
                     if (separateColor)
                     {
-                        count += _scoreCounter.GetColorCount(board[row_i][col_i]);
-                        score += _scoreCounter.GetColorScore(board[row_i][col_i]);
+                        count += ScoreCounter.GetColorCount(board[row_i][col_i]);
+                        score += ScoreCounter.GetColorScore(board[row_i][col_i]);
                     }
                 }
 
@@ -290,7 +290,7 @@ namespace Calico
                     for (int j = 0; j < i; j++)
                     {
                         (int row_j, int col_j) = neighbors[j];
-                        if (_scoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
                         {
                             separatePattern = false;
                         };
@@ -298,14 +298,14 @@ namespace Calico
 
                     if (separatePattern)
                     {
-                        count += _scoreCounter.GetPatternCount(board[row_i][col_i]);
-                        score += _scoreCounter.GetPatternScore(board[row_i][col_i]);
+                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
+                        score += ScoreCounter.GetPatternScore(board[row_i][col_i]);
                     }
                 }
 
             }
 
-            int newScore = _scoreCounter.CountColorScore(count + 1) + _scoreCounter.CountPatternScore(count + 1, gp.Pattern);
+            int newScore = ScoreCounter.CountColorScore(count + 1) + ScoreCounter.CountPatternScore(count + 1, gp.Pattern);
 
 
             if (count == 0) return 0;
@@ -335,13 +335,13 @@ namespace Calico
         {
             Console.WriteLine("       1    2    3    4    5    6    7");
             Console.WriteLine("    ------------------------------------");
-            for (int i = 0; i < size; i++) 
+            for (int i = 0; i < Size; i++) 
             {
 
                 Console.Write(" " + (i+1));
                 if (i % 2 == 0) Console.Write("  ");
                 Console.Write(" |");
-                for (int j = 0; j < size; j++)
+                for (int j = 0; j < Size; j++)
                 {
                     GamePiece p = board[i][j];
                     Console.Write($"{p.Print}|");

@@ -8,7 +8,6 @@ Každý hráč má vlastní herní desku s políčky v mřížce velikosti 5x5. 
 
 Vítězí hráč, kterému se podaří získat nejvíce bodů.
 
-
 ## Průběh hry
 ### Hra pro jednoho hráče
 
@@ -26,7 +25,6 @@ Možnosti dílků k přiložení jsou pro hráče i agenta stejné.
 
 Pro spuštění a ovládání hry postupujte podle instrukcí v konzoli.
 Všechny instrukce zadávejte ve formě celých čísel, (popř "y"/"n", pokud vás o to instrukce žádá).
-
 
 ## Pravidla pro získávání bodů
 

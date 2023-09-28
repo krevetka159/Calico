@@ -36,10 +36,10 @@ namespace Calico
     }
     public class GamePiece
     {
-        public Color Color;
-        public Pattern Pattern;
-        public Type Type;
-        public string Print;
+        public Color Color { get; private set; }
+        public Pattern Pattern { get; private set; }
+        public Type Type { get; private set; }
+        public string Print { get; private set; }
 
 
         public GamePiece(Type t)

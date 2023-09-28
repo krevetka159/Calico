@@ -9,16 +9,16 @@ namespace Calico
     public class Player
     {
         //private int id;
-        public GameBoard board;
+        public GameBoard Board { get; private set; }
 
         public Player(Scoring scoring)
         {
-            board = new GameBoard(scoring);
+            Board = new GameBoard(scoring);
         }
 
         public void MakeMove(GamePiece gamePiece, int x, int y)
         {
-            board.AddPiece(gamePiece, x, y);
+            Board.AddPiece(gamePiece, x, y);
             
         }
 
@@ -63,7 +63,7 @@ namespace Calico
                         Console.Write(" Choose row: ");
                         row = Convert.ToInt32(Console.ReadLine());
 
-                        if (1 <= row && row <= board.size)
+                        if (1 <= row && row <= Board.Size)
                         {
                             break;
                         }
@@ -82,7 +82,7 @@ namespace Calico
                         Console.Write(" Choose column: ");
                         col = Convert.ToInt32(Console.ReadLine());
 
-                        if (1 <= col && col <= board.size)
+                        if (1 <= col && col <= Board.Size)
                         {
                             break;
                         }
@@ -94,7 +94,7 @@ namespace Calico
                     }
                 }
 
-                if (board.IsEmpty(row - 1, col - 1))
+                if (Board.IsEmpty(row - 1, col - 1))
                 {
                     return (row - 1, col - 1);
                 }

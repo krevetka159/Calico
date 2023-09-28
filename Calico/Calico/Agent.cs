@@ -23,13 +23,13 @@ namespace Calico
 
         public (int, int) RandomPosition()
         {
-            int row = random.Next(0, board.size - 1);
-            int col = random.Next(0, board.size - 1);
+            int row = random.Next(0, Board.Size - 1);
+            int col = random.Next(0, Board.Size - 1);
 
-            while (!board.IsEmpty(row, col))
+            while (!Board.IsEmpty(row, col))
             {
-                row = random.Next(0, board.size - 1);
-                col = random.Next(0, board.size - 1);
+                row = random.Next(0, Board.Size - 1);
+                col = random.Next(0, Board.Size - 1);
             }
 
             return (row, col);
@@ -48,26 +48,6 @@ namespace Calico
         {
         }
 
-        public int ChooseGamePiece(int x, int y, GamePiece[]Opts)
-        {
-            int max = 0;
-            int opt = RandomGamePiece(Opts);
-
-            for (int i = 0; i < Opts.Length; i++)
-            {
-                
-                    if (board.EvaluateNeighbors(Opts[i], x, y) > max)
-                    {
-                        max = board.EvaluateNeighbors(Opts[i], x, y);
-                        opt = i;
-                    }
-                
-                
-            }
-
-            return opt;
-        }
-
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             (int x, int y) = RandomPosition();
@@ -77,19 +57,18 @@ namespace Calico
 
             for (int i = 0;i<Opts.Length; i++)
             {
-                if (board.IsEmpty(x, y))
+                if (Board.IsEmpty(x, y))
                 {
-                    if (board.EvaluateNeighbors(Opts[i], x, y) > max)
+                    if (Board.EvaluateNeighbors(Opts[i], x, y) > max)
                     {
-                        max = board.EvaluateNeighbors(Opts[i], x, y);
+                        max = Board.EvaluateNeighbors(Opts[i], x, y);
                         opt = i;
                     }
                 }
                 
             }
 
-            if (max > 0) { return (opt, (x, y)); }
-            return (RandomGamePiece(Opts), (x,y));
+            return (opt, (x, y)); 
         }
     }
 
@@ -104,13 +83,13 @@ namespace Calico
 
         public override (int, int) ChoosePosition(GamePiece gp)
         {
-            for (int i = 1;i<board.size-1;i++)
+            for (int i = 1;i<Board.Size-1;i++)
             {
-                for (int j = 1; j < board.size - 1; j++)
+                for (int j = 1; j < Board.Size - 1; j++)
                 {
-                    if (board.IsEmpty(i, j))
+                    if (Board.IsEmpty(i, j))
                     {
-                        if (board.CheckNeighbors(gp.Color, i, j))
+                        if (Board.CheckNeighbors(gp.Color, i, j))
                         {
                             return (i, j);
                         }
@@ -119,7 +98,7 @@ namespace Calico
                 }
             }
 
-            return (RandomPosition());
+            return RandomPosition();
         }
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
@@ -138,13 +117,13 @@ namespace Calico
 
         public override (int, int) ChoosePosition(GamePiece gp)
         {
-            for (int i = 1; i < board.size - 1; i++)
+            for (int i = 1; i < Board.Size - 1; i++)
             {
-                for (int j = 1; j < board.size - 1; j++)
+                for (int j = 1; j < Board.Size - 1; j++)
                 {
-                    if (board.IsEmpty(i, j))
+                    if (Board.IsEmpty(i, j))
                     {
-                        if (board.CheckNeighbors(gp.Pattern, i, j))
+                        if (Board.CheckNeighbors(gp.Pattern, i, j))
                         {
                             return (i, j);
                         }
@@ -173,13 +152,13 @@ namespace Calico
 
         public override (int, int) ChoosePosition(GamePiece gp)
         {
-            for (int i = 1; i < board.size - 1; i++)
+            for (int i = 1; i < Board.Size - 1; i++)
             {
-                for (int j = 1; j < board.size - 1; j++)
+                for (int j = 1; j < Board.Size - 1; j++)
                 {
-                    if (board.IsEmpty(i, j))
+                    if (Board.IsEmpty(i, j))
                     {
-                        if (board.CheckNeighbors(gp, i, j))
+                        if (Board.CheckNeighbors(gp, i, j))
                         {
                             return (i, j);
                         }
@@ -218,16 +197,16 @@ namespace Calico
             for (int o = 0; o < Opts.Length;o++)
             {
                 GamePiece gp = Opts[o];
-                for (int i = 1; i < board.size - 1; i++)
+                for (int i = 1; i < Board.Size - 1; i++)
                 {
-                    for (int j = 1; j < board.size - 1; j++)
+                    for (int j = 1; j < Board.Size - 1; j++)
                     {
-                        if (board.IsEmpty(i, j))
+                        if (Board.IsEmpty(i, j))
                         {
-                            if (board.EvaluateNeighborsColor(gp, i, j) > max)
+                            if (Board.EvaluateNeighborsColor(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = board.EvaluateNeighborsColor(gp, i, j);
+                                max = Board.EvaluateNeighborsColor(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
@@ -256,16 +235,16 @@ namespace Calico
             for (int o = 0; o < Opts.Length; o++)
             {
                 GamePiece gp = Opts[o];
-                for (int i = 1; i < board.size - 1; i++)
+                for (int i = 1; i < Board.Size - 1; i++)
                 {
-                    for (int j = 1; j < board.size - 1; j++)
+                    for (int j = 1; j < Board.Size - 1; j++)
                     {
-                        if (board.IsEmpty(i, j))
+                        if (Board.IsEmpty(i, j))
                         {
-                            if (board.EvaluateNeighborsPattern(gp, i, j) > max)
+                            if (Board.EvaluateNeighborsPattern(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = board.EvaluateNeighborsPattern(gp, i, j);
+                                max = Board.EvaluateNeighborsPattern(gp, i, j);
                                 maxPosition = (i, j);
                             }
 
@@ -296,16 +275,16 @@ namespace Calico
             for (int o = 0; o < Opts.Length; o++)
             {
                 GamePiece gp = Opts[o];
-                for (int i = 1; i < board.size - 1; i++)
+                for (int i = 1; i < Board.Size - 1; i++)
                 {
-                    for (int j = 1; j < board.size - 1; j++)
+                    for (int j = 1; j < Board.Size - 1; j++)
                     {
-                        if (board.IsEmpty(i, j))
+                        if (Board.IsEmpty(i, j))
                         {
-                            if (board.EvaluateNeighbors(gp, i, j) > max)
+                            if (Board.EvaluateNeighbors(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = board.EvaluateNeighbors(gp, i, j);
+                                max = Board.EvaluateNeighbors(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
