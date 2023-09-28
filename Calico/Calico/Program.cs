@@ -55,7 +55,8 @@ namespace Calico
                     Console.WriteLine(" Mode options: ");
                     Console.WriteLine("   1. Single player");
                     Console.WriteLine("   2. 2 players (vs. computer)");
-                    Console.WriteLine("   3. Agent testing");
+                    Console.WriteLine("   3. Single agent testing");
+                    Console.WriteLine("   4. All agent testing");
 
                     Console.Write(" Choose game mode: ");
 
@@ -77,7 +78,11 @@ namespace Calico
                             {
                                 return 3;
                             }
-                        
+                        case 4:
+                            {
+                                return 4;
+                            }
+
                         default:
                             {
                                 Console.WriteLine(" " + numOfPlayers + " is not a mode option");

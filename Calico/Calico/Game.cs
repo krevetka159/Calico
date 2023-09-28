@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Calico
 {
@@ -33,7 +34,12 @@ namespace Calico
                     }
                 case 3:
                     {
-                        TestGame(false);
+                        Testing();
+                        break;
+                    }
+                case 4:
+                    {
+                        TestAll();
                         break;
                     }
                 default:
@@ -59,13 +65,13 @@ namespace Calico
             Player = new Player(scoring);
 
             //print empty
-            PrintStateSingle();
+            PrintStateSingle(Player);
 
             for (int i = 0; i < 22; i++)
             {
                 MakeMove(Player);
                 // update points
-                PrintStateSingle();
+                PrintStateSingle(Player);
                 
             }
 
@@ -107,10 +113,72 @@ namespace Calico
 
         // ----------------------------------------------- TESTING ------------------------------------------------------------
 
-        public void TestGame(bool withPrint)
+        public void Testing()
+        {
+            int agentOption;
+            //bool choosingAgent = true;
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine(" Agent options: ");
+                    Console.WriteLine("    1. Random");
+                    Console.WriteLine("    2. Easy color half-random agent");
+                    Console.WriteLine("    3. Easy pattern half-random agent");
+                    Console.WriteLine("    4. Easy half-random agent");
+                    Console.WriteLine("    5. Counting color scores");
+                    Console.WriteLine("    6. Counting pattern scores");
+                    Console.WriteLine("    7. Counting scores");
+                    Console.WriteLine("    8. Random position, count scores");
+                    Console.WriteLine("    9. 7 but with probability to do sth random");
+                    Console.Write(" Pick agent: ");
+
+                    agentOption = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine();
+
+                    if (1<= agentOption && agentOption <= 9)
+                    {
+                        
+                        while (true)
+                        {
+                            
+                            Console.Write(" Print progress (y/n): ");
+                            string newGame = Console.ReadLine();
+
+                            if (newGame == "n")
+                            {
+                                TestGame(false, true, agentOption, 50);
+                                break;
+                            }
+                            else if (newGame == "y") 
+                            {
+                                TestGame(true, true, agentOption, 1);
+                                break; 
+                            }
+                            else
+                            {
+                                Console.WriteLine(" Neplatný výraz");
+                            }
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine(" " + agentOption + " is not a mode option");
+                    }
+
+                }
+                catch
+                {
+                    Console.WriteLine(" Must be an integer.");
+                }
+            }
+        }
+        public void TestGame(bool withPrint, bool allResults, int agentType, int iterations)
         {
             int sum = 0;
-            for (int j = 0; j < 50; j++)
+
+            for (int j = 0; j < iterations; j++)
             {
 
 
@@ -122,9 +190,56 @@ namespace Calico
                 {
                     Opts[i] = Bag.Next();
                 }
-                Agent = new AgentComplet(scoring);
-
-                if (withPrint) PrintStateSingle();
+                switch (agentType)
+                {
+                    case 1:
+                        {
+                            Agent = new RandomAgent(scoring);
+                            break;
+                        }
+                    case 2:
+                        {
+                            Agent = new RandomAgentColor(scoring);
+                            break;
+                        }
+                    case 3:
+                        {
+                            Agent = new RandomAgentPattern(scoring);
+                            break;
+                        }
+                    case 4:
+                        {
+                            Agent = new RandomAgentComplet(scoring);
+                            break;
+                        }
+                    case 5:
+                        {
+                            Agent = new AgentColor(scoring);
+                            break;
+                        }
+                    case 6:
+                        {
+                            Agent = new AgentPattern(scoring);
+                            break;
+                        }
+                    case 7:
+                        {
+                            Agent = new AgentComplet(scoring);
+                            break;
+                        }
+                    case 8:
+                        {
+                            Agent = new RandomAgent2(scoring);
+                            break;
+                        }
+                    case 9:
+                        {
+                            Agent = new AgentComplet(scoring);
+                            break;
+                        }
+                }
+                
+                if (withPrint) PrintStateSingle(Agent);
 
 
 
@@ -132,15 +247,37 @@ namespace Calico
                 {
                     MakeTestMove(Agent);
 
-                    if (withPrint) PrintStateSingle();
+                    if (withPrint) PrintStateSingle(Agent);
 
                 }
 
-                PrintStats(Agent);
+                if(allResults) PrintStats(Agent);
                 sum += Agent.board._scoreCounter.GetScore();
             }
+            Console.WriteLine();
+            if (iterations > 1) Console.WriteLine(" Mean: " + (sum / iterations));
+        }
 
-            Console.WriteLine(" Mean: " + (sum / 50));
+        private void TestAll()
+        {
+            Console.WriteLine(" Agents: ");
+            Console.WriteLine("    1. Random");
+            Console.WriteLine("    2. Easy color half-random agent");
+            Console.WriteLine("    3. Easy pattern half-random agent");
+            Console.WriteLine("    4. Easy half-random agent");
+            Console.WriteLine("    5. Counting color scores");
+            Console.WriteLine("    6. Counting pattern scores");
+            Console.WriteLine("    7. Counting scores");
+            Console.WriteLine("    8. Random position, count scores");
+            Console.WriteLine("    9. 7 but with probability to do sth random");
+
+            for (int i = 1;i <= 9;i++)
+            {
+                Console.WriteLine(" " + i + ": ");
+                TestGame(false, false,i, 100);
+                Console.WriteLine();
+            }
+
         }
 
 // ----------------------------------------------- GET COMMAND ------------------------------------------------------------
@@ -172,7 +309,7 @@ namespace Calico
 
         // ----------------------------------------------- PRINT ------------------------------------------------------------------
 
-        private void PrintStateSingle()
+        private void PrintStateSingle(Player p)
         {
             Console.WriteLine();
             
@@ -187,9 +324,9 @@ namespace Calico
 
             Console.WriteLine(scoring.patternScoring);
 
-            Console.WriteLine(" Skóre: " + Player.board._scoreCounter.GetScore());
+            Console.WriteLine(" Skóre: " + p.board._scoreCounter.GetScore());
             Console.WriteLine();
-            Player.board.PrintBoard();
+            p.board.PrintBoard();
             Console.WriteLine();
         }
 
