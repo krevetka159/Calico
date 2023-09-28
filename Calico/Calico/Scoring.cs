@@ -52,17 +52,11 @@ namespace Calico
 
                     patternScoring.Append((char)(64+(int)patterns[randInt]));
                     patternScoring.Append(", ");
-                    //Console.WriteLine(patterns[randInt]);
+                    
                     patterns.RemoveAt(randInt);
                 }
                 patternScoring.Append("\n");
             }
-
-            //foreach ((Pattern p, int size) in _patternClusterSizes)
-            //{
-            //    Console.WriteLine(p);
-            //    Console.WriteLine(size);
-            //}
 
 
 
