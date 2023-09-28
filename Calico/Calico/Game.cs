@@ -85,7 +85,7 @@ namespace Calico
             }
 
             Player = new Player(scoring);
-            Agent = new RandomAgent(scoring);
+            Agent = new AgentComplet(scoring);
 
             //print empty
             PrintStateMulti();
@@ -96,7 +96,7 @@ namespace Calico
                 
                 PrintStateMulti();
 
-                MakeMove(Agent);
+                MakeTestMove(Agent);
                 PrintStateMulti();
 
             }
@@ -122,7 +122,7 @@ namespace Calico
                 {
                     Opts[i] = Bag.Next();
                 }
-                Agent = new RandomAgent2(scoring);
+                Agent = new AgentComplet(scoring);
 
                 if (withPrint) PrintStateSingle();
 
@@ -209,9 +209,9 @@ namespace Calico
             Console.WriteLine(scoring.patternScoring);
 
             Console.WriteLine(" Hráč skóre: " + Player.board._scoreCounter.GetScore());
-            Player.board.PrintBoard();
-            Console.WriteLine(" Agent skóre: " + Player.board._scoreCounter.GetScore());
-            Agent.board.PrintBoard();
+            
+            Console.WriteLine(" Agent skóre: " + Agent.board._scoreCounter.GetScore());
+            
 
 
             Console.WriteLine("       1    2    3    4    5    6    7" + "        " + "      1    2    3    4    5    6    7");
