@@ -132,7 +132,7 @@ namespace Calico
                 {
                     Opts[i] = Bag.Next();
                 }
-                Agent = new RandomAgent41(scoring);
+                Agent = new RandomAgent2(scoring);
 
                 if (withPrint) PrintStateSingle();
 
@@ -153,7 +153,7 @@ namespace Calico
             Console.WriteLine(" Mean: " + (sum / 50));
         }
 
-        // ----------------------------------------------- GET COMMAND ------------------------------------------------------------
+// ----------------------------------------------- GET COMMAND ------------------------------------------------------------
 
 
         private void MakeMove(Player p)
