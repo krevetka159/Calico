@@ -16,13 +16,11 @@ namespace Calico
 
     public class UnionFindWithArray<T> : IUnionFind<T>
     {
-        //private int _score;
         private int _lastCluster;
         private Dictionary<T, int> _clusters = new();
 
         public UnionFindWithArray()
         {
-            //_score = 0;
         }
 
         public void Add(T x)
@@ -66,10 +64,6 @@ namespace Calico
 
             return cnt;
         }
-        //public int Score()
-        //{
-        //    return _score;
-        //}
 
         public void Union(T x, T y)
         {
@@ -80,7 +74,6 @@ namespace Calico
             int xCluster = _clusters[x];
             int yCluster = _clusters[y];
 
-            //_score -= (CountScore(xCluster) + CountScore(yCluster));
 
             foreach ((T z, int zCluster) in _clusters)
             {
@@ -89,8 +82,6 @@ namespace Calico
                     _clusters[z] = xCluster;
                 }
             }
-
-            //_score += CountScore(xCluster);
         }
 
         public int GetCluster(T x)
