@@ -11,8 +11,8 @@ namespace Calico
     {
         public int Score { get; private set; }
 
-        private UnionFindWithArray<GamePiece> colorUF;
-        private UnionFindWithArray<GamePiece> patternUF;
+        private UnionFind<GamePiece> colorUF;
+        private UnionFind<GamePiece> patternUF;
 
         private Scoring scoring;
 
@@ -21,8 +21,8 @@ namespace Calico
             
             Score = 0;
             this.scoring = scoring;
-            colorUF = new UnionFindWithArray<GamePiece>();
-            patternUF = new UnionFindWithArray<GamePiece>();
+            colorUF = new UnionFind<GamePiece>();
+            patternUF = new UnionFind<GamePiece>();
 
         }
 

@@ -14,12 +14,12 @@ namespace Calico
         void Union(T x, T y);
     }
 
-    public class UnionFindWithArray<T> : IUnionFind<T>
+    public class UnionFind<T> : IUnionFind<T>
     {
         private int lastCluster;
         private Dictionary<T, int> clusters = new();
 
-        public UnionFindWithArray()
+        public UnionFind()
         {
         }
 
