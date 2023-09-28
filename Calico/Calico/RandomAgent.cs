@@ -55,11 +55,14 @@ namespace Calico
 
             for (int i = 0; i < Opts.Length; i++)
             {
-                if (board.EvaluateNeighbors(Opts[i], x - 1, y - 1) > max)
-                {
-                    max = board.EvaluateNeighbors(Opts[i], x - 1, y - 1);
-                    opt = i;
-                }
+                
+                    if (board.EvaluateNeighbors(Opts[i], x - 1, y - 1) > max)
+                    {
+                        max = board.EvaluateNeighbors(Opts[i], x - 1, y - 1);
+                        opt = i;
+                    }
+                
+                
             }
 
             return opt;
@@ -74,10 +77,15 @@ namespace Calico
 
             for (int i = 0;i<Opts.Length; i++)
             {
-                if (board.EvaluateNeighbors(Opts[i], x -1, y -1) > max) {
-                    max = board.EvaluateNeighbors(Opts[i], x - 1, y - 1);
-                    opt = i;
+                if (board.IsEmpty(x - 1, y - 1))
+                {
+                    if (board.EvaluateNeighbors(Opts[i], x - 1, y - 1) > max)
+                    {
+                        max = board.EvaluateNeighbors(Opts[i], x - 1, y - 1);
+                        opt = i;
+                    }
                 }
+                
             }
 
             if (max > 0) { return (opt, (x, y)); }
@@ -100,10 +108,14 @@ namespace Calico
             {
                 for (int j = 1; j < board.size - 1; j++)
                 {
-                    if (board.CheckNeighbors(gp.Color, i, j))
+                    if (board.IsEmpty(i, j))
                     {
-                        return (i+1, j+1);
+                        if (board.CheckNeighbors(gp.Color, i, j))
+                        {
+                            return (i + 1, j + 1);
+                        }
                     }
+                    
                 }
             }
 
@@ -130,10 +142,14 @@ namespace Calico
             {
                 for (int j = 1; j < board.size - 1; j++)
                 {
-                    if (board.CheckNeighbors(gp.Pattern, i, j))
+                    if (board.IsEmpty(i, j))
                     {
-                        return (i + 1, j + 1);
+                        if (board.CheckNeighbors(gp.Pattern, i, j))
+                        {
+                            return (i + 1, j + 1);
+                        }
                     }
+                    
                 }
             }
 
@@ -161,10 +177,14 @@ namespace Calico
             {
                 for (int j = 1; j < board.size - 1; j++)
                 {
-                    if (board.CheckNeighbors(gp, i, j))
+                    if (board.IsEmpty(i, j))
                     {
-                        return (i + 1, j + 1);
+                        if (board.CheckNeighbors(gp, i, j))
+                        {
+                            return (i + 1, j + 1);
+                        }
                     }
+                    
                 }
             }
 
@@ -203,12 +223,16 @@ namespace Calico
                 {
                     for (int j = 1; j < board.size - 1; j++)
                     {
-                        if (board.EvaluateNeighborsColor(gp, i, j) > max)
+                        if (board.IsEmpty(i, j))
                         {
-                            maxPieceIndex = o;
-                            max = board.EvaluateNeighborsColor(gp, i, j);
-                            maxPosition = (i + 1, j + 1);
+                            if (board.EvaluateNeighborsColor(gp, i, j) > max)
+                            {
+                                maxPieceIndex = o;
+                                max = board.EvaluateNeighborsColor(gp, i, j);
+                                maxPosition = (i + 1, j + 1);
+                            }
                         }
+                        
                     }
                 }
             }
@@ -249,12 +273,17 @@ namespace Calico
                 {
                     for (int j = 1; j < board.size - 1; j++)
                     {
-                        if (board.EvaluateNeighborsPattern(gp, i, j) > max)
+                        if (board.IsEmpty(i, j))
                         {
-                            maxPieceIndex = o;
-                            max = board.EvaluateNeighborsPattern(gp, i, j);
-                            maxPosition = (i + 1, j + 1);
+                            if (board.EvaluateNeighborsPattern(gp, i, j) > max)
+                            {
+                                maxPieceIndex = o;
+                                max = board.EvaluateNeighborsPattern(gp, i, j);
+                                maxPosition = (i + 1, j + 1);
+                            }
+
                         }
+                        
                     }
                 }
             }
@@ -296,12 +325,16 @@ namespace Calico
                 {
                     for (int j = 1; j < board.size - 1; j++)
                     {
-                        if (board.EvaluateNeighbors(gp, i, j) > max)
+                        if (board.IsEmpty(i, j))
                         {
-                            maxPieceIndex = o;
-                            max = board.EvaluateNeighbors(gp, i, j);
-                            maxPosition = (i + 1, j + 1);
+                            if (board.EvaluateNeighbors(gp, i, j) > max)
+                            {
+                                maxPieceIndex = o;
+                                max = board.EvaluateNeighbors(gp, i, j);
+                                maxPosition = (i + 1, j + 1);
+                            }
                         }
+                        
                     }
                 }
             }
