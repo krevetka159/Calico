@@ -9,29 +9,29 @@ namespace Calico
 {
     public class ScoreCounter
     {
-        public int _score;
+        public int score;
 
 
-        private UnionFindWithArray<GamePiece> _colorUF;
-        private UnionFindWithArray<GamePiece> _patternUF;
+        private UnionFindWithArray<GamePiece> colorUF;
+        private UnionFindWithArray<GamePiece> patternUF;
 
 
-        private Scoring _scoring;
+        private Scoring scoring;
 
         public ScoreCounter(Scoring scoring) 
         {
             
-            _score = 0;
-            _scoring = scoring;
-            _colorUF = new UnionFindWithArray<GamePiece>();
-            _patternUF = new UnionFindWithArray<GamePiece>();
+            score = 0;
+            this.scoring = scoring;
+            colorUF = new UnionFindWithArray<GamePiece>();
+            patternUF = new UnionFindWithArray<GamePiece>();
 
         }
 
         public void AddToUF(GamePiece piece)
         {
-            _patternUF.Add(piece);
-            _colorUF.Add(piece);
+            patternUF.Add(piece);
+            colorUF.Add(piece);
         }
 
         public void EvaluateNew(GamePiece p, GamePiece n)
@@ -39,27 +39,27 @@ namespace Calico
             if (p.Color == n.Color)
             {
 
-                if (!_colorUF.Find(p, n))
+                if (!colorUF.Find(p, n))
                 {
-                    _score -= (_colorUF.CountScore(n) / _scoring._colorClusterSize) * _scoring._colorClusterScore;
-                    _score -= (_colorUF.CountScore(p) / _scoring._colorClusterSize) * _scoring._colorClusterScore;
+                    score -= (colorUF.CountScore(n) / scoring._colorClusterSize) * scoring._colorClusterScore;
+                    score -= (colorUF.CountScore(p) / scoring._colorClusterSize) * scoring._colorClusterScore;
 
-                    _colorUF.Union(n, p);
+                    colorUF.Union(n, p);
 
-                    _score += (_colorUF.CountScore(n) / _scoring._colorClusterSize) * _scoring._colorClusterScore;
+                    score += (colorUF.CountScore(n) / scoring._colorClusterSize) * scoring._colorClusterScore;
                 }
 
             }
             if (p.Pattern == n.Pattern)
             {
-                if (!_patternUF.Find(p, n))
+                if (!patternUF.Find(p, n))
                 {
-                    _score -= (_patternUF.CountScore(n) / _scoring._patternClusterSizes[n.Pattern]) * _scoring._patternClusterScores[n.Pattern];
-                    _score -= (_patternUF.CountScore(p) / _scoring._patternClusterSizes[p.Pattern]) * _scoring._patternClusterScores[p.Pattern];
+                    score -= (patternUF.CountScore(n) / scoring.patternClusterSizes[n.Pattern]) * scoring.patternClusterScores[n.Pattern];
+                    score -= (patternUF.CountScore(p) / scoring.patternClusterSizes[p.Pattern]) * scoring.patternClusterScores[p.Pattern];
 
-                    _patternUF.Union(n, p);
+                    patternUF.Union(n, p);
 
-                    _score += (_patternUF.CountScore(n) / _scoring._patternClusterSizes[n.Pattern]) * _scoring._patternClusterScores[n.Pattern];
+                    score += (patternUF.CountScore(n) / scoring.patternClusterSizes[n.Pattern]) * scoring.patternClusterScores[n.Pattern];
 
                 }
 
@@ -69,48 +69,48 @@ namespace Calico
 
         public bool CheckColorUnion(GamePiece p, GamePiece n)
         {
-            return _colorUF.Find(p, n);
+            return colorUF.Find(p, n);
         }
 
         public bool CheckPatternUnion(GamePiece p, GamePiece n)
         {
-            return _patternUF.Find(p, n);
+            return patternUF.Find(p, n);
         }
 
         public int GetColorCount(GamePiece p)
         {
-            return _colorUF.CountScore(p);
+            return colorUF.CountScore(p);
         }
 
         public int GetColorScore(GamePiece p)
         {
-            return (_colorUF.CountScore(p) /_scoring._colorClusterSize) * _scoring._colorClusterScore;
+            return (colorUF.CountScore(p) /scoring._colorClusterSize) * scoring._colorClusterScore;
         }
 
         public int GetPatternCount(GamePiece p)
         {
-            return _patternUF.CountScore(p);
+            return patternUF.CountScore(p);
         }
 
         public int GetPatternScore(GamePiece p)
         {
-            return (_patternUF.CountScore(p) / _scoring._patternClusterSizes[p.Pattern]) * _scoring._patternClusterScores[p.Pattern];
+            return (patternUF.CountScore(p) / scoring.patternClusterSizes[p.Pattern]) * scoring.patternClusterScores[p.Pattern];
         }
 
         public int CountColorScore(int count)
         {
-            return (count / _scoring._colorClusterSize) * _scoring._colorClusterScore;
+            return (count / scoring._colorClusterSize) * scoring._colorClusterScore;
         }
 
         public int CountPatternScore(int count, Pattern p) 
         {
-            return (count / _scoring._patternClusterSizes[p]) * _scoring._patternClusterScores[p];
+            return (count / scoring.patternClusterSizes[p]) * scoring.patternClusterScores[p];
         }
 
 
         public int GetScore()
         {
-            return _score;
+            return score;
         }
         
 

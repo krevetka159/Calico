@@ -202,7 +202,7 @@ namespace Calico
 
 // ----------------------------------------------- FIND LARGEST SCORE CHANGE ------------------------------------------------------------
 
-    public class AgentColor : Player
+    public class AgentColor : RandomAgent
     {
         Random random = new Random();
 
@@ -252,7 +252,7 @@ namespace Calico
             
         }
     }
-    public class AgentPattern : Player
+    public class AgentPattern : RandomAgent
     {
         Random random = new Random();
 
@@ -304,7 +304,7 @@ namespace Calico
         }
     }
 
-    public class AgentComplet : Player
+    public class AgentComplet : RandomAgent
     {
         Random random = new Random();
 

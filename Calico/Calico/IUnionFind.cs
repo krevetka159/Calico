@@ -16,8 +16,8 @@ namespace Calico
 
     public class UnionFindWithArray<T> : IUnionFind<T>
     {
-        private int _lastCluster;
-        private Dictionary<T, int> _clusters = new();
+        private int lastCluster;
+        private Dictionary<T, int> clusters = new();
 
         public UnionFindWithArray()
         {
@@ -25,22 +25,22 @@ namespace Calico
 
         public void Add(T x)
         {
-            _clusters.Add(x, ++_lastCluster);
+            clusters.Add(x, ++lastCluster);
         }
 
         public bool Find(T x, T y)
         {
             return
-                _clusters.ContainsKey(x) &&
-                _clusters.ContainsKey(y) &&
-                _clusters[x] == _clusters[y];
+                clusters.ContainsKey(x) &&
+                clusters.ContainsKey(y) &&
+                clusters[x] == clusters[y];
         }
 
         public int CountScore(T x)
         {
-            int xCluster = _clusters[x];
+            int xCluster = clusters[x];
             int cnt = 0;
-            foreach ((T z, int zCluster) in _clusters)
+            foreach ((T z, int zCluster) in clusters)
             {
                 if (zCluster == xCluster)
                 {
@@ -54,7 +54,7 @@ namespace Calico
         public int CountScore(int xCluster)
         {
             int cnt = 0;
-            foreach ((T z, int zCluster) in _clusters)
+            foreach ((T z, int zCluster) in clusters)
             {
                 if (zCluster == xCluster)
                 {
@@ -67,32 +67,32 @@ namespace Calico
 
         public void Union(T x, T y)
         {
-            if (!_clusters.ContainsKey(x)) throw new ArgumentException($"{x} not found", nameof(x));
-            if (!_clusters.ContainsKey(y)) throw new ArgumentException($"{y} not found", nameof(y));
+            if (!clusters.ContainsKey(x)) throw new ArgumentException($"{x} not found", nameof(x));
+            if (!clusters.ContainsKey(y)) throw new ArgumentException($"{y} not found", nameof(y));
 
 
-            int xCluster = _clusters[x];
-            int yCluster = _clusters[y];
+            int xCluster = clusters[x];
+            int yCluster = clusters[y];
 
 
-            foreach ((T z, int zCluster) in _clusters)
+            foreach ((T z, int zCluster) in clusters)
             {
                 if (zCluster == yCluster)
                 {
-                    _clusters[z] = xCluster;
+                    clusters[z] = xCluster;
                 }
             }
         }
 
         public int GetCluster(T x)
         {
-            return _clusters[x];
+            return clusters[x];
         }
 
         public override string ToString()
         {
             StringBuilder sb = new();
-            foreach ((T z, int zColor) in _clusters)
+            foreach ((T z, int zColor) in clusters)
             {
                 sb.Append($"{z}: {zColor}");
                 sb.Append(Environment.NewLine);

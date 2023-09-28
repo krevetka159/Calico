@@ -11,10 +11,10 @@ namespace Calico
         private Random random;
 
         public int _colorClusterScore = 3;
-        public Dictionary<Pattern, int> _patternClusterScores;
+        public Dictionary<Pattern, int> patternClusterScores;
 
         public int _colorClusterSize = 3;
-        public Dictionary<Pattern, int> _patternClusterSizes;
+        public Dictionary<Pattern, int> patternClusterSizes;
 
         public StringBuilder patternScoring;
 
@@ -36,8 +36,8 @@ namespace Calico
                 }
             }
 
-            _patternClusterScores = new Dictionary<Pattern, int>();
-            _patternClusterSizes = new Dictionary<Pattern, int>();
+            patternClusterScores = new Dictionary<Pattern, int>();
+            patternClusterSizes = new Dictionary<Pattern, int>();
 
             patternScoring = new StringBuilder();
 
@@ -47,8 +47,8 @@ namespace Calico
                 for (int i = 0; i < 2; i++)
                 {
                     int randInt = random.Next(patterns.Count);
-                    _patternClusterSizes[patterns[randInt]] = size;
-                    _patternClusterScores[patterns[randInt]] = score;
+                    patternClusterSizes[patterns[randInt]] = size;
+                    patternClusterScores[patterns[randInt]] = score;
 
                     patternScoring.Append((char)(64+(int)patterns[randInt]));
                     patternScoring.Append(", ");
