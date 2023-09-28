@@ -103,10 +103,7 @@ namespace Calico
 
     }
 
-    //internal class Program
-    //{
-    //    static void Main(string[] args)
-    //    {
+   
     //        UnionFindWithArray<string> uf = new();
     //        uf.Add("David");
     //        uf.Add("Dita");
@@ -131,6 +128,5 @@ namespace Calico
 
     //        //uf.Union("Petr", "Kaja"); // Vyhodim chybu, Kaja neexistuje
 
-    //    }
-    //}
+  
 }

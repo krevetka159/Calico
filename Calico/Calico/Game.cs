@@ -348,8 +348,9 @@ namespace Calico
             Console.WriteLine(" Hráč skóre: " + Player.board._scoreCounter.GetScore());
             
             Console.WriteLine(" Agent skóre: " + Agent.board._scoreCounter.GetScore());
-            
 
+            Console.WriteLine();
+            Console.WriteLine("                   Player                                        Agent");
 
             Console.WriteLine("       1    2    3    4    5    6    7" + "        " + "      1    2    3    4    5    6    7");
             Console.WriteLine("    ------------------------------------" + "        " + "   ------------------------------------");
