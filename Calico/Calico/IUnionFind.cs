@@ -86,30 +86,6 @@ namespace Calico
 
     }
 
-   
-    //        UnionFindWithArray<string> uf = new();
-    //        uf.Add("David");
-    //        uf.Add("Dita");
-    //        uf.Add("Petr");
-    //        uf.Add("Lucka");
-    //        uf.Add("Jelinek");
-    //        uf.Add("Barca");
-    //        uf.Add("Opler");
-    //        uf.Add("Balko");
-    //        uf.Add("Vojta");
-    //        Console.WriteLine(uf.ToString());
-
-    //        uf.Union("Dita", "Vojta");
-    //        uf.Union("Vojta", "Lucka");
-    //        uf.Union("Dita", "David");
-    //        uf.Union("David", "Petr");
-    //        Console.WriteLine(uf.ToString());
-
-    //        uf.Union("David", "Balko");
-    //        uf.Union("Jelinek", "Barca");
-    //        Console.WriteLine(uf.ToString());
-
-    //        //uf.Union("Petr", "Kaja"); // Vyhodim chybu, Kaja neexistuje
 
   
 }
