@@ -36,7 +36,7 @@ namespace Calico
                 clusters[x] == clusters[y];
         }
 
-        public int CountScore(T x)
+        public int Count(T x)
         {
             int xCluster = clusters[x];
             int cnt = 0;
@@ -51,19 +51,6 @@ namespace Calico
             return cnt;
         }
 
-        public int CountScore(int xCluster)
-        {
-            int cnt = 0;
-            foreach ((T z, int zCluster) in clusters)
-            {
-                if (zCluster == xCluster)
-                {
-                    cnt++;
-                }
-            }
-
-            return cnt;
-        }
 
         public void Union(T x, T y)
         {
@@ -84,10 +71,6 @@ namespace Calico
             }
         }
 
-        public int GetCluster(T x)
-        {
-            return clusters[x];
-        }
 
         public override string ToString()
         {
@@ -95,7 +78,7 @@ namespace Calico
             foreach ((T z, int zColor) in clusters)
             {
                 sb.Append($"{z}: {zColor}");
-                sb.Append(Environment.NewLine);
+                sb.Append("\n");
             }
             return sb.ToString();
         }
