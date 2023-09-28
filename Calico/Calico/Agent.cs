@@ -41,10 +41,10 @@ namespace Calico
         }
     }
 
-    public class RandomAgent2 : Agent
+    public class RandomPositionAgent : Agent
     {
 
-        public RandomAgent2(Scoring scoring) : base(scoring)
+        public RandomPositionAgent(Scoring scoring) : base(scoring)
         {
         }
 
@@ -123,7 +123,7 @@ namespace Calico
         }
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
-            // TODO
+            
             int opt = RandomGamePiece(Opts);
 
             return (RandomGamePiece(Opts), ChoosePosition(Opts[opt]));
@@ -157,7 +157,7 @@ namespace Calico
         }
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
-            // TODO
+            
             int opt = RandomGamePiece(Opts);
 
             return (RandomGamePiece(Opts), ChoosePosition(Opts[opt]));
@@ -193,7 +193,7 @@ namespace Calico
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
-            //TODO
+           
             int opt = RandomGamePiece(Opts);
 
             return (RandomGamePiece(Opts), ChoosePosition(Opts[opt]));
@@ -204,7 +204,6 @@ namespace Calico
 
     public class AgentColor : Agent
     {
-        Random random = new Random();
 
         public AgentColor(Scoring scoring) : base(scoring)
         {
@@ -212,9 +211,9 @@ namespace Calico
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
-            int maxPieceIndex = 0;
+            int maxPieceIndex = RandomGamePiece(Opts);
             int max = 0;
-            (int, int) maxPosition = (2, 2);
+            (int, int) maxPosition = RandomPosition();
 
             for (int o = 0; o < Opts.Length;o++)
             {
@@ -237,24 +236,12 @@ namespace Calico
                 }
             }
 
-            if (max > 0) return (maxPieceIndex,maxPosition);
-
-            int row = random.Next(0, board.size - 1);
-            int col = random.Next(0, board.size - 1);
-
-            while (!board.IsEmpty(row, col))
-            {
-                row = random.Next(0, board.size - 1);
-                col = random.Next(0, board.size - 1);
-            }
-
-            return (maxPieceIndex,(row, col));
+            return (maxPieceIndex,maxPosition);
             
         }
     }
     public class AgentPattern : Agent
     {
-        Random random = new Random();
 
         public AgentPattern(Scoring scoring) : base(scoring)
         {
@@ -262,9 +249,9 @@ namespace Calico
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
-            int maxPieceIndex = 0;
+            int maxPieceIndex = RandomGamePiece(Opts);
             int max = 0;
-            (int, int) maxPosition = (2, 2);
+            (int, int) maxPosition = RandomPosition();
 
             for (int o = 0; o < Opts.Length; o++)
             {
@@ -288,25 +275,13 @@ namespace Calico
                 }
             }
 
-            if (max > 0) return (maxPieceIndex, maxPosition);
-
-            int row = random.Next(0, board.size - 1);
-            int col = random.Next(0, board.size - 1);
-
-            while (!board.IsEmpty(row, col))
-            {
-                row = random.Next(0, board.size - 1);
-                col = random.Next(0, board.size - 1);
-            }
-
-            return (maxPieceIndex, (row, col));
+            return (maxPieceIndex, maxPosition);
 
         }
     }
 
     public class AgentComplet : Agent
     {
-        Random random = new Random();
 
         public AgentComplet(Scoring scoring) : base(scoring)
         {
@@ -314,9 +289,9 @@ namespace Calico
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
-            int maxPieceIndex = 0;
+            int maxPieceIndex = RandomGamePiece(Opts);
             int max = 0;
-            (int, int) maxPosition = (2, 2);
+            (int, int) maxPosition = RandomPosition();
 
             for (int o = 0; o < Opts.Length; o++)
             {
@@ -338,19 +313,8 @@ namespace Calico
                     }
                 }
             }
+            return (maxPieceIndex, maxPosition);
 
-            if (max > 0) return (maxPieceIndex, maxPosition);
-
-            int row = random.Next(0, board.size - 1);
-            int col = random.Next(0, board.size - 1);
-
-            while (!board.IsEmpty(row, col))
-            {
-                row = random.Next(0, board.size - 1);
-                col = random.Next(0, board.size - 1);
-            }
-
-            return (maxPieceIndex, (row, col));
 
         }
     }

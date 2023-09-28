@@ -229,7 +229,7 @@ namespace Calico
                         }
                     case 8:
                         {
-                            Agent = new RandomAgent2(scoring);
+                            Agent = new RandomPositionAgent(scoring);
                             break;
                         }
                     case 9:
