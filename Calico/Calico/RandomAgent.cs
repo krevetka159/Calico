@@ -48,6 +48,23 @@ namespace Calico
         {
         }
 
+        public int ChooseGamePiece(int x, int y, GamePiece[]Opts)
+        {
+            int max = 0;
+            int opt = RandomGamePiece(Opts);
+
+            for (int i = 0; i < Opts.Length; i++)
+            {
+                if (board.EvaluateNeighbors(Opts[i], x - 1, y - 1) > max)
+                {
+                    max = board.EvaluateNeighbors(Opts[i], x - 1, y - 1);
+                    opt = i;
+                }
+            }
+
+            return opt;
+        }
+
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             (int x, int y) = RandomPosition();
@@ -77,11 +94,6 @@ namespace Calico
         {
         }
 
-        //public override int ChooseGamePiece(GamePiece[] Opts)
-        //{
-        //    return random.Next(1, Opts.Length);
-        //}
-
         public override (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1;i<board.size-1;i++)
@@ -100,21 +112,17 @@ namespace Calico
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             // TODO
-            return (RandomGamePiece(Opts), RandomPosition());
+            int opt = RandomGamePiece(Opts);
+
+            return (RandomGamePiece(Opts), ChoosePosition(Opts[opt]));
         }
     }
     public class RandomAgentPattern : RandomAgent
     {
-        Random random = new Random();
 
         public RandomAgentPattern(Scoring scoring) : base(scoring)
         {
         }
-
-        //public override int ChooseGamePiece(GamePiece[] Opts)
-        //{
-        //    return random.Next(1, Opts.Length);
-        //}
 
         public override (int, int) ChoosePosition(GamePiece gp)
         {
@@ -134,22 +142,18 @@ namespace Calico
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             // TODO
-            return (RandomGamePiece(Opts), RandomPosition());
+            int opt = RandomGamePiece(Opts);
+
+            return (RandomGamePiece(Opts), ChoosePosition(Opts[opt]));
         }
     }
 
     public class RandomAgentComplet : RandomAgent
     {
-        Random random = new Random();
-
         public RandomAgentComplet(Scoring scoring) : base(scoring)
         {
         }
 
-        public override int ChooseGamePiece(GamePiece[] Opts)
-        {
-            return random.Next(1, Opts.Length);
-        }
 
         public override (int, int) ChoosePosition(GamePiece gp)
         {
@@ -170,7 +174,9 @@ namespace Calico
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             //TODO
-            return (RandomGamePiece(Opts), RandomPosition());
+            int opt = RandomGamePiece(Opts);
+
+            return (RandomGamePiece(Opts), ChoosePosition(Opts[opt]));
         }
     }
 
