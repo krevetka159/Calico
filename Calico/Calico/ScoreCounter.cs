@@ -82,6 +82,32 @@ namespace Calico
             return _colorUF.CountScore(p);
         }
 
+        public int GetColorScore(GamePiece p)
+        {
+            return (_colorUF.CountScore(p) /_scoring._colorClusterSize) * _scoring._colorClusterScore;
+        }
+
+        public int GetPatternCount(GamePiece p)
+        {
+            return _patternUF.CountScore(p);
+        }
+
+        public int GetPatternScore(GamePiece p)
+        {
+            return (_patternUF.CountScore(p) / _scoring._patternClusterSizes[p.Pattern]) * _scoring._patternClusterScores[p.Pattern];
+        }
+
+        public int CountColorScore(int count)
+        {
+            return (count / _scoring._colorClusterSize) * _scoring._colorClusterScore;
+        }
+
+        public int CountPatternScore(int count, Pattern p) 
+        {
+            return (count / _scoring._patternClusterSizes[p]) * _scoring._patternClusterScores[p];
+        }
+
+
         public int GetScore()
         {
             return _score;

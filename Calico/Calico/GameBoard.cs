@@ -200,13 +200,13 @@ namespace Calico
                     if (separate)
                     {
                         count += _scoreCounter.GetColorCount(board[row_i][col_i]);
-                        score += (_scoreCounter.GetColorCount(board[row_i][col_i]) / 3) * 3;
+                        score += _scoreCounter.GetColorScore(board[row_i][col_i]);
                     }
                 }
 
             }
 
-            int newScore = ((count + 1) / 3) * 3;
+            int newScore = _scoreCounter.CountColorScore(count + 1);
 
             
             if (count == 0) return 0;
@@ -214,36 +214,107 @@ namespace Calico
 
             return (newScore - score + 1);
         }
-        public int EvaluateNeighborsPattern(Pattern pattern, int row, int col)
+        public int EvaluateNeighborsPattern(GamePiece gp, int row, int col)
         {
-            int sum = 0;
+            int score = 0;
+            int count = 0;
             List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
 
-            foreach ((int r, int c) in neighbors)
+            for (int i = 0; i < neighbors.Count; i++)
             {
-                if (board[r][c].Pattern == pattern)
+
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Pattern == gp.Pattern)
                 {
-                    sum++;
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (_scoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        count += _scoreCounter.GetPatternCount(board[row_i][col_i]);
+                        score += _scoreCounter.GetPatternScore(board[row_i][col_i]);
+                    }
                 }
+
             }
 
-            return sum;
+            int newScore = _scoreCounter.CountPatternScore(count + 1, gp.Pattern);
+
+
+            if (count == 0) return 0;
+
+
+            return (newScore - score + 1);
         }
 
         public int EvaluateNeighbors(GamePiece gp, int row, int col)
         {
-            int sum = 0;
+            int score = 0;
+            int count = 0;
             List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
 
-            foreach ((int r, int c) in neighbors)
+            for (int i = 0; i < neighbors.Count; i++)
             {
-                if (board[r][c].Color == gp.Color || board[r][c].Pattern == gp.Pattern)
+
+                bool separateColor = true;
+                bool separatePattern = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Color == gp.Color)
                 {
-                    sum++;  
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (_scoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separateColor = false;
+                        };
+                    }
+
+                    if (separateColor)
+                    {
+                        count += _scoreCounter.GetColorCount(board[row_i][col_i]);
+                        score += _scoreCounter.GetColorScore(board[row_i][col_i]);
+                    }
                 }
+
+                if (board[row_i][col_i].Pattern == gp.Pattern)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (_scoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separatePattern = false;
+                        };
+                    }
+
+                    if (separatePattern)
+                    {
+                        count += _scoreCounter.GetPatternCount(board[row_i][col_i]);
+                        score += _scoreCounter.GetPatternScore(board[row_i][col_i]);
+                    }
+                }
+
             }
 
-            return sum;
+            int newScore = _scoreCounter.CountColorScore(count + 1) + _scoreCounter.CountPatternScore(count + 1, gp.Pattern);
+
+
+            if (count == 0) return 0;
+
+
+            return (newScore - score + 1);
         }
 
 

@@ -132,7 +132,7 @@ namespace Calico
                 {
                     Opts[i] = Bag.Next();
                 }
-                Agent = new RandomAgent2(scoring);
+                Agent = new RandomAgent41(scoring);
 
                 if (withPrint) PrintStateSingle();
 
@@ -171,9 +171,7 @@ namespace Calico
         private void MakeTestMove(Player p)
         {
 
-            int next = p.ChooseGamePiece(Opts) - 1;
-
-            (int row, int col) = p.ChoosePosition(Opts[next]);
+            (int next, (int row, int col)) = p.ChooseNextMove(Opts);
 
             p.MakeMove(Opts[next], row - 1, col - 1);
 

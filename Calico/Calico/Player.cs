@@ -107,5 +107,11 @@ namespace Calico
         {
             return (0, 0);
         }
+
+        public virtual (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            return (ChooseGamePiece(Opts), ChoosePosition());
+        }
+
     }
 }
