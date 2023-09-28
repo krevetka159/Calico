@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 namespace Calico
 {
     public class Player
-
-        // todo AI class co dědí z Player -> jiné pick next a position
     {
         //private int id;
         public GameBoard board;

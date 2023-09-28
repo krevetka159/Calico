@@ -14,20 +14,10 @@ namespace Calico
         private Player Agent;
         private GamePiece[] Opts = new GamePiece[3];
         private Scoring scoring;
-        //private (GamePiece, GamePiece, GamePiece) PossiblePieces;
-
 
 
         public Game(int mode) 
         { 
-            //Bag = new Bag();
-
-            //scoring = new Scoring();
-
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    Opts[i] = Bag.Next();
-            //}
             
             switch (mode)
             {
