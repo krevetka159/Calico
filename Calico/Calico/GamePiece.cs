@@ -19,7 +19,6 @@ namespace Calico
 
     public enum Pattern
     {
-        //to jsem si nevymyslela, to je legit z pravidel
         None,
         Dots,
         Stripes,
@@ -39,7 +38,6 @@ namespace Calico
     {
         public Color Color;
         public Pattern Pattern;
-        private int ID;
         public Type Type;
         public string Print;
 
