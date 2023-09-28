@@ -10,7 +10,7 @@ namespace Calico
 
     public class Agent : Player
     {
-        Random random = new Random();
+        public Random random = new Random();
 
         public Agent(Scoring scoring) : base(scoring)
         {
@@ -294,6 +294,51 @@ namespace Calico
             }
             return (maxPieceIndex, maxPosition);
 
+
+        }
+
+        public class AgentCompletWithProb : Agent
+        {
+
+            public AgentCompletWithProb(Scoring scoring) : base(scoring)
+            {
+            }
+
+            public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+            {
+                int maxPieceIndex = RandomGamePiece(Opts);
+                int max = 0;
+                (int, int) maxPosition = RandomPosition();
+
+                for (int o = 0; o < Opts.Length; o++)
+                {
+                    GamePiece gp = Opts[o];
+                    for (int i = 1; i < Board.Size - 1; i++)
+                    {
+                        for (int j = 1; j < Board.Size - 1; j++)
+                        {
+                            if (Board.IsEmpty(i, j))
+                            {
+                                if (Board.EvaluateNeighbors(gp, i, j) > max)
+                                {
+                                    maxPieceIndex = o;
+                                    max = Board.EvaluateNeighbors(gp, i, j);
+                                    maxPosition = (i, j);
+                                }
+                            }
+
+                        }
+                    }
+                }
+                if (random.NextDouble() > 0.05)
+                {
+                    return (maxPieceIndex, maxPosition);
+                }
+                return (RandomGamePiece(Opts), RandomPosition());
+
+
+
+            }
 
         }
     }

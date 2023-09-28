@@ -31,5 +31,7 @@ Clusterem chápeme skupinu propojených (sousedících) políček se stejnou vla
 * Count(T x) = metoda vracející velikost clusteru, ve kterém se nachází prvek x
 
 ## Ovládání konzolové aplikace
-
+Vybrání módu hry probíhá v třídě Program.
+Výběr dalšího tahu implementuje třída Player.
+Výběr pro testovací mód zajišťuje třída Game.
 

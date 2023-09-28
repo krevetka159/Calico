@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static Calico.AgentComplet;
 
 namespace Calico
 {
@@ -234,7 +235,7 @@ namespace Calico
                         }
                     case 9:
                         {
-                            Agent = new AgentComplet(scoring);
+                            Agent = new AgentCompletWithProb(scoring);
                             break;
                         }
                 }
