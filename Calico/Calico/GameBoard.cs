@@ -112,8 +112,7 @@ namespace Calico
 
         public void UnionWithNeighbors(GamePiece piece,int row, int col)
         {
-            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
-
+            List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors) 
             {
                 if (IsOccupied(r, c))
@@ -128,8 +127,7 @@ namespace Calico
 
         public bool CheckNeighbors(Color color, int row, int col)
         {
-            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
-
+            List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors)
             {
                 if (board[r][c].Color == color)
@@ -142,8 +140,7 @@ namespace Calico
         }
         public bool CheckNeighbors(Pattern pattern, int row, int col)
         {
-            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
-
+            List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors)
             {
                 if (board[r][c].Pattern == pattern)
@@ -157,8 +154,7 @@ namespace Calico
 
         public bool CheckNeighbors(GamePiece gp, int row, int col)
         {
-            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
-
+            List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors)
             {
                 if (board[r][c].Color == gp.Color || board[r][c].Pattern == gp.Pattern)
@@ -177,7 +173,7 @@ namespace Calico
 
             int score = 0;
             int count = 0;
-            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+            List<(int, int)> neighbors = GetNeighbors(row, col);
 
             for (int i = 0; i < neighbors.Count; i++)
             {
@@ -218,7 +214,7 @@ namespace Calico
         {
             int score = 0;
             int count = 0;
-            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+            List<(int, int)> neighbors = GetNeighbors(row, col);
 
             for (int i = 0; i < neighbors.Count; i++)
             {
@@ -260,7 +256,8 @@ namespace Calico
         {
             int score = 0;
             int count = 0;
-            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+            
 
             for (int i = 0; i < neighbors.Count; i++)
             {
@@ -315,6 +312,20 @@ namespace Calico
 
 
             return (newScore - score + 1);
+        }
+
+        public List<(int,int)> GetNeighbors(int row, int col)
+        {
+            List<(int, int)> neighbors;
+            if (row % 2 == 1)
+            {
+                neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+            }
+            else
+            {
+                neighbors = new List<(int, int)>() { (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col), (row + 1, col + 1) };
+            }
+            return neighbors;
         }
 
 
