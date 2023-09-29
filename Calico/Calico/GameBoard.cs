@@ -130,7 +130,31 @@ namespace Calico
             }
         }
 
-// ----------------------------------------------- CHECK FOR SIMILAR NEIGHBORS ------------------------------------------------------------
+// ----------------------------------------------------- GET NEIGHBORS -------------------------------------------------------
+
+        /// <summary>
+        /// Return a list of neighboring positions
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        private List<(int, int)> GetNeighbors(int row, int col)
+        {
+            List<(int, int)> neighbors;
+            if (row % 2 == 1)
+            {
+                neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
+            }
+            else
+            {
+                neighbors = new List<(int, int)>() { (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col), (row + 1, col + 1) };
+            }
+            return neighbors;
+        }
+
+
+
+        // ----------------------------------------------- CHECK FOR SIMILAR NEIGHBORS ------------------------------------------------------------
 
         /// <summary>
         /// Checks whether a position on a gameboard has a neighbor with a certain color
@@ -183,7 +207,6 @@ namespace Calico
         /// <returns></returns>
         public bool CheckNeighbors(GamePiece gp, int row, int col)
         {
-            List<(int, int)> neighbors = GetNeighbors(row, col);
 
             return (CheckNeighborsColor(gp.Color, row, col) || CheckNeighborsPattern(gp.Pattern, row, col));
 
@@ -302,29 +325,6 @@ namespace Calico
             return EvaluateNeighborsColor(gp, row, col) + EvaluateNeighborsPattern(gp, row, col);
             
         }
-
-// ----------------------------------------------------------------------------------------------------------------------------
-
-        /// <summary>
-        /// Return a list of neighboring positions
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        private List<(int,int)> GetNeighbors(int row, int col)
-        {
-            List<(int, int)> neighbors;
-            if (row % 2 == 1)
-            {
-                neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
-            }
-            else
-            {
-                neighbors = new List<(int, int)>() { (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col), (row + 1, col + 1) };
-            }
-            return neighbors;
-        }
-
 
 // ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
        /// <summary>
