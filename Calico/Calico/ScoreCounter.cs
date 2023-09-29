@@ -48,12 +48,12 @@ namespace Calico
 
                 if (!colorUF.Find(p, n))
                 {
-                    Score -= (colorUF.Count(n) / scoring.ColorClusterSize) * scoring.ColorClusterScore;
-                    Score -= (colorUF.Count(p) / scoring.ColorClusterSize) * scoring.ColorClusterScore;
+                    Score -= GetColorScore(n);
+                    Score -= GetColorScore(p);
 
                     colorUF.Union(n, p);
 
-                    Score += (colorUF.Count(n) / scoring.ColorClusterSize) * scoring.ColorClusterScore;
+                    Score += GetColorScore(n);
                 }
 
             }
@@ -61,13 +61,12 @@ namespace Calico
             {
                 if (!patternUF.Find(p, n))
                 {
-                    Score -= (patternUF.Count(n) / scoring.PatternClusterSizes[n.Pattern]) * scoring.PatternClusterScores[n.Pattern];
-                    Score -= (patternUF.Count(p) / scoring.PatternClusterSizes[p.Pattern]) * scoring.PatternClusterScores[p.Pattern];
+                    Score -= GetPatternScore(n);
+                    Score -= GetPatternScore(p);
 
                     patternUF.Union(n, p);
 
-                    Score += (patternUF.Count(n) / scoring.PatternClusterSizes[n.Pattern]) * scoring.PatternClusterScores[n.Pattern];
-
+                    Score += GetPatternScore(n);
                 }
 
             }
