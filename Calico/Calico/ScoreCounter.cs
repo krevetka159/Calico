@@ -14,13 +14,13 @@ namespace Calico
         private UnionFind<GamePiece> colorUF;
         private UnionFind<GamePiece> patternUF;
 
-        private Scoring scoring;
+        public Scoring Scoring { get; private set; }
 
         public ScoreCounter(Scoring scoring) 
         {
             
             Score = 0;
-            this.scoring = scoring;
+            Scoring = scoring;
             colorUF = new UnionFind<GamePiece>();
             patternUF = new UnionFind<GamePiece>();
 
@@ -112,7 +112,7 @@ namespace Calico
         /// <returns></returns>
         public int GetColorScore(GamePiece p)
         {
-            return (colorUF.Count(p) /scoring.ColorClusterSize) * scoring.ColorClusterScore;
+            return (colorUF.Count(p) /Scoring.ColorClusterSize) * Scoring.ColorClusterScore;
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Calico
         /// <returns></returns>
         public int GetPatternScore(GamePiece p)
         {
-            return (patternUF.Count(p) / scoring.PatternClusterSizes[p.Pattern]) * scoring.PatternClusterScores[p.Pattern];
+            return (patternUF.Count(p) / Scoring.PatternClusterSizes[p.Pattern]) * Scoring.PatternClusterScores[p.Pattern];
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Calico
         /// <returns></returns>
         public int CountColorScore(int count)
         {
-            return (count / scoring.ColorClusterSize) * scoring.ColorClusterScore;
+            return (count / Scoring.ColorClusterSize) * Scoring.ColorClusterScore;
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace Calico
         /// <returns></returns>
         public int CountPatternScore(int count, Pattern p) 
         {
-            return (count / scoring.PatternClusterSizes[p]) * scoring.PatternClusterScores[p];
+            return (count / Scoring.PatternClusterSizes[p]) * Scoring.PatternClusterScores[p];
         }
 
 
