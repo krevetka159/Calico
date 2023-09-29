@@ -53,7 +53,7 @@ namespace Calico
         }
 
 // ----------------------------------------------- SINGLEPLAYER ------------------------------------------------------------
-        public void SinglePlayer()
+        private void SinglePlayer()
         {
             Bag = new Bag();
 
@@ -80,7 +80,7 @@ namespace Calico
         }
 
 // ----------------------------------------------- MULTIPLAYER ------------------------------------------------------------
-        public void MultiPlayer() 
+        private void MultiPlayer() 
         {
             Bag = new Bag();
 
@@ -103,7 +103,7 @@ namespace Calico
                 
                 PrintStateMulti();
 
-                MakeTestMove(Agent);
+                MakeMove(Agent);
                 PrintStateMulti();
 
             }
@@ -114,7 +114,7 @@ namespace Calico
 
         // ----------------------------------------------- TESTING ------------------------------------------------------------
 
-        public void Testing()
+        private void Testing()
         {
             int agentOption;
             //bool choosingAgent = true;
@@ -175,7 +175,7 @@ namespace Calico
                 }
             }
         }
-        public void TestGame(bool withPrint, bool allResults, int agentType, int iterations)
+        private void TestGame(bool withPrint, bool allResults, int agentType, int iterations)
         {
             int sum = 0;
 
@@ -246,7 +246,7 @@ namespace Calico
 
                 for (int i = 0; i < 22; i++)
                 {
-                    MakeTestMove(Agent);
+                    MakeMove(Agent);
 
                     if (withPrint) PrintStateSingle(Agent);
 
@@ -287,16 +287,6 @@ namespace Calico
         private void MakeMove(Player p)
         {
             
-            (int next, (int row, int col)) = p.ChooseNextMove(Opts);
-
-            p.MakeMove(Opts[next], row, col);
-
-            Opts[next] = Bag.Next();
-        }
-
-        private void MakeTestMove(Player p)
-        {
-
             (int next, (int row, int col)) = p.ChooseNextMove(Opts);
 
             p.MakeMove(Opts[next], row, col);
