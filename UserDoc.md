@@ -61,3 +61,14 @@ Pokud se uživatel rozhodne tisknout průběh hry, agent odehraje 1 hru. Pokud n
 
 Mód 4 slouží k porovnání agentů. Každý agent odehraje 100 her a do konzole se vytisknou pouze průměrné výsledky.
 
+#### Agenti, které lze testovat
+1. Základní náhodný agent, náhodně vybraný dílek přidá na náhodně vybranou (volnou) pozici herní desky
+2. Náhodně vybraný dílek přidá na první nalezenou pozici se stejně barevným sousedícím dílkem, pokud takovou pozici nenalezne, vybere ji náhodně
+3. Náhodně vybraný dílek přidá na první nalezenou pozici se stejně vzorovaným sousedícím dílkem, pokud takovou pozici nenalezne, vybere ji náhodně
+4. Náhodně vybraný dílek přidá na první nalezenou pozici se stejně barevným nebo stejně vzorovaným sousedícím dílkem, pokud takovou pozici nenalezne, vybere ji náhodně
+5. Na náhodně vybranou pozici přiřadí dílek, který nejvíce zvýší skóre nebo má na pozici alespoň stejně barevného/vzorovaného souseda, pokud žádný takový dílek v možnostech není, vybere si s možností dílků náhodně
+6. Vybere takový dílek a pozici, aby co nejvíce zvýšil skóre z barevných seskupení, popř. tak, aby měl dílek stejně barevného souseda. Pokud taková kombinace neexistuje, vybere dílek a pozici náhodně
+7. Vybere takový dílek a pozici, aby co nejvíce zvýšil skóre z vzorovaných seskupení, popř. tak, aby měl dílek stejně vzorovaného souseda. Pokud taková kombinace neexistuje, vybere dílek a pozici náhodně
+8. Vybere takový dílek a pozici, aby co nejvíce zvýšil skóre, popř. tak, aby měl dílek stejně barevného/vzorovaného souseda. Pokud taková kombinace neexistuje, vybere dílek a pozici náhodně
+9. S pravděpodobností 95% se chová jako AgentComplet, jinak jako základní náhodný agent
+
