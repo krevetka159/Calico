@@ -91,7 +91,7 @@ namespace Calico
                 {
                     if (Board.IsEmpty(i, j))
                     {
-                        if (Board.CheckNeighbors(gp.Color, i, j))
+                        if (Board.CheckNeighborsColor(gp.Color, i, j))
                         {
                             return (i, j);
                         }
@@ -125,7 +125,7 @@ namespace Calico
                 {
                     if (Board.IsEmpty(i, j))
                     {
-                        if (Board.CheckNeighbors(gp.Pattern, i, j))
+                        if (Board.CheckNeighborsPattern(gp.Pattern, i, j))
                         {
                             return (i, j);
                         }

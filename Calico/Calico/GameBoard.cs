@@ -79,8 +79,9 @@ namespace Calico
             CornerUF();
 
         }
-        public void CornerUF()
+        private void CornerUF()
         {
+            //Add corners to unionfind
             for (int row = 0; row < Size; row++)
             {
                 if (row == 0 || row == Size - 1)
@@ -102,6 +103,12 @@ namespace Calico
 
 // ----------------------------------------------- ADD PIECE ------------------------------------------------------------
 
+        /// <summary>
+        /// Add patchtile to gameboard and to unionfind
+        /// </summary>
+        /// <param name="piece"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void AddPiece(GamePiece piece, int x, int y)
         {
             board[x][y] = piece;
@@ -110,7 +117,7 @@ namespace Calico
             
         }
 
-        public void UnionWithNeighbors(GamePiece piece,int row, int col)
+        private void UnionWithNeighbors(GamePiece piece,int row, int col)
         {
             List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors) 
@@ -125,7 +132,14 @@ namespace Calico
 
 // ----------------------------------------------- CHECK FOR SIMILAR NEIGHBORS ------------------------------------------------------------
 
-        public bool CheckNeighbors(Color color, int row, int col)
+        /// <summary>
+        /// Checks whether a position on a gameboard has a neighbor with a certain color
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public bool CheckNeighborsColor(Color color, int row, int col)
         {
             List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors)
@@ -138,7 +152,15 @@ namespace Calico
 
             return false;
         }
-        public bool CheckNeighbors(Pattern pattern, int row, int col)
+
+        /// <summary>
+        /// Checks whether a position on a gameboard has a neighbor with a certain pattern
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public bool CheckNeighborsPattern(Pattern pattern, int row, int col)
         {
             List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors)
@@ -152,22 +174,30 @@ namespace Calico
             return false;
         }
 
+        /// <summary>
+        /// Checks whether a position on a gameboard has a neighbor with the same pattern or color as gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public bool CheckNeighbors(GamePiece gp, int row, int col)
         {
             List<(int, int)> neighbors = GetNeighbors(row, col);
-            foreach ((int r, int c) in neighbors)
-            {
-                if (board[r][c].Color == gp.Color || board[r][c].Pattern == gp.Pattern)
-                {
-                    return true;
-                }
-            }
 
-            return false;
+            return (CheckNeighborsColor(gp.Color, row, col) || CheckNeighborsPattern(gp.Pattern, row, col));
+
         }
 
-// ----------------------------------------------- COUNT SIMILAR NEIGHBORS -----------------------------------------------------
+// ----------------------------------------------- EVALUATE NEIGHBORS -----------------------------------------------------
 
+        /// <summary>
+        /// Counts how much color score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public int EvaluateNeighborsColor(GamePiece gp, int row, int col)
         {
 
@@ -210,6 +240,14 @@ namespace Calico
 
             return (newScore - score + 1);
         }
+
+        /// <summary>
+        /// Counts how much pattern score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public int EvaluateNeighborsPattern(GamePiece gp, int row, int col)
         {
             int score = 0;
@@ -252,69 +290,28 @@ namespace Calico
             return (newScore - score + 1);
         }
 
+        /// <summary>
+        /// Counts how much score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public int EvaluateNeighbors(GamePiece gp, int row, int col)
         {
-            int score = 0;
-            int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            return EvaluateNeighborsColor(gp, row, col) + EvaluateNeighborsPattern(gp, row, col);
             
-
-            for (int i = 0; i < neighbors.Count; i++)
-            {
-
-                bool separateColor = true;
-                bool separatePattern = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
-                if (board[row_i][col_i].Color == gp.Color)
-                {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (ScoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separateColor = false;
-                        };
-                    }
-
-                    if (separateColor)
-                    {
-                        count += ScoreCounter.GetColorCount(board[row_i][col_i]);
-                        score += ScoreCounter.GetColorScore(board[row_i][col_i]);
-                    }
-                }
-
-                if (board[row_i][col_i].Pattern == gp.Pattern)
-                {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separatePattern = false;
-                        };
-                    }
-
-                    if (separatePattern)
-                    {
-                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
-                        score += ScoreCounter.GetPatternScore(board[row_i][col_i]);
-                    }
-                }
-
-            }
-
-            int newScore = ScoreCounter.CountColorScore(count + 1) + ScoreCounter.CountPatternScore(count + 1, gp.Pattern);
-
-
-            if (count == 0) return 0;
-
-
-            return (newScore - score + 1);
         }
 
-        public List<(int,int)> GetNeighbors(int row, int col)
+// ----------------------------------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Return a list of neighboring positions
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        private List<(int,int)> GetNeighbors(int row, int col)
         {
             List<(int, int)> neighbors;
             if (row % 2 == 1)
@@ -353,10 +350,22 @@ namespace Calico
         }
 
 // ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
+       /// <summary>
+       /// Checks whether the position is empty
+       /// </summary>
+       /// <param name="row"></param>
+       /// <param name="col"></param>
+       /// <returns></returns>
         public bool IsEmpty(int row, int col)
         {
             return (board[row][col].Type == Type.Empty);
         }
+        /// <summary>
+        /// Checks whether the position is occupied by a patchtile
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public bool IsOccupied(int row, int col)
         {
             return (board[row][col].Type == Type.PatchTile);
