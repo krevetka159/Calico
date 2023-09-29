@@ -286,10 +286,8 @@ namespace Calico
 
         private void MakeMove(Player p)
         {
-   
-            int next = p.ChooseGamePiece(Opts) - 1;
             
-            (int row, int col) = p.ChoosePosition();
+            (int next, (int row, int col)) = p.ChooseNextMove(Opts);
 
             p.MakeMove(Opts[next], row, col);
 

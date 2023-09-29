@@ -83,7 +83,7 @@ namespace Calico
         {
         }
 
-        public override (int, int) ChoosePosition(GamePiece gp)
+        public (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1;i<Board.Size-1;i++)
             {
@@ -117,7 +117,7 @@ namespace Calico
         {
         }
 
-        public override (int, int) ChoosePosition(GamePiece gp)
+        public (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1; i < Board.Size - 1; i++)
             {
@@ -153,7 +153,7 @@ namespace Calico
         }
 
 
-        public override (int, int) ChoosePosition(GamePiece gp)
+        public (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1; i < Board.Size - 1; i++)
             {

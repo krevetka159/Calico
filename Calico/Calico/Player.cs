@@ -16,13 +16,24 @@ namespace Calico
             Board = new GameBoard(scoring);
         }
 
-        public void MakeMove(GamePiece gamePiece, int x, int y)
+        /// <summary>
+        /// Add patchtile to gameboard
+        /// </summary>
+        /// <param name="gamePiece"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void MakeMove(GamePiece gamePiece, int row, int col)
         {
-            Board.AddPiece(gamePiece, x, y);
+            Board.AddPiece(gamePiece, row, col);
             
         }
 
-        public virtual int ChooseGamePiece(GamePiece[] Opts)
+        /// <summary>
+        /// Let the player choose patchtile to add (gets instructions from console)
+        /// </summary>
+        /// <param name="Opts"></param>
+        /// <returns></returns>
+        private int ChooseGamePiece(GamePiece[] Opts)
         {
             int gamepiece;
             while (true)
@@ -33,9 +44,9 @@ namespace Calico
                     gamepiece = Convert.ToInt32(Console.ReadLine());
                     switch (gamepiece)
                     {
-                        case 1: return 1;
-                        case 2: return 2;
-                        case 3: return 3;
+                        case 1: return 0;
+                        case 2: return 1;
+                        case 3: return 2;
                         default:
                             {
                                 Console.WriteLine(" Choose of of the three pieces (1/2/3).");
@@ -50,7 +61,13 @@ namespace Calico
             }
         }
 
-        public virtual (int, int) ChoosePosition()
+
+        /// <summary>
+        /// Let the player choose position to add new patchtile to (gets instructions from console)
+        /// </summary>
+        /// <param name="Opts"></param>
+        /// <returns></returns>
+        private (int, int) ChoosePosition()
         {
             int row;
             int col;
@@ -105,15 +122,16 @@ namespace Calico
             }
 
         }
-        public virtual (int, int) ChoosePosition(GamePiece gp)
-        {
-            return (0, 0);
-        }
-
+        /// <summary>
+        /// Let the player choose his next move (gets input from console)
+        /// </summary>
+        /// <param name="Opts"></param>
+        /// <returns></returns>
         public virtual (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             return (ChooseGamePiece(Opts), ChoosePosition());
         }
+
 
     }
 }
