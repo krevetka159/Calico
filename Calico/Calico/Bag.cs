@@ -19,6 +19,8 @@ namespace Calico
         {
             random = new Random();
             pieces = new List<GamePiece>();
+
+            // 3 patchtiles for each color-pattern combination
             for (int i = 1; i <= NumOfColors; i++)
             {
                 for (int j = 1; j <= NumOfPatterns; j++)
@@ -32,6 +34,8 @@ namespace Calico
 
         public GamePiece Next()
         {
+            // randomly picks a patchtile from bag 
+
             int randInt = random.Next(0, pieces.Count());
             GamePiece next = pieces[randInt];
             pieces.RemoveAt(randInt);

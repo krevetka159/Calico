@@ -16,7 +16,8 @@ namespace Calico
         public int ColorClusterSize = 3;
         public Dictionary<Pattern, int> PatternClusterSizes { get; private set; }
 
-        public StringBuilder patternScoring { get; private set; }
+        public StringBuilder PatternScoring { get; private set; }
+        // for printState in game
 
         public Scoring() 
         {
@@ -39,23 +40,23 @@ namespace Calico
             PatternClusterScores = new Dictionary<Pattern, int>();
             PatternClusterSizes = new Dictionary<Pattern, int>();
 
-            patternScoring = new StringBuilder();
+            PatternScoring = new StringBuilder();
 
             foreach ((int size, int score) in patternProps)
             {
-                patternScoring.Append(" " + size + " : ");
+                PatternScoring.Append($" {size} patchtiles = {score} points for patterns ");
                 for (int i = 0; i < 2; i++)
                 {
                     int randInt = random.Next(patterns.Count);
                     PatternClusterSizes[patterns[randInt]] = size;
                     PatternClusterScores[patterns[randInt]] = score;
 
-                    patternScoring.Append((char)(64+(int)patterns[randInt]));
-                    patternScoring.Append(", ");
+                    PatternScoring.Append((char)(64+(int)patterns[randInt]));
+                    PatternScoring.Append(", ");
                     
                     patterns.RemoveAt(randInt);
                 }
-                patternScoring.Append("\n");
+                PatternScoring.Append("\n");
             }
 
 

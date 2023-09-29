@@ -323,7 +323,7 @@ namespace Calico
             Console.WriteLine();
             Console.WriteLine();
 
-            Console.WriteLine(scoring.patternScoring);
+            Console.WriteLine(scoring.PatternScoring);
 
             Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
             Console.WriteLine();
@@ -344,7 +344,7 @@ namespace Calico
             Console.WriteLine("");
             Console.WriteLine("");
 
-            Console.WriteLine(scoring.patternScoring);
+            Console.WriteLine(scoring.PatternScoring);
 
             Console.WriteLine(" Player score: " + Player.Board.ScoreCounter.GetScore());
             
