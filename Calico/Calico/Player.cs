@@ -8,7 +8,6 @@ namespace Calico
 {
     public class Player
     {
-        //private int id;
         public GameBoard Board { get; private set; }
 
         public Player(Scoring scoring)
