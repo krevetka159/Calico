@@ -70,5 +70,5 @@ Mód 4 slouží k porovnání agentů. Každý agent odehraje 100 her a do konzo
 6. Vybere takový dílek a pozici, aby co nejvíce zvýšil skóre z barevných seskupení, popř. tak, aby měl dílek stejně barevného souseda. Pokud taková kombinace neexistuje, vybere dílek a pozici náhodně
 7. Vybere takový dílek a pozici, aby co nejvíce zvýšil skóre z vzorovaných seskupení, popř. tak, aby měl dílek stejně vzorovaného souseda. Pokud taková kombinace neexistuje, vybere dílek a pozici náhodně
 8. Vybere takový dílek a pozici, aby co nejvíce zvýšil skóre, popř. tak, aby měl dílek stejně barevného/vzorovaného souseda. Pokud taková kombinace neexistuje, vybere dílek a pozici náhodně
-9. S pravděpodobností 95% se chová jako AgentComplet, jinak jako základní náhodný agent
+9. S pravděpodobností 95% se chová jako agent 8, jinak jako základní náhodný agent
 
