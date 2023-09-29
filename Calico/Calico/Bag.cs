@@ -31,11 +31,12 @@ namespace Calico
                 }
             }
         }
-
+        /// <summary>
+        /// Randomly picks a patchtile from bag
+        /// </summary>
+        /// <returns></returns>
         public GamePiece Next()
         {
-            // randomly picks a patchtile from bag 
-
             int randInt = random.Next(0, pieces.Count());
             GamePiece next = pieces[randInt];
             pieces.RemoveAt(randInt);
