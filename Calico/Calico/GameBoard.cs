@@ -107,13 +107,13 @@ namespace Calico
         /// Add patchtile to gameboard and to unionfind
         /// </summary>
         /// <param name="piece"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void AddPiece(GamePiece piece, int x, int y)
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        public void AddPiece(GamePiece piece, int row, int col)
         {
-            board[x][y] = piece;
+            board[row][col] = piece;
             ScoreCounter.AddToUF(piece);
-            UnionWithNeighbors(piece, x, y);
+            UnionWithNeighbors(piece, row, col);
             
         }
 
