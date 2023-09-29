@@ -15,6 +15,11 @@ namespace Calico
             this.scoring = scoring;
         }
 
+        /// <summary>
+        /// Print game state for a single player game
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="Opts"></param>
         public void PrintStateSingle(Player p, GamePiece[] Opts)
         {
             Console.WriteLine();
@@ -36,6 +41,12 @@ namespace Calico
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// Print game state for a game against an agent
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="a"></param>
+        /// <param name="Opts"></param>
         public void PrintStateMulti(Player p, Agent a, GamePiece[] Opts)
         {
             Console.WriteLine();
@@ -63,6 +74,10 @@ namespace Calico
 
         }
 
+        /// <summary>
+        /// Print game board
+        /// </summary>
+        /// <param name="p"></param>
         private void PrintBoard(Player p)
         {
             Console.WriteLine("       1    2    3    4    5    6    7");
@@ -83,6 +98,11 @@ namespace Calico
             }
         }
 
+        /// <summary>
+        /// Print 2 boards next to each other
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="a"></param>
         private void PrintBoards(Player p, Agent a)
         {
             Console.WriteLine("                  Player                                          Agent");
@@ -116,6 +136,10 @@ namespace Calico
 
         }
 
+        /// <summary>
+        /// Print final score
+        /// </summary>
+        /// <param name="p"></param>
         public void PrintStats(Player p)
         {
             // finální výsledky
