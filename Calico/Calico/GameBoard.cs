@@ -326,29 +326,6 @@ namespace Calico
         }
 
 
- // ----------------------------------------------- PRINT ------------------------------------------------------------
-
-        public void PrintBoard()
-        {
-            Console.WriteLine("       1    2    3    4    5    6    7");
-            Console.WriteLine("    ------------------------------------");
-            for (int i = 0; i < Size; i++) 
-            {
-
-                Console.Write(" " + (i+1));
-                if (i % 2 == 0) Console.Write("  ");
-                Console.Write(" |");
-                for (int j = 0; j < Size; j++)
-                {
-                    GamePiece p = board[i][j];
-                    Console.Write($"{p.Print}|");
-                }
-                Console.Write("\n");
-                Console.WriteLine("    ------------------------------------");
-            }
-
-        }
-
 // ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
        /// <summary>
        /// Checks whether the position is empty

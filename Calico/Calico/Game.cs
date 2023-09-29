@@ -11,15 +11,16 @@ namespace Calico
 {
     internal class Game
     {
-        private Bag Bag;
-        private Player Player;
-        private Player Agent;
+        private Bag bag;
+        private Player player;
+        private Agent agent;
         private GamePiece[] Opts = new GamePiece[3];
         private Scoring scoring;
+        private GameStatePrinter gameStatePrinter;
 
 
         public Game(int mode) 
-        { 
+        {
             
             switch (mode)
             {
@@ -55,61 +56,65 @@ namespace Calico
 // ----------------------------------------------- SINGLEPLAYER ------------------------------------------------------------
         private void SinglePlayer()
         {
-            Bag = new Bag();
+            bag = new Bag();
 
             scoring = new Scoring();
 
+            gameStatePrinter = new GameStatePrinter(scoring);
+
             for (int i = 0; i < 3; i++)
             {
-                Opts[i] = Bag.Next();
+                Opts[i] = bag.Next();
             }
-            Player = new Player(scoring);
+            player = new Player(scoring);
 
             //print empty
-            PrintStateSingle(Player);
+            gameStatePrinter.PrintStateSingle(player, Opts);
 
             for (int i = 0; i < 22; i++)
             {
-                MakeMove(Player);
+                MakeMove(player);
                 // update points
-                PrintStateSingle(Player);
-                
+                gameStatePrinter.PrintStateSingle(player, Opts);
+
             }
 
-            PrintStats(Player);
+            gameStatePrinter.PrintStats(player);
         }
 
 // ----------------------------------------------- MULTIPLAYER ------------------------------------------------------------
         private void MultiPlayer() 
         {
-            Bag = new Bag();
+            bag = new Bag();
 
             scoring = new Scoring();
 
+            gameStatePrinter = new GameStatePrinter(scoring);
+
             for (int i = 0; i < 3; i++)
             {
-                Opts[i] = Bag.Next();
+                Opts[i] = bag.Next();
             }
 
-            Player = new Player(scoring);
-            Agent = new AgentComplet(scoring);
+            player = new Player(scoring);
+            agent = new AgentComplet(scoring);
 
             //print empty
-            PrintStateMulti();
+            gameStatePrinter.PrintStateMulti(player, agent, Opts);
 
             for (int i = 0; i < 22; i++)
             {
-                MakeMove(Player);
-                
-                PrintStateMulti();
+                MakeMove(player);
 
-                MakeMove(Agent);
-                PrintStateMulti();
+                gameStatePrinter.PrintStateMulti(player, agent, Opts);
+
+                MakeMove(agent);
+                gameStatePrinter.PrintStateMulti(player, agent, Opts);
 
             }
 
-            PrintStats(Player);
-            PrintStats(Agent);
+            gameStatePrinter.PrintStats(player);
+            gameStatePrinter.PrintStats(agent);
         }
 
         // ----------------------------------------------- TESTING ------------------------------------------------------------
@@ -117,7 +122,7 @@ namespace Calico
         private void Testing()
         {
             int agentOption;
-            //bool choosingAgent = true;
+            
             while (true)
             {
                 try
@@ -183,77 +188,79 @@ namespace Calico
             {
 
 
-                Bag = new Bag();
+                bag = new Bag();
 
                 scoring = new Scoring();
 
+                gameStatePrinter = new GameStatePrinter(scoring);
+
                 for (int i = 0; i < 3; i++)
                 {
-                    Opts[i] = Bag.Next();
+                    Opts[i] = bag.Next();
                 }
                 switch (agentType)
                 {
                     case 1:
                         {
-                            Agent = new Agent(scoring);
+                            agent = new Agent(scoring);
                             break;
                         }
                     case 2:
                         {
-                            Agent = new RandomAgentColor(scoring);
+                            agent = new RandomAgentColor(scoring);
                             break;
                         }
                     case 3:
                         {
-                            Agent = new RandomAgentPattern(scoring);
+                            agent = new RandomAgentPattern(scoring);
                             break;
                         }
                     case 4:
                         {
-                            Agent = new RandomAgentComplet(scoring);
+                            agent = new RandomAgentComplet(scoring);
                             break;
                         }
                     case 5:
                         {
-                            Agent = new AgentColor(scoring);
+                            agent = new AgentColor(scoring);
                             break;
                         }
                     case 6:
                         {
-                            Agent = new AgentPattern(scoring);
+                            agent = new AgentPattern(scoring);
                             break;
                         }
                     case 7:
                         {
-                            Agent = new AgentComplet(scoring);
+                            agent = new AgentComplet(scoring);
                             break;
                         }
                     case 8:
                         {
-                            Agent = new RandomPositionAgent(scoring);
+                            agent = new RandomPositionAgent(scoring);
                             break;
                         }
                     case 9:
                         {
-                            Agent = new AgentCompletWithProb(scoring);
+                            agent = new AgentCompletWithProb(scoring);
                             break;
                         }
                 }
                 
-                if (withPrint) PrintStateSingle(Agent);
+                if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
 
 
                 for (int i = 0; i < 22; i++)
                 {
-                    MakeMove(Agent);
+                    MakeMove(agent);
 
-                    if (withPrint) PrintStateSingle(Agent);
+                    if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
                 }
 
-                if(allResults) PrintStats(Agent);
-                sum += Agent.Board.ScoreCounter.GetScore();
+                if(allResults) gameStatePrinter.PrintStats(agent);
+                sum += agent.Board.ScoreCounter.GetScore();
             }
             Console.WriteLine();
             if (iterations > 1) Console.WriteLine(" Mean: " + (sum / iterations));
@@ -291,92 +298,8 @@ namespace Calico
 
             p.MakeMove(Opts[next], row, col);
 
-            Opts[next] = Bag.Next();
+            Opts[next] = bag.Next();
         }
 
-
-
-        // ----------------------------------------------- PRINT ------------------------------------------------------------------
-
-        private void PrintStateSingle(Player p)
-        {
-            Console.WriteLine();
-            
-            Console.Write(" Patch tiles to use: ");
-            for (int i = 0; i < 3; i++)
-            {
-                Console.Write($" {i + 1}: |{Opts[i].Print}| ");
-            }
-
-            Console.WriteLine();
-            Console.WriteLine();
-
-            Console.WriteLine(scoring.PatternScoring);
-
-            Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
-            Console.WriteLine();
-            p.Board.PrintBoard();
-            Console.WriteLine();
-        }
-
-        private void PrintStateMulti()
-        {
-            Console.WriteLine();
-
-            Console.Write(" Patch tiles to use: ");
-            for (int i = 0; i < 3; i++)
-            {
-                Console.Write($" {i + 1}: |{Opts[i].Print}| ");
-            }
-
-            Console.WriteLine("");
-            Console.WriteLine("");
-
-            Console.WriteLine(scoring.PatternScoring);
-
-            Console.WriteLine(" Player score: " + Player.Board.ScoreCounter.GetScore());
-            
-            Console.WriteLine(" Agent score: " + Agent.Board.ScoreCounter.GetScore());
-
-            Console.WriteLine();
-            Console.WriteLine("                   Player                                        Agent");
-
-            Console.WriteLine("       1    2    3    4    5    6    7" + "        " + "      1    2    3    4    5    6    7");
-            Console.WriteLine("    ------------------------------------" + "        " + "   ------------------------------------");
-            for (int i = 0; i < Player.Board.Size; i++)
-            {
-
-                Console.Write(" " + (i + 1));
-                if (i % 2 == 0) Console.Write("  ");
-                Console.Write(" |");
-                for (int j = 0; j < Player.Board.Size; j++)
-                {
-                    GamePiece p = Player.Board.board[i][j];
-                    Console.Write($"{p.Print}|");
-                }
-                Console.Write("        ");
-                Console.Write(i + 1);
-                if (i % 2 == 0) Console.Write("  ");
-                Console.Write(" |");
-                for (int j = 0; j < Agent.Board.Size; j++)
-                {
-                    GamePiece p = Agent.Board.board[i][j];
-                    Console.Write($"{p.Print}|");
-                }
-                Console.Write("\n");
-                Console.WriteLine("    ------------------------------------" + "        " + "   ------------------------------------");
-            }
-
-            
-            Console.WriteLine();
-        }
-
-
-
-        private void PrintStats(Player p)
-        {
-            // finální výsledky
-            Console.WriteLine(" Final score: " + p.Board.ScoreCounter.GetScore());
-        }
     }
 }
