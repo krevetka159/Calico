@@ -132,10 +132,10 @@ namespace Calico
                     Console.WriteLine("    2. Easy color half-random agent");
                     Console.WriteLine("    3. Easy pattern half-random agent");
                     Console.WriteLine("    4. Easy half-random agent");
-                    Console.WriteLine("    5. Counting color scores");
-                    Console.WriteLine("    6. Counting pattern scores");
-                    Console.WriteLine("    7. Counting scores");
-                    Console.WriteLine("    8. Random position, count scores");
+                    Console.WriteLine("    5. Random position, count scores");
+                    Console.WriteLine("    6. Counting color scores");
+                    Console.WriteLine("    7. Counting pattern scores");
+                    Console.WriteLine("    8. Counting scores");
                     Console.WriteLine("    9. 7 but with probability to do sth random");
                     Console.Write(" Pick agent: ");
 
@@ -222,22 +222,22 @@ namespace Calico
                         }
                     case 5:
                         {
-                            agent = new AgentColor(scoring);
+                            agent = new RandomPositionAgent(scoring);
                             break;
                         }
                     case 6:
                         {
-                            agent = new AgentPattern(scoring);
+                            agent = new AgentColor(scoring);
                             break;
                         }
                     case 7:
                         {
-                            agent = new AgentComplet(scoring);
+                            agent = new AgentPattern(scoring);
                             break;
                         }
                     case 8:
                         {
-                            agent = new RandomPositionAgent(scoring);
+                            agent = new AgentComplet(scoring);
                             break;
                         }
                     case 9:
@@ -273,10 +273,10 @@ namespace Calico
             Console.WriteLine("    2. Easy color half-random agent");
             Console.WriteLine("    3. Easy pattern half-random agent");
             Console.WriteLine("    4. Easy half-random agent");
-            Console.WriteLine("    5. Counting color scores");
-            Console.WriteLine("    6. Counting pattern scores");
-            Console.WriteLine("    7. Counting scores");
-            Console.WriteLine("    8. Random position, count scores");
+            Console.WriteLine("    5. Random position, count scores");
+            Console.WriteLine("    6. Counting color scores");
+            Console.WriteLine("    7. Counting pattern scores");
+            Console.WriteLine("    8. Counting scores");
             Console.WriteLine("    9. 7 but with probability to do sth random");
 
             for (int i = 1;i <= 9;i++)
