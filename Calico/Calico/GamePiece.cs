@@ -8,24 +8,25 @@ namespace Calico
 {
     public enum Color
     {
-        None,
-        Yellow,
-        Green, 
-        Cyan, 
-        Blue, 
-        Purple, 
-        Pink
+        None = 0,
+
+        Yellow = 1,
+        Green = 2, 
+        Cyan = 3, 
+        Blue = 4, 
+        Purple = 5, 
+        Pink = 6,
     }
 
     public enum Pattern
     {
-        None,
-        Dots,
-        Stripes,
-        Fern,
-        Flowers,
-        Vines,
-        Quatrefoil
+        None = 0,
+        Dots = 1,
+        Stripes = 2,
+        Fern = 3,
+        Flowers = 4,
+        Vines = 5,
+        Quatrefoil = 6,
     }
 
     public enum Type
@@ -44,6 +45,8 @@ namespace Calico
 
         public GamePiece(Type t)
         {
+            // init for Empty and Blocked
+
             Type = t;
             Color = Color.None;
             Pattern = Pattern.None;
@@ -54,6 +57,7 @@ namespace Calico
 
         public GamePiece(Color c, Pattern p) 
         {
+            // init for PatchTile
             Color = c;
             Pattern = p;
             Type = Type.PatchTile;
