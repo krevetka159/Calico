@@ -14,15 +14,28 @@ namespace Calico
 
         public Random random = new Random();
 
+        /// <summary>
+        /// Random patchtile, random position
+        /// </summary>
+        /// <param name="scoring"></param>
         public Agent(Scoring scoring) : base(scoring)
         {
         }
 
+        /// <summary>
+        /// Choose a random patchtile from options
+        /// </summary>
+        /// <param name="Opts"></param>
+        /// <returns></returns>
         public int RandomGamePiece(GamePiece[] Opts)
         {
-            return random.Next(1, Opts.Length);
+            return random.Next(0, Opts.Length-1);
         }
 
+        /// <summary>
+        /// Choose at random an empty position on the gameboard
+        /// </summary>
+        /// <returns></returns>
         public (int, int) RandomPosition()
         {
             int row = random.Next(0, Board.Size - 1);
@@ -37,15 +50,25 @@ namespace Calico
             return (row, col);
         }
 
+        /// <summary>
+        /// Agent makes a move
+        /// </summary>
+        /// <param name="Opts"></param>
+        /// <returns></returns>
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             return (RandomGamePiece(Opts), RandomPosition());
         }
     }
 
+
+
     public class RandomPositionAgent : Agent
     {
-        // random position, then looks for best possible patch tile
+        /// <summary>
+        /// random position, then looks for best possible patch tile
+        /// </summary>
+        /// <param name="scoring"></param>
         public RandomPositionAgent(Scoring scoring) : base(scoring)
         {
         }
@@ -78,12 +101,15 @@ namespace Calico
 
     public class RandomAgentColor : Agent
     {
-        // random patch tile, finds first position with the same color neighbor
+        /// <summary>
+        /// random patch tile, finds first position with the same color neighbor
+        /// </summary>
+        /// <param name="scoring"></param>
         public RandomAgentColor(Scoring scoring) : base(scoring)
         {
         }
 
-        public (int, int) ChoosePosition(GamePiece gp)
+        private (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1;i<Board.Size-1;i++)
             {
@@ -112,12 +138,16 @@ namespace Calico
     }
     public class RandomAgentPattern : Agent
     {
-        // random patch tile, finds first position with the same pattern neighbor
+
+        /// <summary>
+        /// random patch tile, finds first position with the same color neighbor
+        /// </summary>
+        /// <param name="scoring"></param>
         public RandomAgentPattern(Scoring scoring) : base(scoring)
         {
         }
 
-        public (int, int) ChoosePosition(GamePiece gp)
+        private (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1; i < Board.Size - 1; i++)
             {
@@ -147,13 +177,16 @@ namespace Calico
 
     public class RandomAgentComplet : Agent
     {
-        // random patch tile, finds first position with the same color or pattern neighbor
+        /// <summary>
+        /// random patch tile, finds first position with the same color or pattern neighbor
+        /// </summary>
+        /// <param name="scoring"></param>
         public RandomAgentComplet(Scoring scoring) : base(scoring)
         {
         }
 
 
-        public (int, int) ChoosePosition(GamePiece gp)
+        private (int, int) ChoosePosition(GamePiece gp)
         {
             for (int i = 1; i < Board.Size - 1; i++)
             {
@@ -186,8 +219,10 @@ namespace Calico
 
     public class AgentColor : Agent
     {
-        // picks patchtile and position that increases color score the most
-        // -> first that does or first neighbor if it can't increase score
+        /// <summary>
+        ///  picks patchtile and position that increases color score the most
+        /// </summary>
+        /// <param name="scoring"></param>
         public AgentColor(Scoring scoring) : base(scoring)
         {
         }
@@ -225,8 +260,11 @@ namespace Calico
     }
     public class AgentPattern : Agent
     {
-        // picks patchtile and position that increases pattern score the most
-        // -> first that does or first neighbor if it can't increase score
+
+        /// <summary>
+        ///  picks patchtile and position that increases pattern score the most
+        /// </summary>
+        /// <param name="scoring"></param>
         public AgentPattern(Scoring scoring) : base(scoring)
         {
         }
@@ -266,8 +304,10 @@ namespace Calico
 
     public class AgentComplet : Agent
     {
-        // picks patchtile and position that increases score the most
-        // -> first that does or first neighbor if it can't increase score
+        /// <summary>
+        /// picks patchtile and position that increases score the most
+        /// </summary>
+        /// <param name="scoring"></param>
         public AgentComplet(Scoring scoring) : base(scoring)
         {
         }
@@ -305,9 +345,10 @@ namespace Calico
 
         public class AgentCompletWithProb : Agent
         {
-            // picks patchtile and position that increases score the most
-            // -> first that does or first neighbor if it can't increase score
-            // with a small probability make random move
+            /// <summary>
+            /// picks patchtile and position that increases score the most, but with a small probability make random move
+            /// </summary>
+            /// <param name="scoring"></param>
 
             public AgentCompletWithProb(Scoring scoring) : base(scoring)
             {
