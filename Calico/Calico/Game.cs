@@ -263,7 +263,7 @@ namespace Calico
                 sum += agent.Board.ScoreCounter.GetScore();
             }
             Console.WriteLine();
-            if (iterations > 1) Console.WriteLine(" Mean: " + (sum / iterations));
+            if (iterations > 1) Console.WriteLine(" Mean: " + (Convert.ToDouble(sum) / Convert.ToDouble(iterations)));
         }
 
         private void TestAll()
