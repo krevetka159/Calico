@@ -334,7 +334,7 @@ namespace Calico
                                 maxPosition = (i, j);
                             }
                         }
-                        
+
                     }
                 }
             }
@@ -342,7 +342,7 @@ namespace Calico
 
 
         }
-
+    }
         public class AgentCompletWithProb : Agent
         {
             /// <summary>
@@ -391,7 +391,68 @@ namespace Calico
             }
 
         }
-    }
 
+    // ----------------------------------------------- MULTIPLAYER AGENT ------------------------------------------------------------
+    public class TwoPlayerAgent : Agent
+    {
+        private Player Opponent;
+        /// <summary>
+        /// random position, then looks for best possible patch tile
+        /// </summary>
+        /// <param name="scoring"></param>
+        public TwoPlayerAgent(Scoring scoring, ref Agent opponent) : base(scoring)
+        {
+            Opponent = opponent;
+        }
+
+        private int FindOpponentsBestPiece(GamePiece[] Opts)
+        {
+            int maxPieceIndex = RandomGamePiece(Opts);
+            int max = 0;
+
+            for (int o = 0; o < Opts.Length; o++)
+            {
+                GamePiece gp = Opts[o];
+                for (int i = 1; i < Board.Size - 1; i++)
+                {
+                    for (int j = 1; j < Board.Size - 1; j++)
+                    {
+                        if (Board.IsEmpty(i, j))
+                        {
+                            if (Board.EvaluateNeighbors(gp, i, j) > max)
+                            {
+                                maxPieceIndex = o;
+                                max = Board.EvaluateNeighbors(gp, i, j);
+                            }
+                        }
+                    }
+                }
+            }
+            return (maxPieceIndex);
+        }
+
+        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            int max = 0;
+            (int, int) maxPosition = RandomPosition();
+            int pieceIndex = FindOpponentsBestPiece(Opts);
+            GamePiece gp = Opts[pieceIndex];
+                for (int i = 1; i < Board.Size - 1; i++)
+                {
+                    for (int j = 1; j < Board.Size - 1; j++)
+                    {
+                        if (Board.IsEmpty(i, j))
+                        {
+                            if (Board.EvaluateNeighbors(gp, i, j) > max)
+                            {
+                                max = Board.EvaluateNeighbors(gp, i, j);
+                                maxPosition = (i, j);
+                            }
+                        }
+                    }
+                }
+            return (pieceIndex, maxPosition);
+        }
+    }
 
 }
