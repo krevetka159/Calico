@@ -14,6 +14,7 @@ namespace Calico
         private Bag bag;
         private Player player;
         private Agent agent;
+        private Agent agent2;
         private GamePiece[] Opts = new GamePiece[3];
         private Scoring scoring;
         private GameStatePrinter gameStatePrinter;
@@ -42,6 +43,11 @@ namespace Calico
                 case 4:
                     {
                         TestAll();
+                        break;
+                    }
+                case 5:
+                    {
+                        TestMultiPlayer();
                         break;
                     }
                 default:
@@ -266,6 +272,55 @@ namespace Calico
             if (iterations > 1) Console.WriteLine(" Mean: " + (Convert.ToDouble(sum) / Convert.ToDouble(iterations)));
         }
 
+        private void TestMultiPlayerGame(bool withPrint, bool allResults, int iterations)
+        {
+            int sumA1 = 0;
+            int sumA2 = 0;
+
+            for (int j = 0; j < iterations; j++)
+            {
+
+                bag = new Bag();
+
+                scoring = new Scoring();
+
+                gameStatePrinter = new GameStatePrinter(scoring);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Opts[i] = bag.Next();
+                }
+
+                agent = new AgentComplet(scoring);
+                agent2 = new TwoPlayerAgent(scoring, ref agent);
+
+                //print empty
+                if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
+
+                for (int i = 0; i < 22; i++)
+                {
+                    MakeMove(agent);
+
+                    if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
+
+                    MakeMove(agent2);
+                    if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
+
+                }
+
+                if (allResults) gameStatePrinter.PrintStats(agent, agent2);
+                sumA1 += agent.Board.ScoreCounter.GetScore();
+                sumA2 += agent2.Board.ScoreCounter.GetScore();
+            }
+            Console.WriteLine();
+            if (iterations > 1) 
+            { 
+                Console.WriteLine(" MeanA1: " + (Convert.ToDouble(sumA1) / Convert.ToDouble(iterations)));
+                Console.WriteLine(" MeanA2: " + (Convert.ToDouble(sumA2) / Convert.ToDouble(iterations)));
+
+            }
+        }
+
         private void TestAll()
         {
             Console.WriteLine(" Agents: ");
@@ -286,6 +341,68 @@ namespace Calico
                 Console.WriteLine();
             }
 
+        }
+
+        private void TestMultiPlayer()
+        {
+            //int agentOption;
+
+            while (true)
+            {
+                try
+                {
+                    //Console.WriteLine(" Agent options: ");
+                    //Console.WriteLine("    1. Random");
+                    //Console.WriteLine("    2. Easy color half-random agent");
+                    //Console.WriteLine("    3. Easy pattern half-random agent");
+                    //Console.WriteLine("    4. Easy half-random agent");
+                    //Console.WriteLine("    5. Random position, count scores");
+                    //Console.WriteLine("    6. Counting color scores");
+                    //Console.WriteLine("    7. Counting pattern scores");
+                    //Console.WriteLine("    8. Counting scores");
+                    //Console.WriteLine("    9. 7 but with probability to do sth random");
+                    //Console.Write(" Pick agent: ");
+
+                    //agentOption = Convert.ToInt32(Console.ReadLine());
+                    //Console.WriteLine();
+
+                    //if (1 <= agentOption && agentOption <= 9)
+                    //{
+
+                        while (true)
+                        {
+
+                            Console.Write(" Print progress (y/n): ");
+                            string newGame = Console.ReadLine();
+
+                            if (newGame == "n")
+                            {
+                                TestMultiPlayerGame(false, true, 50);
+                                break;
+                            }
+                            else if (newGame == "y")
+                            {
+                                TestMultiPlayerGame(true,true, 1);
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine(" Invalid expression");
+                            }
+                        }
+                        break;
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine(" " + agentOption + " is not a mode option");
+                    //}
+
+                }
+                catch
+                {
+                    Console.WriteLine(" Must be an integer.");
+                }
+            }
         }
 
 // ----------------------------------------------- GET COMMAND ------------------------------------------------------------

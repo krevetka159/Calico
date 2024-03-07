@@ -46,7 +46,7 @@ namespace Calico
 
         private static int GetGameMode()
         {
-            int numOfPlayers;
+            int gameMode;
            
             while (true)
             {
@@ -57,14 +57,15 @@ namespace Calico
                     Console.WriteLine("   2. 2 players (vs. computer)");
                     Console.WriteLine("   3. Single agent testing");
                     Console.WriteLine("   4. All agent testing");
+                    Console.WriteLine("   5. Multiplayer testing");
 
                     Console.Write(" Choose game mode: ");
 
-                    numOfPlayers = Convert.ToInt32(Console.ReadLine());
+                    gameMode = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine();
                     
 
-                    switch (numOfPlayers)
+                    switch (gameMode)
                     {
                         case 1:
                             {
@@ -82,10 +83,13 @@ namespace Calico
                             {
                                 return 4;
                             }
-
+                        case 5:
+                            {
+                                return 5;
+                            }
                         default:
                             {
-                                Console.WriteLine(" " + numOfPlayers + " is not a mode option");
+                                Console.WriteLine(" " + gameMode + " is not a mode option");
                                 break;
                             }
                     }
@@ -95,7 +99,7 @@ namespace Calico
                 }
                 catch
                 {
-                    Console.WriteLine(" Number of players must be an integer.");
+                    Console.WriteLine(" Game mode must be an integer.");
                 }
             }
 
