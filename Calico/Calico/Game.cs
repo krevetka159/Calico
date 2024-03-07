@@ -189,6 +189,9 @@ namespace Calico
         private void TestGame(bool withPrint, bool allResults, int agentType, int iterations)
         {
             int sum = 0;
+            int max = 0;
+            int min = -1;
+            int score;
 
             for (int j = 0; j < iterations; j++)
             {
@@ -266,16 +269,36 @@ namespace Calico
                 }
 
                 if(allResults) gameStatePrinter.PrintStats(agent);
-                sum += agent.Board.ScoreCounter.GetScore();
+                score = agent.Board.ScoreCounter.GetScore();
+                sum += score;
+                if (score > max) max = score;
+                if (score < min || min == -1) min = score;
             }
             Console.WriteLine();
-            if (iterations > 1) Console.WriteLine(" Mean: " + (Convert.ToDouble(sum) / Convert.ToDouble(iterations)));
+            if (iterations > 1)
+            {
+                Console.WriteLine(" Mean: " + (Convert.ToDouble(sum) / Convert.ToDouble(iterations)));
+                Console.WriteLine(" Best score: " + max);
+                Console.WriteLine(" Lowest score: " + min);
+            }
         }
 
         private void TestMultiPlayerGame(bool withPrint, bool allResults, int iterations)
         {
             int sumA1 = 0;
             int sumA2 = 0;
+
+            int maxA1 = 0;
+            int maxA2 = 0;
+
+            int minA1 = -1;
+            int minA2 = -1;
+
+            int winsA1 = 0;
+            int winsA2 = 0;
+
+            int scoreA1;
+            int scoreA2;
 
             for (int j = 0; j < iterations; j++)
             {
@@ -308,15 +331,31 @@ namespace Calico
 
                 }
 
+                scoreA1 = agent.Board.ScoreCounter.GetScore();
+                scoreA2 = agent2.Board.ScoreCounter.GetScore();
+
                 if (allResults) gameStatePrinter.PrintStats(agent, agent2);
-                sumA1 += agent.Board.ScoreCounter.GetScore();
-                sumA2 += agent2.Board.ScoreCounter.GetScore();
+                sumA1 += scoreA1;
+                sumA2 += scoreA2;
+                if (scoreA1 > maxA1) maxA1 = scoreA1;
+                if (scoreA2 > maxA2) maxA2 = scoreA2;
+                if (scoreA1 < minA1 || minA1 == -1) minA1 = scoreA1;
+                if (scoreA2 < minA2 || minA2 == -1) minA2 = scoreA2;
+                if (scoreA1 > scoreA2) winsA1++;
+                else if (scoreA2 > scoreA1) winsA2++;
             }
             Console.WriteLine();
             if (iterations > 1) 
             { 
-                Console.WriteLine(" MeanA1: " + (Convert.ToDouble(sumA1) / Convert.ToDouble(iterations)));
-                Console.WriteLine(" MeanA2: " + (Convert.ToDouble(sumA2) / Convert.ToDouble(iterations)));
+                Console.WriteLine(" Mean A1: " + (Convert.ToDouble(sumA1) / Convert.ToDouble(iterations)));
+                Console.WriteLine(" Mean A2: " + (Convert.ToDouble(sumA2) / Convert.ToDouble(iterations)));
+                Console.WriteLine();
+                Console.WriteLine(" Best score A1: " + maxA1);
+                Console.WriteLine(" Best score A2: " + maxA2);
+                Console.WriteLine(" Lowest score A1: " + minA1);
+                Console.WriteLine(" Lowest score A2: " + minA2);
+                Console.WriteLine(" Wins A1: " + winsA1);
+                Console.WriteLine(" Wins A2: " + winsA2);
 
             }
         }
