@@ -11,6 +11,11 @@ namespace Calico
     public class Agent : Player
     {
         // basic random agent
+        private Player Opponent;
+        public void SetOpponent(ref Agent opponent)
+        {
+            Opponent = opponent;
+        }
 
         public Random random = new Random();
 
@@ -432,14 +437,12 @@ namespace Calico
     // ----------------------------------------------- MULTIPLAYER AGENT ------------------------------------------------------------
     public class TwoPlayerAgent : Agent
     {
-        private Player Opponent;
         /// <summary>
         /// choose the piece that AgentComplete opponent whould choose and pick the position that increases the score the most
         /// </summary>
         /// <param name="scoring"></param>
-        public TwoPlayerAgent(Scoring scoring, ref Agent opponent) : base(scoring)
+        public TwoPlayerAgent(Scoring scoring) : base(scoring)
         {
-            Opponent = opponent;
         }
 
         private int FindOpponentsBestPiece(GamePiece[] Opts)

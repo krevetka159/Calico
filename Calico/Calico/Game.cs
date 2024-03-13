@@ -125,10 +125,10 @@ namespace Calico
 
         // ----------------------------------------------- TESTING ------------------------------------------------------------
 
-        private void Testing()
+        private int PickAgent(bool multiPlayer)
         {
             int agentOption;
-            
+
             while (true)
             {
                 try
@@ -144,36 +144,15 @@ namespace Calico
                     Console.WriteLine("    8. Counting scores");
                     Console.WriteLine("    9. 7 but with probability to do sth random");
                     Console.WriteLine("    10. random patch tile, best position");
+                    Console.WriteLine("    11. twoplayer");
                     Console.Write(" Pick agent: ");
 
                     agentOption = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine();
 
-                    if (1<= agentOption && agentOption <= 10)
+                    if (1 <= agentOption && agentOption <= 11)
                     {
-                        
-                        while (true)
-                        {
-                            
-                            Console.Write(" Print progress (y/n): ");
-                            string newGame = Console.ReadLine();
-
-                            if (newGame == "n")
-                            {
-                                TestGame(false, true, agentOption, 50);
-                                break;
-                            }
-                            else if (newGame == "y") 
-                            {
-                                TestGame(true, true, agentOption, 1);
-                                break; 
-                            }
-                            else
-                            {
-                                Console.WriteLine(" Invalid expression");
-                            }
-                        }
-                        break;
+                        return agentOption;
                     }
                     else
                     {
@@ -184,6 +163,86 @@ namespace Calico
                 catch
                 {
                     Console.WriteLine(" Must be an integer.");
+                }
+            }
+        }
+        private Agent UseAgent(int agentOption)
+        {
+            switch (agentOption)
+            {
+                case 1:
+                    {
+                        return new Agent(scoring);
+                    }
+                case 2:
+                    {
+                        return new RandomAgentColor(scoring);
+                    }
+                case 3:
+                    {
+                        return new RandomAgentPattern(scoring);
+                    }
+                case 4:
+                    {
+                        return new RandomAgentComplete(scoring);
+                    }
+                case 5:
+                    {
+                        return new RandomPositionAgent(scoring);
+                    }
+                case 6:
+                    {
+                        return new AgentColor(scoring);
+                    }
+                case 7:
+                    {
+                        return new AgentPattern(scoring);
+                    }
+                case 8:
+                    {
+                        return new AgentComplete(scoring);
+                    }
+                case 9:
+                    {
+                        return new AgentCompleteWithProb(scoring);
+                    }
+                case 10:
+                    {
+                        return new RandomPatchTileAgent(scoring);
+                    }
+                case 11:
+                    {
+                        return new TwoPlayerAgent(scoring);
+                    }
+                default:
+                    {
+                        return new Agent(scoring);
+                    }
+            }
+        }
+        private void Testing()
+        {
+            int agentOption = PickAgent(false);
+            
+            while (true)
+            {
+                            
+                Console.Write(" Print progress (y/n): ");
+                string newGame = Console.ReadLine();
+
+                if (newGame == "n")
+                {
+                    TestGame(false, true, agentOption, 50);
+                    break;
+                }
+                else if (newGame == "y") 
+                {
+                    TestGame(true, true, agentOption, 1);
+                    break; 
+                }
+                else
+                {
+                    Console.WriteLine(" Invalid expression");
                 }
             }
         }
@@ -208,59 +267,8 @@ namespace Calico
                 {
                     Opts[i] = bag.Next();
                 }
-                switch (agentType)
-                {
-                    case 1:
-                        {
-                            agent = new Agent(scoring);
-                            break;
-                        }
-                    case 2:
-                        {
-                            agent = new RandomAgentColor(scoring);
-                            break;
-                        }
-                    case 3:
-                        {
-                            agent = new RandomAgentPattern(scoring);
-                            break;
-                        }
-                    case 4:
-                        {
-                            agent = new RandomAgentComplete(scoring);
-                            break;
-                        }
-                    case 5:
-                        {
-                            agent = new RandomPositionAgent(scoring);
-                            break;
-                        }
-                    case 6:
-                        {
-                            agent = new AgentColor(scoring);
-                            break;
-                        }
-                    case 7:
-                        {
-                            agent = new AgentPattern(scoring);
-                            break;
-                        }
-                    case 8:
-                        {
-                            agent = new AgentComplete(scoring);
-                            break;
-                        }
-                    case 9:
-                        {
-                            agent = new AgentCompleteWithProb(scoring);
-                            break;
-                        }
-                    case 10:
-                        {
-                            agent = new RandomPatchTileAgent(scoring);
-                            break;
-                        }
-                }
+
+                agent = UseAgent(agentType);
                 
                 if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
@@ -306,6 +314,9 @@ namespace Calico
             int scoreA1;
             int scoreA2;
 
+            int a1 = PickAgent(true);
+            int a2 = PickAgent(true);
+
             for (int j = 0; j < iterations; j++)
             {
 
@@ -319,9 +330,11 @@ namespace Calico
                 {
                     Opts[i] = bag.Next();
                 }
+                agent = UseAgent(a1);
+                agent2 = UseAgent(a2);
 
-                agent = new AgentComplete(scoring);
-                agent2 = new TwoPlayerAgent(scoring, ref agent);
+                agent.SetOpponent(ref agent2);
+                agent2.SetOpponent(ref agent);
 
                 //print empty
                 if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
@@ -391,62 +404,25 @@ namespace Calico
 
         private void TestMultiPlayer()
         {
-            //int agentOption;
-
             while (true)
             {
-                try
+
+                Console.Write(" Print progress (y/n): ");
+                string newGame = Console.ReadLine();
+
+                if (newGame == "n")
                 {
-                    //Console.WriteLine(" Agent options: ");
-                    //Console.WriteLine("    1. Random");
-                    //Console.WriteLine("    2. Easy color half-random agent");
-                    //Console.WriteLine("    3. Easy pattern half-random agent");
-                    //Console.WriteLine("    4. Easy half-random agent");
-                    //Console.WriteLine("    5. Random position, count scores");
-                    //Console.WriteLine("    6. Counting color scores");
-                    //Console.WriteLine("    7. Counting pattern scores");
-                    //Console.WriteLine("    8. Counting scores");
-                    //Console.WriteLine("    9. 7 but with probability to do sth random");
-                    //Console.Write(" Pick agent: ");
-
-                    //agentOption = Convert.ToInt32(Console.ReadLine());
-                    //Console.WriteLine();
-
-                    //if (1 <= agentOption && agentOption <= 9)
-                    //{
-
-                        while (true)
-                        {
-
-                            Console.Write(" Print progress (y/n): ");
-                            string newGame = Console.ReadLine();
-
-                            if (newGame == "n")
-                            {
-                                TestMultiPlayerGame(false, false, 1000);
-                                break;
-                            }
-                            else if (newGame == "y")
-                            {
-                                TestMultiPlayerGame(true,true, 1);
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine(" Invalid expression");
-                            }
-                        }
-                        break;
-                    //}
-                    //else
-                    //{
-                    //    Console.WriteLine(" " + agentOption + " is not a mode option");
-                    //}
-
+                    TestMultiPlayerGame(false, false, 1000);
+                    break;
                 }
-                catch
+                else if (newGame == "y")
                 {
-                    Console.WriteLine(" Must be an integer.");
+                    TestMultiPlayerGame(true,true, 1);
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine(" Invalid expression");
                 }
             }
         }
