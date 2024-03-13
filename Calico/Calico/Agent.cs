@@ -97,7 +97,44 @@ namespace Calico
         }
     }
 
-// ----------------------------------------------- FIND NEIGHBOR ------------------------------------------------------------
+    public class RandomPatchTileAgent : Agent
+    {
+        /// <summary>
+        /// random patch tile, then looks for best possible position
+        /// </summary>
+        /// <param name="scoring"></param>
+        public RandomPatchTileAgent(Scoring scoring) : base(scoring)
+        {
+        }
+
+        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            (int x, int y) = RandomPosition();
+            int opt = RandomGamePiece(Opts);
+
+            int max = 0;
+
+            for (int i = 1; i < Board.Size - 1; i++)
+            {
+                for (int j = 1; j < Board.Size - 1; j++)
+                {
+                    if (Board.IsEmpty(i, j))
+                    {
+                        if (Board.EvaluateNeighbors(Opts[opt], i, j) > max)
+                        {
+                            max = Board.EvaluateNeighbors(Opts[opt], i, j);
+                            (x, y) = (i, j);
+                        }
+                    }
+
+                }
+            }
+
+            return (opt, (x, y));
+        }
+    }
+
+    // ----------------------------------------------- FIND NEIGHBOR ------------------------------------------------------------
 
     public class RandomAgentColor : Agent
     {

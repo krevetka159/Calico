@@ -143,12 +143,13 @@ namespace Calico
                     Console.WriteLine("    7. Counting pattern scores");
                     Console.WriteLine("    8. Counting scores");
                     Console.WriteLine("    9. 7 but with probability to do sth random");
+                    Console.WriteLine("    10. random patch tile, best position");
                     Console.Write(" Pick agent: ");
 
                     agentOption = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine();
 
-                    if (1<= agentOption && agentOption <= 9)
+                    if (1<= agentOption && agentOption <= 10)
                     {
                         
                         while (true)
@@ -252,6 +253,11 @@ namespace Calico
                     case 9:
                         {
                             agent = new AgentCompleteWithProb(scoring);
+                            break;
+                        }
+                    case 10:
+                        {
+                            agent = new RandomPatchTileAgent(scoring);
                             break;
                         }
                 }
@@ -372,8 +378,9 @@ namespace Calico
             Console.WriteLine("    7. Counting pattern scores");
             Console.WriteLine("    8. Counting scores");
             Console.WriteLine("    9. 7 but with probability to do sth random");
+            Console.WriteLine("    10. random patch tile, best position");
 
-            for (int i = 1;i <= 9;i++)
+            for (int i = 1;i <= 10;i++)
             {
                 Console.WriteLine(" " + i + ": ");
                 TestGame(false, false,i, 100);
