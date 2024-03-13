@@ -175,13 +175,13 @@ namespace Calico
         }
     }
 
-    public class RandomAgentComplet : Agent
+    public class RandomAgentComplete : Agent
     {
         /// <summary>
         /// random patch tile, finds first position with the same color or pattern neighbor
         /// </summary>
         /// <param name="scoring"></param>
-        public RandomAgentComplet(Scoring scoring) : base(scoring)
+        public RandomAgentComplete(Scoring scoring) : base(scoring)
         {
         }
 
@@ -302,13 +302,13 @@ namespace Calico
         }
     }
 
-    public class AgentComplet : Agent
+    public class AgentComplete : Agent
     {
         /// <summary>
         /// picks patchtile and position that increases score the most
         /// </summary>
         /// <param name="scoring"></param>
-        public AgentComplet(Scoring scoring) : base(scoring)
+        public AgentComplete(Scoring scoring) : base(scoring)
         {
         }
 
@@ -343,14 +343,14 @@ namespace Calico
 
         }
     }
-        public class AgentCompletWithProb : Agent
+        public class AgentCompleteWithProb : Agent
         {
             /// <summary>
             /// picks patchtile and position that increases score the most, but with a small probability make random move
             /// </summary>
             /// <param name="scoring"></param>
 
-            public AgentCompletWithProb(Scoring scoring) : base(scoring)
+            public AgentCompleteWithProb(Scoring scoring) : base(scoring)
             {
             }
 
@@ -397,7 +397,7 @@ namespace Calico
     {
         private Player Opponent;
         /// <summary>
-        /// random position, then looks for best possible patch tile
+        /// choose the piece that AgentComplete opponent whould choose and pick the position that increases the score the most
         /// </summary>
         /// <param name="scoring"></param>
         public TwoPlayerAgent(Scoring scoring, ref Agent opponent) : base(scoring)

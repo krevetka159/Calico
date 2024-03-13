@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using static Calico.AgentComplet;
+using static Calico.AgentComplete;
 
 namespace Calico
 {
@@ -103,7 +103,7 @@ namespace Calico
             }
 
             player = new Player(scoring);
-            agent = new AgentComplet(scoring);
+            agent = new AgentComplete(scoring);
 
             //print empty
             gameStatePrinter.PrintStateMulti(player, agent, Opts);
@@ -226,7 +226,7 @@ namespace Calico
                         }
                     case 4:
                         {
-                            agent = new RandomAgentComplet(scoring);
+                            agent = new RandomAgentComplete(scoring);
                             break;
                         }
                     case 5:
@@ -246,12 +246,12 @@ namespace Calico
                         }
                     case 8:
                         {
-                            agent = new AgentComplet(scoring);
+                            agent = new AgentComplete(scoring);
                             break;
                         }
                     case 9:
                         {
-                            agent = new AgentCompletWithProb(scoring);
+                            agent = new AgentCompleteWithProb(scoring);
                             break;
                         }
                 }
@@ -314,7 +314,7 @@ namespace Calico
                     Opts[i] = bag.Next();
                 }
 
-                agent = new AgentComplet(scoring);
+                agent = new AgentComplete(scoring);
                 agent2 = new TwoPlayerAgent(scoring, ref agent);
 
                 //print empty
@@ -416,7 +416,7 @@ namespace Calico
 
                             if (newGame == "n")
                             {
-                                TestMultiPlayerGame(false, true, 50);
+                                TestMultiPlayerGame(false, false, 1000);
                                 break;
                             }
                             else if (newGame == "y")
