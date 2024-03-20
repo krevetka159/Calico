@@ -11,10 +11,10 @@ namespace Calico
     public class Agent : Player
     {
         // basic random agent
-        private Player Opponent;
-        public void SetOpponent(ref Agent opponent)
+        public List<Agent> Opponents;
+        public void SetOpponent(ref List<Agent> opponents)
         {
-            Opponent = opponent;
+            Opponents = opponents;
         }
 
         public Random random = new Random();
@@ -452,17 +452,20 @@ namespace Calico
 
             for (int o = 0; o < Opts.Length; o++)
             {
-                GamePiece gp = Opts[o];
-                for (int i = 1; i < Board.Size - 1; i++)
+                foreach (Agent opponent in Opponents)
                 {
-                    for (int j = 1; j < Board.Size - 1; j++)
+                    GamePiece gp = Opts[o];
+                    for (int i = 1; i < opponent.Board.Size - 1; i++)
                     {
-                        if (Board.IsEmpty(i, j))
+                        for (int j = 1; j < opponent.Board.Size - 1; j++)
                         {
-                            if (Board.EvaluateNeighbors(gp, i, j) > max)
+                            if (opponent.Board.IsEmpty(i, j))
                             {
-                                maxPieceIndex = o;
-                                max = Board.EvaluateNeighbors(gp, i, j);
+                                if (opponent.Board.EvaluateNeighbors(gp, i, j) > max)
+                                {
+                                    maxPieceIndex = o;
+                                    max = opponent.Board.EvaluateNeighbors(gp, i, j);
+                                }
                             }
                         }
                     }

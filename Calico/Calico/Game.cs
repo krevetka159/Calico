@@ -15,6 +15,7 @@ namespace Calico
         private Player player;
         private Agent agent;
         private Agent agent2;
+        private List<Agent> multiAgents;
         private GamePiece[] Opts = new GamePiece[3];
         private Scoring scoring;
         private GameStatePrinter gameStatePrinter;
@@ -297,25 +298,28 @@ namespace Calico
             }
         }
 
-        private void TestMultiPlayerGame(bool withPrint, bool allResults, int iterations)
+        private void TestMultiPlayerGame(int numOfPlayers, bool withPrint, bool allResults, int iterations)
         {
-            int sumA1 = 0;
-            int sumA2 = 0;
+            List<int> sum = new List<int>();
+            List<int> max = new List<int>();
+            List<int> min = new List<int>();
+            List<int> wins = new List<int>();
+            List<int> score = new List<int>();
+            List<int> agentOptions = new List<int>();
 
-            int maxA1 = 0;
-            int maxA2 = 0;
+            multiAgents = new List<Agent>();
 
-            int minA1 = -1;
-            int minA2 = -1;
-
-            int winsA1 = 0;
-            int winsA2 = 0;
-
-            int scoreA1;
-            int scoreA2;
-
-            int a1 = PickAgent(true);
-            int a2 = PickAgent(true);
+            for (int i = 0; i < numOfPlayers; i++)
+            {
+                int a = PickAgent(true);
+                agentOptions.Add(a);
+                sum.Add(0);
+                max.Add(0);
+                min.Add(-1);
+                wins.Add(0);
+                score.Add(0);
+                multiAgents.Add(UseAgent(a));
+            }
 
             for (int j = 0; j < iterations; j++)
             {
@@ -330,52 +334,72 @@ namespace Calico
                 {
                     Opts[i] = bag.Next();
                 }
-                agent = UseAgent(a1);
-                agent2 = UseAgent(a2);
+                for (int i = 0; i < numOfPlayers; i++)
+                {
+                    multiAgents[i] = UseAgent(agentOptions[i]);
+                }
 
-                agent.SetOpponent(ref agent2);
-                agent2.SetOpponent(ref agent);
+                for (int i = 0; i < numOfPlayers; i++)
+                {
+                    List<Agent> ops = new List<Agent>();
+                    for (int k = 0; k < numOfPlayers; k++)
+                    {
+                        if (i != k)
+                        {
+                            ops.Add(multiAgents[k]);
+                        }
+                    }
+                    multiAgents[i].SetOpponent(ref ops);
+                }
 
                 //print empty
-                if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
+                if (withPrint) gameStatePrinter.PrintStateTestMulti(multiAgents[0], multiAgents[1], Opts);
 
                 for (int i = 0; i < 22; i++)
                 {
-                    MakeMove(agent);
+                    //MakeMove(agent);
 
-                    if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
+                    //MakeMove(agent2);
+                    //if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
 
-                    MakeMove(agent2);
-                    if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
+                    for (int k = 0; k < numOfPlayers; k++)
+                    {
+                        MakeMove(multiAgents[k]);
+                        if (withPrint) gameStatePrinter.PrintStateTestMulti(multiAgents[0], multiAgents[1], Opts);
+                    }
 
                 }
 
-                scoreA1 = agent.Board.ScoreCounter.GetScore();
-                scoreA2 = agent2.Board.ScoreCounter.GetScore();
+                for (int i = 0;i < numOfPlayers; i++)
+                {
+                    score[i] = multiAgents[i].Board.ScoreCounter.GetScore();
+                    if (allResults) gameStatePrinter.PrintStats(multiAgents[i]);
 
-                if (allResults) gameStatePrinter.PrintStats(agent, agent2);
-                sumA1 += scoreA1;
-                sumA2 += scoreA2;
-                if (scoreA1 > maxA1) maxA1 = scoreA1;
-                if (scoreA2 > maxA2) maxA2 = scoreA2;
-                if (scoreA1 < minA1 || minA1 == -1) minA1 = scoreA1;
-                if (scoreA2 < minA2 || minA2 == -1) minA2 = scoreA2;
-                if (scoreA1 > scoreA2) winsA1++;
-                else if (scoreA2 > scoreA1) winsA2++;
+                    sum[i] += score[i];
+                    if (score[i] > max[i]) max[i] = score[i];
+                    if (score[i] < min[i] || min[i] == -1) min[i] = score[i];
+                }
+
+                int max_game_score = score.Max();
+                for (int i = 0; i < numOfPlayers; i++)
+                {
+                    if (score[i] == max_game_score)
+                    {
+                        wins[i] += 1;
+                    }
+                }
+
             }
             Console.WriteLine();
             if (iterations > 1) 
-            { 
-                Console.WriteLine(" Mean A1: " + (Convert.ToDouble(sumA1) / Convert.ToDouble(iterations)));
-                Console.WriteLine(" Mean A2: " + (Convert.ToDouble(sumA2) / Convert.ToDouble(iterations)));
-                Console.WriteLine();
-                Console.WriteLine(" Best score A1: " + maxA1);
-                Console.WriteLine(" Best score A2: " + maxA2);
-                Console.WriteLine(" Lowest score A1: " + minA1);
-                Console.WriteLine(" Lowest score A2: " + minA2);
-                Console.WriteLine(" Wins A1: " + winsA1);
-                Console.WriteLine(" Wins A2: " + winsA2);
-
+            {
+                for (int i = 0; i < numOfPlayers; i++)
+                {
+                    Console.WriteLine(" Mean " + i + ": " + (Convert.ToDouble(sum[i]) / Convert.ToDouble(iterations)));
+                    Console.WriteLine(" Best score " + i + ": " + max[i]);
+                    Console.WriteLine(" Lowest score " + i +": " + min[i]);
+                    Console.WriteLine(" Wins " + i + ": " + wins[i]);
+                }
             }
         }
 
@@ -406,24 +430,49 @@ namespace Calico
         {
             while (true)
             {
-
-                Console.Write(" Print progress (y/n): ");
-                string newGame = Console.ReadLine();
-
-                if (newGame == "n")
+                Console.Write("Number of players (2-4): ");
+                try
                 {
-                    TestMultiPlayerGame(false, false, 1000);
-                    break;
+                    int numOfPlayers = Convert.ToInt32(Console.ReadLine());
+
+                    if (numOfPlayers == 2) 
+                    {
+                        while (true)
+                        {
+                            Console.Write(" Print progress (y/n): ");
+                            string newGame = Console.ReadLine();
+
+                            if (newGame == "n")
+                            {
+                                TestMultiPlayerGame(numOfPlayers, false, false, 1000);
+                                break;
+                            }
+                            else if (newGame == "y")
+                            {
+                                TestMultiPlayerGame(numOfPlayers, true, true, 1);
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine(" Invalid expression");
+                            }
+                        }
+                    }
+                    else if ( numOfPlayers == 3 || numOfPlayers == 4)
+                    {
+                        TestMultiPlayerGame(numOfPlayers, false, false, 1000);
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine(" Invalid number of players");
+                    }
                 }
-                else if (newGame == "y")
-                {
-                    TestMultiPlayerGame(true,true, 1);
-                    break;
-                }
-                else
+                catch
                 {
                     Console.WriteLine(" Invalid expression");
                 }
+
             }
         }
 
