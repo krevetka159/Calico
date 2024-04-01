@@ -123,6 +123,7 @@ namespace Calico
             if(possible_button && GetColorCount(p) >= Scoring.ColorClusterSize)
             {
                 Score += Scoring.ColorClusterScore;
+                AddAndUpdateButtons(p.Color);
             }
             if (possible_cat && GetPatternCount(p) >= Scoring.PatternClusterSizes[p.Pattern])
             {
@@ -223,7 +224,43 @@ namespace Calico
         {
             return Score;
         }
-        
 
+
+        public bool GetsRainbowButton(Color c)
+        {
+            foreach (KeyValuePair<Color,int> pair in buttons)
+            {
+                if (pair.Key == c)
+                {
+                    if (pair.Value != 0) return false;
+                }
+                else
+                {
+                    if (pair.Value == 0) return false;
+                }
+            }
+            return true;
+        }
+
+        public void AddAndUpdateButtons(Color c)
+        {
+            if (GetsRainbowButton(c))
+            {
+                Score += Scoring.ColorClusterScore;
+
+                foreach (KeyValuePair<Color, int> pair in buttons)
+                {
+                    if (pair.Key != c)
+                    {
+                        buttons[pair.Key]--;
+                    }
+                }
+            }
+            else
+            {
+                buttons[c] += 1;
+            }
+        }
+        
     }
 }

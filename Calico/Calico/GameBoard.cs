@@ -436,7 +436,17 @@ namespace Calico
             }
 
             if (count == 0) return 0;
-            else if (count + 1 >= ScoreCounter.Scoring.ColorClusterSize) return ScoreCounter.Scoring.ColorClusterScore + 1;
+            else if (count + 1 >= ScoreCounter.Scoring.ColorClusterSize)
+            {
+                if (ScoreCounter.GetsRainbowButton(gp.Color))
+                {
+                    return ScoreCounter.Scoring.ColorClusterScore + 1 + 3;
+                }
+                else
+                {
+                    return ScoreCounter.Scoring.ColorClusterScore + 1;
+                }   
+            }
             else return 1;
         }
 
