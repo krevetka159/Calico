@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,6 +15,9 @@ namespace Calico
         private UnionFind<GamePiece> colorUF;
         private UnionFind<GamePiece> patternUF;
 
+        private Dictionary<Color, int> buttons;
+        private Dictionary<Pattern, int> cats;
+
         public Scoring Scoring { get; private set; }
 
         public ScoreCounter(Scoring scoring) 
@@ -24,6 +28,15 @@ namespace Calico
             colorUF = new UnionFind<GamePiece>();
             patternUF = new UnionFind<GamePiece>();
 
+            buttons = new Dictionary<Color, int>(){ 
+                { Color.Yellow, 0 },
+                { Color.Green, 0 },
+                { Color.Cyan, 0 },
+                { Color.Blue, 0 },
+                { Color.Purple, 0 },
+                { Color.Pink, 0 },
+            };
+            
         }
 
         /// <summary>
@@ -72,6 +85,52 @@ namespace Calico
             }
 
         }
+        /// <summary>
+        /// Checks the sizes of neighbours clusters for both color and pattern
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="neighbors"></param>
+        public void EvaluateNew(GamePiece p, List<GamePiece> neighbors)
+        {
+            bool possible_button = true;
+            bool possible_cat = true;
+
+            foreach (GamePiece n in neighbors)
+            {
+                if (p.Color == n.Color)
+                {
+                    if (GetColorCount(n) >= Scoring.ColorClusterSize) 
+                    {
+                        possible_button = false;
+                    }
+                }
+
+                if (p.Pattern == n.Pattern)
+                {
+                    if (GetPatternCount(n) >= Scoring.PatternClusterSizes[n.Pattern])
+                    {
+                        possible_cat = false;
+                    }
+                }
+            }
+
+            foreach (GamePiece n in neighbors)
+            {
+                if (p.Color == n.Color)  colorUF.Union(n, p);
+                if (p.Pattern == n.Pattern)  patternUF.Union(n, p);
+            }
+
+            if(possible_button && GetColorCount(p) >= Scoring.ColorClusterSize)
+            {
+                Score += Scoring.ColorClusterScore;
+            }
+            if (possible_cat && GetPatternCount(p) >= Scoring.PatternClusterSizes[p.Pattern])
+            {
+                Score += Scoring.PatternClusterScores[p.Pattern];
+            }
+
+        }
+
         /// <summary>
         /// Checks whether two patchtiles are in the same color cluster
         /// </summary>

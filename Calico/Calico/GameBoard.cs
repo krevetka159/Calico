@@ -185,14 +185,17 @@ namespace Calico
         private void UnionWithNeighbors(GamePiece piece,int row, int col)
         {
             List<(int, int)> neighbors = GetNeighbors(row, col);
+            List<GamePiece> neighborsToEvaluate = new List<GamePiece>();
             foreach ((int r, int c) in neighbors) 
             {
                 if (IsOccupied(r, c))
                 {
-                    ScoreCounter.EvaluateNew(piece, board[r][c]);
+                    //ScoreCounter.EvaluateNew(piece, board[r][c]);
+                    neighborsToEvaluate.Add(board[r][c]);
 
                 }
             }
+            ScoreCounter.EvaluateNew(piece, neighborsToEvaluate);
         }
 
 // ----------------------------------------------------- GET NEIGHBORS -------------------------------------------------------
@@ -387,17 +390,116 @@ namespace Calico
         /// <returns></returns>
         public int EvaluateNeighbors(GamePiece gp, int row, int col)
         {
-            return EvaluateNeighborsColor(gp, row, col) + EvaluateNeighborsPattern(gp, row, col);
+            return EvaluateNeighborsColorFixed(gp, row, col) + EvaluateNeighborsPatternFixed(gp, row, col);
             
         }
 
-// ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
-       /// <summary>
-       /// Checks whether the position is empty
-       /// </summary>
-       /// <param name="row"></param>
-       /// <param name="col"></param>
-       /// <returns></returns>
+        // ----------------------------------------------- EVALUATE NEIGHBORS NEW -----------------------------------------------------
+
+        /// <summary>
+        /// Counts how much color score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public int EvaluateNeighborsColorFixed(GamePiece gp, int row, int col)
+        {
+            int count = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Color == gp.Color)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (ScoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorClusterSize) return 0;
+                        count += ScoreCounter.GetColorCount(board[row_i][col_i]);
+                    }
+                }
+
+            }
+
+            if (count == 0) return 0;
+            else if (count + 1 >= ScoreCounter.Scoring.ColorClusterSize) return ScoreCounter.Scoring.ColorClusterScore + 1;
+            else return 1;
+        }
+
+        /// <summary>
+        /// Counts how much pattern score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public int EvaluateNeighborsPatternFixed(GamePiece gp, int row, int col)
+        {
+            int count = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Pattern == gp.Pattern)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return 0;
+                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
+                    }
+                }
+
+            }
+
+
+            if (count == 0) return 0;
+            else if (count + 1 >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return ScoreCounter.Scoring.PatternClusterScores[gp.Pattern] + 1;
+            else return 1;
+        }
+
+        /// <summary>
+        /// Counts how much score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+
+        // ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
+        /// <summary>
+        /// Checks whether the position is empty
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public bool IsEmpty(int row, int col)
         {
             return (board[row][col].Type == Type.Empty);
