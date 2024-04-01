@@ -225,7 +225,11 @@ namespace Calico
             return Score;
         }
 
-
+        /// <summary>
+        /// Checks whether a button of given color would gain a rainbow button
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool GetsRainbowButton(Color c)
         {
             foreach (KeyValuePair<Color,int> pair in buttons)
@@ -242,6 +246,10 @@ namespace Calico
             return true;
         }
 
+        /// <summary>
+        /// Updates buttons dictionary while adding a button of a given color. If a rainbow button is gained, deletes buttons that were used to gain that rainbow button.
+        /// </summary>
+        /// <param name="c"></param>
         public void AddAndUpdateButtons(Color c)
         {
             if (GetsRainbowButton(c))
