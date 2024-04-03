@@ -16,7 +16,7 @@ namespace Calico
         private UnionFind<GamePiece> patternUF;
 
         private Dictionary<Color, int> buttons;
-        private Dictionary<Pattern, int> cats;
+        private Dictionary<CatScoringTile, int> cats; 
 
         public Scoring Scoring { get; private set; }
 
