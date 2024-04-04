@@ -428,7 +428,7 @@ namespace Calico
 
                     if (separate)
                     {
-                        if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorClusterSize) return 0;
+                        if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorScoring.ClusterSize) return 0;
                         count += ScoreCounter.GetColorCount(board[row_i][col_i]);
                     }
                 }
@@ -436,15 +436,15 @@ namespace Calico
             }
 
             if (count == 0) return 0;
-            else if (count + 1 >= ScoreCounter.Scoring.ColorClusterSize)
+            else if (count + 1 >= ScoreCounter.Scoring.ColorScoring.ClusterSize)
             {
                 if (ScoreCounter.GetsRainbowButton(gp.Color))
                 {
-                    return ScoreCounter.Scoring.ColorClusterScore + 1 + 3;
+                    return ScoreCounter.Scoring.ColorScoring.Points + 1 + 3;
                 }
                 else
                 {
-                    return ScoreCounter.Scoring.ColorClusterScore + 1;
+                    return ScoreCounter.Scoring.ColorScoring.Points + 1;
                 }   
             }
             else return 1;
@@ -475,7 +475,7 @@ namespace Calico
 
                     if (separate)
                     {
-                        if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorClusterSize) return 0;
+                        if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorScoring.ClusterSize) return 0;
                         count += ScoreCounter.GetColorCount(board[row_i][col_i]);
                     }
                 }
@@ -485,11 +485,11 @@ namespace Calico
             {
                 if (ScoreCounter.GetsRainbowButton(gp.Color))
                 {
-                    return ScoreCounter.Scoring.ColorClusterScore + 1 + 3;
+                    return ScoreCounter.Scoring.ColorScoring.Points + 1 + 3;
                 }
                 else
                 {
-                    return ScoreCounter.Scoring.ColorClusterScore + 1;
+                    return ScoreCounter.Scoring.ColorScoring.Points + 1;
                 }
             }
             else return count;
@@ -527,7 +527,7 @@ namespace Calico
 
                     if (separate)
                     {
-                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return 0;
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
                         count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
                     }
                 }
@@ -536,7 +536,7 @@ namespace Calico
 
 
             if (count == 0) return 0;
-            else if (count + 1 >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return ScoreCounter.Scoring.PatternClusterScores[gp.Pattern] + 1;
+            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
             else return 1;
         }
 
@@ -565,14 +565,14 @@ namespace Calico
 
                     if (separate)
                     {
-                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return 0;
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
                         count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
                     }
                 }
 
             }
 
-            if (count + 1 >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return ScoreCounter.Scoring.PatternClusterScores[gp.Pattern] + 1;
+            if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
             else return count;
         }
 

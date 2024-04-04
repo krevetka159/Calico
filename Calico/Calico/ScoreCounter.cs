@@ -107,7 +107,7 @@ namespace Calico
             {
                 if (p.Color == n.Color)
                 {
-                    if (GetColorCount(n) >= Scoring.ColorClusterSize) 
+                    if (GetColorCount(n) >= Scoring.ColorScoring.ClusterSize) 
                     {
                         possible_button = false;
                     }
@@ -115,7 +115,7 @@ namespace Calico
 
                 if (p.Pattern == n.Pattern)
                 {
-                    if (GetPatternCount(n) >= Scoring.PatternClusterSizes[n.Pattern])
+                    if (GetPatternCount(n) >= Scoring.PatternScoring.PatternScoringDict[n.Pattern].ClusterSize)
                     {
                         possible_cat = false;
                     }
@@ -128,14 +128,14 @@ namespace Calico
                 if (p.Pattern == n.Pattern)  patternUF.Union(n, p);
             }
 
-            if(possible_button && GetColorCount(p) >= Scoring.ColorClusterSize)
+            if(possible_button && GetColorCount(p) >= Scoring.ColorScoring.ClusterSize)
             {
-                Score += Scoring.ColorClusterScore;
+                Score += Scoring.ColorScoring.Points;
                 AddAndUpdateButtons(p.Color);
             }
-            if (possible_cat && GetPatternCount(p) >= Scoring.PatternClusterSizes[p.Pattern])
+            if (possible_cat && GetPatternCount(p) >= Scoring.PatternScoring.PatternScoringDict[p.Pattern].ClusterSize)
             {
-                Score += Scoring.PatternClusterScores[p.Pattern];
+                Score += Scoring.PatternScoring.PatternScoringDict[p.Pattern].Points;
                 AddCat(p.Pattern);
             }
 
@@ -265,6 +265,7 @@ namespace Calico
             if (GetsRainbowButton(c))
             {
                 Score += Scoring.ColorClusterScore;
+                rainbowButtons += 1;
             }
             buttons[c] += 1;
         }
