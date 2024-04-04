@@ -450,6 +450,51 @@ namespace Calico
             else return 1;
         }
 
+        public int EvaluateNeighborsColorUtility(GamePiece gp, int row, int col)
+        {
+            int count = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Color == gp.Color)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (ScoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorClusterSize) return 0;
+                        count += ScoreCounter.GetColorCount(board[row_i][col_i]);
+                    }
+                }
+            }
+
+            if (count + 1 >= ScoreCounter.Scoring.ColorClusterSize)
+            {
+                if (ScoreCounter.GetsRainbowButton(gp.Color))
+                {
+                    return ScoreCounter.Scoring.ColorClusterScore + 1 + 3;
+                }
+                else
+                {
+                    return ScoreCounter.Scoring.ColorClusterScore + 1;
+                }
+            }
+            else return count;
+        }
+
         /// <summary>
         /// Counts how much pattern score would change after adding gamepiece
         /// </summary>
@@ -495,6 +540,42 @@ namespace Calico
             else return 1;
         }
 
+        public int EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col)
+        {
+            int count = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Pattern == gp.Pattern)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return 0;
+                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
+                    }
+                }
+
+            }
+
+            if (count + 1 >= ScoreCounter.Scoring.PatternClusterSizes[gp.Pattern]) return ScoreCounter.Scoring.PatternClusterScores[gp.Pattern] + 1;
+            else return count;
+        }
+
         /// <summary>
         /// Counts how much score would change after adding gamepiece
         /// </summary>
@@ -502,6 +583,11 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
+        public int EvaluateNeighborsUtility(GamePiece gp, int row, int col)
+        {
+            return EvaluateNeighborsColorUtility(gp, row, col) + EvaluateNeighborsPatternUtility(gp, row, col);
+
+        }
 
         // ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
         /// <summary>
