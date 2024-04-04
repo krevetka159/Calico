@@ -385,7 +385,48 @@ namespace Calico
 
         }
     }
-        public class AgentCompleteWithProb : Agent
+    public class AgentCompleteWithUtility : Agent
+    {
+        /// <summary>
+        /// picks patchtile and position that increases score the most
+        /// </summary>
+        /// <param name="scoring"></param>
+        public AgentCompleteWithUtility(Scoring scoring) : base(scoring)
+        {
+        }
+
+        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            int maxPieceIndex = RandomGamePiece(Opts);
+            int max = 0;
+            (int, int) maxPosition = RandomPosition();
+
+            for (int o = 0; o < Opts.Length; o++)
+            {
+                GamePiece gp = Opts[o];
+                for (int i = 1; i < Board.Size - 1; i++)
+                {
+                    for (int j = 1; j < Board.Size - 1; j++)
+                    {
+                        if (Board.IsEmpty(i, j))
+                        {
+                            if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
+                            {
+                                maxPieceIndex = o;
+                                max = Board.EvaluateNeighborsUtility(gp, i, j);
+                                maxPosition = (i, j);
+                            }
+                        }
+
+                    }
+                }
+            }
+            return (maxPieceIndex, maxPosition);
+
+
+        }
+    }
+    public class AgentCompleteWithProb : Agent
         {
             /// <summary>
             /// picks patchtile and position that increases score the most, but with a small probability make random move
