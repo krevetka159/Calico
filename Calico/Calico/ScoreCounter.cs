@@ -15,8 +15,9 @@ namespace Calico
         private UnionFind<GamePiece> colorUF;
         private UnionFind<GamePiece> patternUF;
 
-        private Dictionary<Color, int> buttons;
-        private Dictionary<CatScoringTile, int> cats; 
+        public Dictionary<Color, int> buttons;
+        public int rainbowButtons { get; private set; }
+        public Dictionary<PatternScoringPanel, int> cats; 
 
         public Scoring Scoring { get; private set; }
 
@@ -36,6 +37,13 @@ namespace Calico
                 { Color.Purple, 0 },
                 { Color.Pink, 0 },
             };
+            rainbowButtons = 0;
+
+            cats = new Dictionary<PatternScoringPanel, int>();
+            foreach (PatternScoringPanel panel in Scoring.PatternScoring.PatternScoringPanels)
+            {
+                cats[panel] = 0;
+            }
             
         }
 
@@ -128,6 +136,7 @@ namespace Calico
             if (possible_cat && GetPatternCount(p) >= Scoring.PatternClusterSizes[p.Pattern])
             {
                 Score += Scoring.PatternClusterScores[p.Pattern];
+                AddCat(p.Pattern);
             }
 
         }
@@ -232,22 +241,23 @@ namespace Calico
         /// <returns></returns>
         public bool GetsRainbowButton(Color c)
         {
+            int min = buttons.Values.Min();
             foreach (KeyValuePair<Color,int> pair in buttons)
             {
                 if (pair.Key == c)
                 {
-                    if (pair.Value != 0) return false;
+                    if (pair.Value != min) return false;
                 }
                 else
                 {
-                    if (pair.Value == 0) return false;
+                    if (pair.Value <= min) return false;
                 }
             }
             return true;
         }
 
         /// <summary>
-        /// Updates buttons dictionary while adding a button of a given color. If a rainbow button is gained, deletes buttons that were used to gain that rainbow button.
+        /// Updates buttons dictionary while adding a button of a given color.
         /// </summary>
         /// <param name="c"></param>
         public void AddAndUpdateButtons(Color c)
@@ -255,20 +265,23 @@ namespace Calico
             if (GetsRainbowButton(c))
             {
                 Score += Scoring.ColorClusterScore;
-
-                foreach (KeyValuePair<Color, int> pair in buttons)
-                {
-                    if (pair.Key != c)
-                    {
-                        buttons[pair.Key]--;
-                    }
-                }
             }
-            else
-            {
-                buttons[c] += 1;
-            }
+            buttons[c] += 1;
         }
         
+        public void AddCat(Pattern p)
+        {
+            cats[Scoring.PatternScoring.PatternScoringDict[p]] += 1;
+        }
+
+        public int GetButtonsCount()
+        {
+            return buttons.Values.Sum() + rainbowButtons;
+        }
+
+        public (int, int, int) GetCatsCount()
+        {
+            return (cats[Scoring.PatternScoring.PatternScoringPanels[0]], cats[Scoring.PatternScoring.PatternScoringPanels[1]], cats[Scoring.PatternScoring.PatternScoringPanels[2]]);
+        }
     }
 }
