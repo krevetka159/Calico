@@ -146,7 +146,8 @@ namespace Calico
                     Console.WriteLine("    8. Counting scores");
                     Console.WriteLine("    9. 7 but with probability to do sth random");
                     Console.WriteLine("    10. random patch tile, best position");
-                    Console.WriteLine("    11. twoplayer");
+                    Console.WriteLine("    11. Counting scores with utility");
+                    Console.WriteLine("    12. twoplayer");
                     Console.Write(" Pick agent: ");
 
                     agentOption = Convert.ToInt32(Console.ReadLine());
@@ -214,6 +215,10 @@ namespace Calico
                     }
                 case 11:
                     {
+                        return new AgentCompleteWithUtility(scoring);
+                    }
+                case 12:
+                    {
                         return new TwoPlayerAgent(scoring);
                     }
                 default:
@@ -254,6 +259,10 @@ namespace Calico
             int max = 0;
             int min = -1;
             int score;
+            int buttons = 0;
+            (int, int, int) cats = (0,0,0);
+            int maxButtons = 0;
+            (int, int, int) maxCats = (0, 0, 0);
 
             for (int j = 0; j < iterations; j++)
             {
@@ -287,14 +296,31 @@ namespace Calico
                 if(allResults) gameStatePrinter.PrintStats(agent);
                 score = agent.Board.ScoreCounter.GetScore();
                 sum += score;
-                if (score > max) max = score;
+                if (score > max)
+                {
+                    max = score;
+                    maxButtons = agent.Board.ScoreCounter.GetButtonsCount();
+                    var maxCatsTemp = agent.Board.ScoreCounter.GetCatsCount();
+                    maxCats.Item1 = maxCatsTemp.Item1;
+                    maxCats.Item2 = maxCatsTemp.Item2;
+                    maxCats.Item3 = maxCatsTemp.Item3;
+                }
                 if (score < min || min == -1) min = score;
+
+                buttons += agent.Board.ScoreCounter.GetButtonsCount();
+                var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
+                cats.Item1 += catsTemp.Item1;
+                cats.Item2 += catsTemp.Item2;
+                cats.Item3 += catsTemp.Item3;
             }
             Console.WriteLine();
             if (iterations > 1)
             {
                 Console.WriteLine(" Mean: " + (Convert.ToDouble(sum) / Convert.ToDouble(iterations)));
-                Console.WriteLine(" Best score: " + max);
+                Console.WriteLine(" Average number of buttons: " + (Convert.ToDouble(buttons) / Convert.ToDouble(iterations)));
+                Console.WriteLine(" Average number of cats: " + (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations)) + "; "+ (Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)));
+                Console.WriteLine(" Best score: " + max + "; buttons: " + Convert.ToDouble(maxButtons)+
+                    "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3)) ;
                 Console.WriteLine(" Lowest score: " + min);
             }
         }
@@ -417,8 +443,9 @@ namespace Calico
             Console.WriteLine("    8. Counting scores");
             Console.WriteLine("    9. 7 but with probability to do sth random");
             Console.WriteLine("    10. random patch tile, best position");
+            Console.WriteLine("    11. Counting scores with utility");
 
-            for (int i = 1;i <= 10;i++)
+            for (int i = 1;i <= 11;i++)
             {
                 Console.WriteLine(" " + i + ": ");
                 TestGame(false, false,i, 100);
