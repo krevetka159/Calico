@@ -33,7 +33,8 @@ namespace Calico
             Console.WriteLine();
             Console.WriteLine();
 
-            Console.WriteLine(scoring.PatternScoring);
+            Console.WriteLine(scoring.PatternScoringToString);
+            Console.WriteLine(PrintPartialScoreStats(p));
 
             Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
             Console.WriteLine();
@@ -60,7 +61,7 @@ namespace Calico
             Console.WriteLine("");
             Console.WriteLine("");
 
-            Console.WriteLine(scoring.PatternScoring);
+            Console.WriteLine(scoring.PatternScoringToString);
 
             Console.WriteLine(" Player score: " + p.Board.ScoreCounter.GetScore());
 
@@ -86,7 +87,7 @@ namespace Calico
             Console.WriteLine("");
             Console.WriteLine("");
 
-            Console.WriteLine(scoring.PatternScoring);
+            Console.WriteLine(scoring.PatternScoringToString);
 
             Console.WriteLine(" Agent 1 score: " + a1.Board.ScoreCounter.GetScore());
 
@@ -205,6 +206,29 @@ namespace Calico
         {
             // finální výsledky
             Console.WriteLine(" Final score: " + p.Board.ScoreCounter.GetScore() + " : " + a.Board.ScoreCounter.GetScore());
+        }
+
+
+        public string PrintPartialScoreStats(Player p)
+        {
+            StringBuilder partialScore = new StringBuilder();
+            foreach (Color c in Enum.GetValues(typeof(Color)))
+            {
+                if (c != Color.None)
+                {
+                    partialScore.Append($" {(int)c} : {p.Board.ScoreCounter.buttons[c]},");
+                }
+            }
+            partialScore.Append($" RB : {p.Board.ScoreCounter.rainbowButtons}");
+            partialScore.Append('\n');
+
+            foreach (KeyValuePair<PatternScoringPanel,int> panel in p.Board.ScoreCounter.cats)
+            {
+                partialScore.Append($" {(char)(64 + (int)panel.Key.Patterns.Item1)},{(char)(64 + (int)panel.Key.Patterns.Item2)} : {panel.Value},");
+            }
+            partialScore.Append('\n');
+
+            return partialScore.ToString();
         }
 
 
