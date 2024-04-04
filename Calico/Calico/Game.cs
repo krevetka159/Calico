@@ -44,7 +44,8 @@ namespace Calico
                     }
                 case 4:
                     {
-                        TestAll();
+                        //TestAll();
+                        TestTopAgents();
                         break;
                     }
                 case 5:
@@ -144,7 +145,7 @@ namespace Calico
                     Console.WriteLine("    6. Counting color scores");
                     Console.WriteLine("    7. Counting pattern scores");
                     Console.WriteLine("    8. Counting scores");
-                    Console.WriteLine("    9. 7 but with probability to do sth random");
+                    Console.WriteLine("    9. 8 but with probability to do sth random");
                     Console.WriteLine("    10. random patch tile, best position");
                     Console.WriteLine("    11. Counting scores with utility");
                     Console.WriteLine("    12. twoplayer");
@@ -441,7 +442,7 @@ namespace Calico
             Console.WriteLine("    6. Counting color scores");
             Console.WriteLine("    7. Counting pattern scores");
             Console.WriteLine("    8. Counting scores");
-            Console.WriteLine("    9. 7 but with probability to do sth random");
+            Console.WriteLine("    9. 8 but with probability to do sth random");
             Console.WriteLine("    10. random patch tile, best position");
             Console.WriteLine("    11. Counting scores with utility");
 
@@ -452,6 +453,21 @@ namespace Calico
                 Console.WriteLine();
             }
 
+        }
+
+        private void TestTopAgents()
+        {
+            Console.WriteLine("    8. Counting scores");
+            Console.WriteLine("    9. 8 but with probability to do sth random");
+            Console.WriteLine("    11. Counting scores with utility");
+
+
+            foreach (int i in new List<int>(){ 8, 9, 11 })
+            {
+                Console.WriteLine(" " + i + ": ");
+                TestGame(false, false, i, 1000);
+                Console.WriteLine();
+            }
         }
 
         private void TestMultiPlayer()
