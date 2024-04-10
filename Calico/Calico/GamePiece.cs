@@ -96,6 +96,7 @@ namespace Calico
                 { Pattern.Flowers, 0 },
                 { Pattern.Vines, 0 },
                 { Pattern.Quatrefoil, 0 } };
+        string Description;
 
         public TaskPiece(int TaskId) : base(TaskId) 
         {
@@ -105,31 +106,37 @@ namespace Calico
                     ScoreCompletedFully = 15;
                     ScoreCompletedPartly = 10;
                     Task = new List<int>() { 1, 1, 1, 1, 1, 1 };
+                    Description = " all different ";
                     break;
                 case 2:
                     ScoreCompletedFully = 14;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 4, 2, 0, 0, 0, 0 };
+                    Description = " 4:2 ";
                     break;
                 case 3:
                     ScoreCompletedFully = 13;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 3, 3, 0, 0, 0, 0 };
+                    Description = " 3:3 ";
                     break;
                 case 4:
                     ScoreCompletedFully = 11;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 3, 2, 1, 0, 0, 0 };
+                    Description = " 3:2:1";
                     break;
                 case 5:
                     ScoreCompletedFully = 11;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 2, 2, 2, 0, 0, 0 };
+                    Description = " 2:2:2 ";
                     break;
                 case 6:
                     ScoreCompletedFully = 7;
                     ScoreCompletedPartly = 5;
                     Task = new List<int>() { 2, 2, 1, 1, 0, 0 };
+                    Description = " 2:2:1:1 ";
                     break;
             }
         }
