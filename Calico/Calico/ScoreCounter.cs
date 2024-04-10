@@ -141,6 +141,11 @@ namespace Calico
 
         }
 
+        public void EvaluateTask(TaskPiece task)
+        {
+            Score += task.Evaluate();
+        }
+
         /// <summary>
         /// Checks whether two patchtiles are in the same color cluster
         /// </summary>

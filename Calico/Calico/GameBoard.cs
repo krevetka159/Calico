@@ -14,6 +14,8 @@ namespace Calico
         private static GamePiece empty = new GamePiece(Type.Empty);
         private static GamePiece blocked = new GamePiece(Type.Blocked);
         public int Size = 7;
+        public List<(int,int)> TaskPieceSpots = new List<(int,int)>() { (2,3),(3,4),(4,2)};
+        public Dictionary<(int,int),TaskPiece> TaskPieces = new Dictionary<(int, int), TaskPiece>();
 
         public ScoreCounter ScoreCounter { get; private set; }
 
@@ -76,7 +78,7 @@ namespace Calico
                     board = new List<List<GamePiece>>();
                     break;
             }
-            CornerUF();
+            BorderUF();
 
         }
         /// <summary>
@@ -141,10 +143,10 @@ namespace Calico
                     board = new List<List<GamePiece>>();
                     break;
             }
-            CornerUF();
+            BorderUF();
 
         }
-        private void CornerUF()
+        private void BorderUF()
         {
             //Add corners to unionfind
             for (int row = 0; row < Size; row++)
@@ -166,6 +168,18 @@ namespace Calico
             }
         }
 
+        public void AddTaskPiece(int taskId,int position )
+        {
+            (int row, int col) = TaskPieceSpots[position];
+
+            TaskPiece task = new TaskPiece(taskId);
+            board[row][col] = task;
+
+            TaskPieces[(row,col)]=task;
+        }
+
+
+
 // ----------------------------------------------- ADD PIECE ------------------------------------------------------------
 
         /// <summary>
@@ -179,6 +193,7 @@ namespace Calico
             board[row][col] = piece;
             ScoreCounter.AddToUF(piece);
             UnionWithNeighbors(piece, row, col);
+            AddToTaskNeighbors(piece, row, col);
             
         }
 
@@ -198,7 +213,20 @@ namespace Calico
             ScoreCounter.EvaluateNew(piece, neighborsToEvaluate);
         }
 
-// ----------------------------------------------------- GET NEIGHBORS -------------------------------------------------------
+        private void AddToTaskNeighbors(GamePiece piece, int row, int col)
+        {
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+            foreach ((int r, int c) in neighbors)
+            {
+                if (IsTask(r, c))
+                {
+                    TaskPieces[(r,c)].AddNeighbor(piece);
+                    ScoreCounter.EvaluateTask(TaskPieces[(r, c)]);
+                }
+            }
+        }
+
+        // ----------------------------------------------------- GET NEIGHBORS -------------------------------------------------------
 
         /// <summary>
         /// Return a list of neighboring positions
@@ -576,6 +604,21 @@ namespace Calico
             else return count;
         }
 
+        public int EvaluateNeighboringTask(GamePiece gp, int row, int col)
+        {
+            int score = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+            foreach ((int r, int c) in neighbors)
+            {
+                if (IsTask(r, c))
+                {
+                    score += TaskPieces[(r, c)].CheckNeighbours(gp);
+                }
+            }
+
+            return score;
+        }
+
         /// <summary>
         /// Counts how much score would change after adding gamepiece
         /// </summary>
@@ -609,6 +652,17 @@ namespace Calico
         public bool IsOccupied(int row, int col)
         {
             return (board[row][col].Type == Type.PatchTile);
+        }
+
+        /// <summary>
+        /// Checks whether the position is occupied by a tasktile
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public bool IsTask(int row, int col)
+        {
+            return (board[row][col].Type == Type.Task);
         }
     }
 }

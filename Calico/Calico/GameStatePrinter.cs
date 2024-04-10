@@ -33,10 +33,37 @@ namespace Calico
             Console.WriteLine();
             Console.WriteLine();
 
+            foreach (TaskPiece t in p.Board.TaskPieces.Values)
+            {
+                Console.WriteLine($" {t.Print}: {t.Description}");
+            }
             Console.WriteLine(scoring.PatternScoringToString);
             Console.WriteLine(PrintPartialScoreStats(p));
 
             Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
+            Console.WriteLine();
+            PrintBoard(p);
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Print game state for a single player game
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="Opts"></param>
+        public void PrintTaskChoosing(Player p, GamePiece[] Opts)
+        {
+            Console.WriteLine();
+
+            Console.WriteLine(" Task piece options: ");
+ 
+            Console.WriteLine(" 1: all different, 10/15");
+            Console.WriteLine(" 2: 4:2, 7/14");
+            Console.WriteLine(" 3: 3:3, 7/13");
+            Console.WriteLine(" 4: 3:2:1, 7/11");
+            Console.WriteLine(" 5: 2:2:2, 7/11");
+            Console.WriteLine(" 6: 2:2:1:1, 5/7");
+
             Console.WriteLine();
             PrintBoard(p);
             Console.WriteLine();
@@ -113,7 +140,7 @@ namespace Calico
             {
 
                 Console.Write(" " + (i + 1));
-                if (i % 2 == 0) Console.Write("  ");
+                if (i % 2 == 1) Console.Write("  ");
                 Console.Write(" |");
                 for (int j = 0; j < p.Board.Size; j++)
                 {

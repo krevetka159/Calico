@@ -10,6 +10,8 @@ namespace Calico
     {
         public GameBoard Board { get; private set; }
 
+        public List<int> AvailableTaskPieces = new List<int>() { 1,2,3,4,5,6};
+
         public Player(Scoring scoring)
         {
             Board = new GameBoard(scoring);
@@ -129,6 +131,44 @@ namespace Calico
         public virtual (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             return (ChooseGamePiece(Opts), ChoosePosition());
+        }
+
+        private int ChooseTaskPiece(int row)
+        {
+            int gamepiece;
+            while (true)
+            {
+                try
+                {
+                    Console.Write(" Choose TaskPiece for row " + row + ":");
+                    gamepiece = Convert.ToInt32(Console.ReadLine());
+                    switch (gamepiece)
+                    {
+                        case 1: return 1;
+                        case 2: return 2;
+                        case 3: return 3;
+                        case 4: return 4;
+                        case 5: return 5;
+                        case 6: return 6;
+                        default:
+                            {
+                                Console.WriteLine(" Choose one of the task pieces 1-6. ");
+                                break;
+                            }
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine(" Choose one of the task pieces 1-6. ");
+                }
+            }
+        }
+
+        public virtual void ChooseTaskPieces()
+        {
+            Board.AddTaskPiece(ChooseTaskPiece(3), 0);
+            Board.AddTaskPiece(ChooseTaskPiece(4), 1);
+            Board.AddTaskPiece(ChooseTaskPiece(5), 2);
         }
 
 

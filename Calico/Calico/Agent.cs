@@ -64,6 +64,13 @@ namespace Calico
         {
             return (RandomGamePiece(Opts), RandomPosition());
         }
+
+        public override void ChooseTaskPieces()
+        {
+            Board.AddTaskPiece(random.Next(1,6), 0);
+            Board.AddTaskPiece(random.Next(1, 6), 1);
+            Board.AddTaskPiece(random.Next(1, 6), 2);
+        }
     }
 
 

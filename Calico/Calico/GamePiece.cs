@@ -79,24 +79,24 @@ namespace Calico
 
     public class TaskPiece : GamePiece
     {
-        int ScoreCompletedFully;
-        int ScoreCompletedPartly;
-        List<int> Task;
-        Dictionary<Color, int> NeighboringColors = new Dictionary<Color, int>(){
+        public int ScoreCompletedFully;
+        public int ScoreCompletedPartly;
+        public List<int> Task;
+        public Dictionary<Color, int> NeighboringColors = new Dictionary<Color, int>(){
                 { Color.Yellow, 0 },
                 { Color.Green, 0 },
                 { Color.Cyan, 0 },
                 { Color.Blue, 0 },
                 { Color.Purple, 0 },
                 { Color.Pink, 0 }};
-        Dictionary<Pattern, int> NeighboringPatterns = new Dictionary<Pattern, int>(){
+        public Dictionary<Pattern, int> NeighboringPatterns = new Dictionary<Pattern, int>(){
                 { Pattern.Dots, 0 },
                 { Pattern.Stripes, 0 },
                 { Pattern.Fern, 0 },
                 { Pattern.Flowers, 0 },
                 { Pattern.Vines, 0 },
                 { Pattern.Quatrefoil, 0 } };
-        string Description;
+        public string Description;
 
         public TaskPiece(int TaskId) : base(TaskId) 
         {
@@ -106,37 +106,37 @@ namespace Calico
                     ScoreCompletedFully = 15;
                     ScoreCompletedPartly = 10;
                     Task = new List<int>() { 1, 1, 1, 1, 1, 1 };
-                    Description = " all different ";
+                    Description = " all different, 10/15 ";
                     break;
                 case 2:
                     ScoreCompletedFully = 14;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 4, 2, 0, 0, 0, 0 };
-                    Description = " 4:2 ";
+                    Description = " 4:2, 7/14 ";
                     break;
                 case 3:
                     ScoreCompletedFully = 13;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 3, 3, 0, 0, 0, 0 };
-                    Description = " 3:3 ";
+                    Description = " 3:3, 7/13 ";
                     break;
                 case 4:
                     ScoreCompletedFully = 11;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 3, 2, 1, 0, 0, 0 };
-                    Description = " 3:2:1";
+                    Description = " 3:2:1, 7/11 ";
                     break;
                 case 5:
                     ScoreCompletedFully = 11;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 2, 2, 2, 0, 0, 0 };
-                    Description = " 2:2:2 ";
+                    Description = " 2:2:21 7/11 ";
                     break;
                 case 6:
                     ScoreCompletedFully = 7;
                     ScoreCompletedPartly = 5;
                     Task = new List<int>() { 2, 2, 1, 1, 0, 0 };
-                    Description = " 2:2:1:1 ";
+                    Description = " 2:2:1:1, 5/7 ";
                     break;
             }
         }
@@ -171,6 +171,64 @@ namespace Calico
             if (!colorsFailed && !patternsFailed) return ScoreCompletedFully;
             else if (!patternsFailed || !colorsFailed) return ScoreCompletedPartly;
             else return 0;
+        }
+
+        public int CheckNeighbours(GamePiece gp)
+        {
+            bool colorsFailed = false; ;
+            bool patternsFailed = false;
+            Dictionary<Color, int> colorN = NeighboringColors;
+            Dictionary<Pattern,int> patternsN = NeighboringPatterns;
+            colorN[gp.Color] += 1;
+            patternsN[gp.Pattern] += 1;
+
+            List<int> colors = colorN.Values.ToList();
+            List<int> patterns = patternsN.Values.ToList();
+
+            colors.Sort((a, b) => b.CompareTo(a));
+            patterns.Sort((a, b) => b.CompareTo(a));
+
+            if (colors.Sum() == 6)
+            {
+                for (int i = 0; i < Task.Count(); i++)
+                {
+                    if (colors[i] != Task[i])
+                    {
+                        if (patternsFailed) return 0;
+                        else colorsFailed = true;
+                    }
+                    if (patterns[i] != Task[i])
+                    {
+                        if (colorsFailed) return 0;
+                        else patternsFailed = true;
+                    }
+                }
+
+                if (!colorsFailed && !patternsFailed) return ScoreCompletedFully;
+                else if (!patternsFailed || !colorsFailed) return ScoreCompletedPartly;
+                else return 0;
+            }
+            else
+            {
+
+                for (int i = 0; i < Task.Count(); i++)
+                {
+                    if (colors[i] > Task[i])
+                    {
+                        if (patternsFailed) return 0;
+                        else colorsFailed = true;
+                    }
+                    if (patterns[i] > Task[i])
+                    {
+                        if (colorsFailed) return 0;
+                        else patternsFailed = true;
+                    }
+                }
+
+                if (!colorsFailed && !patternsFailed) return ScoreCompletedFully/2;
+                else if (!patternsFailed || !colorsFailed) return ScoreCompletedPartly/2;
+                else return 0;
+            }
         }
 
         public void AddNeighbor(GamePiece piece)

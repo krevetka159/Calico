@@ -78,7 +78,11 @@ namespace Calico
             player = new Player(scoring);
 
             //print empty
+            gameStatePrinter.PrintTaskChoosing(player, Opts);
+            player.ChooseTaskPieces();
+
             gameStatePrinter.PrintStateSingle(player, Opts);
+
 
             for (int i = 0; i < 22; i++)
             {
@@ -281,7 +285,8 @@ namespace Calico
                 }
 
                 agent = UseAgent(agentType);
-                
+
+                agent.ChooseTaskPieces();
                 if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
 
