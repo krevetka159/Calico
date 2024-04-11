@@ -67,9 +67,33 @@ namespace Calico
 
         public override void ChooseTaskPieces()
         {
-            Board.AddTaskPiece(random.Next(1,6), 0);
-            Board.AddTaskPiece(random.Next(1, 6), 1);
-            Board.AddTaskPiece(random.Next(1, 6), 2);
+            int taskId = random.Next(1,6);
+
+            Board.AddTaskPiece(taskId, 0);
+            TaskIds[0] = taskId;
+
+            while (taskId == TaskIds[0])
+            {
+                taskId = random.Next(1,6);
+            }
+
+            Board.AddTaskPiece(taskId, 1);
+            TaskIds[1] = taskId;
+
+            while (taskId == TaskIds[0] || taskId == TaskIds[1])
+            {
+                taskId = random.Next(1, 6);
+            }
+
+            Board.AddTaskPiece(taskId, 2);
+            TaskIds[2] = taskId;
+        }
+
+        public void AddTaskPieces(int a, int b, int c)
+        {
+            Board.AddTaskPiece(a, 0);
+            Board.AddTaskPiece(b, 1);
+            Board.AddTaskPiece(c, 2);
         }
     }
 

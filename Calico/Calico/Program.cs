@@ -58,6 +58,7 @@ namespace Calico
                     Console.WriteLine("   3. Single agent testing");
                     Console.WriteLine("   4. All agent testing");
                     Console.WriteLine("   5. Multiplayer testing");
+                    Console.WriteLine("   6. Task analysis");
 
                     Console.Write(" Choose game mode: ");
 
@@ -86,6 +87,10 @@ namespace Calico
                         case 5:
                             {
                                 return 5;
+                            }
+                        case 6:
+                            {
+                                return 6;
                             }
                         default:
                             {

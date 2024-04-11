@@ -53,6 +53,11 @@ namespace Calico
                         TestMultiPlayer();
                         break;
                     }
+                case 6:
+                    {
+                        TestTasks();
+                        break;
+                    }
                 default:
                     {
                         break;
@@ -472,6 +477,116 @@ namespace Calico
                 Console.WriteLine(" " + i + ": ");
                 TestGame(false, false, i, 1000);
                 Console.WriteLine();
+            }
+        }
+
+        private void TestTask(int agentType, int iterations, (int,int,int) tasks)
+        {
+            int sum = 0;
+            int max = 0;
+            int min = -1;
+            int score;
+            int buttons = 0;
+            (int, int, int) cats = (0, 0, 0);
+            int maxButtons = 0;
+            (int, int, int) maxCats = (0, 0, 0);
+
+            for (int j = 0; j < iterations; j++)
+            {
+
+
+                bag = new Bag();
+
+                scoring = new Scoring();
+
+                gameStatePrinter = new GameStatePrinter(scoring);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Opts[i] = bag.Next();
+                }
+
+                agent = UseAgent(agentType);
+
+                agent.AddTaskPieces(tasks.Item1,tasks.Item2,tasks.Item3);
+
+                for (int i = 0; i < 22; i++)
+                {
+                    MakeMove(agent);
+                }
+
+                score = agent.Board.ScoreCounter.GetScore();
+                sum += score;
+                if (score > max)
+                {
+                    max = score;
+                    maxButtons = agent.Board.ScoreCounter.GetButtonsCount();
+                    var maxCatsTemp = agent.Board.ScoreCounter.GetCatsCount();
+                    maxCats.Item1 = maxCatsTemp.Item1;
+                    maxCats.Item2 = maxCatsTemp.Item2;
+                    maxCats.Item3 = maxCatsTemp.Item3;
+                }
+                if (score < min || min == -1) min = score;
+
+                buttons += agent.Board.ScoreCounter.GetButtonsCount();
+                var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
+                cats.Item1 += catsTemp.Item1;
+                cats.Item2 += catsTemp.Item2;
+                cats.Item3 += catsTemp.Item3;
+            }
+
+            if (iterations > 1)
+            {
+                Console.WriteLine(" Mean: " + (Convert.ToDouble(sum) / Convert.ToDouble(iterations)));
+                //Console.WriteLine(" Average number of buttons: " + (Convert.ToDouble(buttons) / Convert.ToDouble(iterations)));
+                //Console.WriteLine(" Average number of cats: " + (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)));
+                //Console.WriteLine(" Best score: " + max + "; buttons: " + Convert.ToDouble(maxButtons) +
+                //    "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3));
+                //Console.WriteLine(" Lowest score: " + min);
+            }
+        }
+
+        private void TestTasks()
+        {
+            for (int i = 1;  i <= 5; i++) 
+            {
+                for (int j = 1; j <= 6; j++)
+                {
+                    if (i != j)
+                    {
+                        for (int k = 1; k <= 6; k++)
+                        {
+                            if (k != j && k != i)
+                            {
+                                Console.WriteLine($" {i},{j},{k}: ");
+                                TestTask(11, 1000, (i, j, k));
+                                Console.WriteLine();
+                            }
+                        }
+                    }
+                }
+
+                //if (i != 4)
+                //{
+                //    Console.WriteLine($" {i},{4},{6}: ");
+                //    TestTask(11, 1000, (i, 4, 6));
+                //    Console.WriteLine();
+                //    Console.WriteLine($" {i},{6},{4}: ");
+                //    TestTask(11, 1000, (i, 6, 4));
+                //    Console.WriteLine();
+                //    Console.WriteLine($" {4},{i},{6}: ");
+                //    TestTask(11, 1000, (4, i, 6));
+                //    Console.WriteLine();
+                //    Console.WriteLine($" {6},{4},{i}: ");
+                //    TestTask(11, 1000, (6, 4, i));
+                //    Console.WriteLine();
+                //    Console.WriteLine($" {6},{i},{4}: ");
+                //    TestTask(11, 1000, (6, i, 4));
+                //    Console.WriteLine();
+                //    Console.WriteLine($" 4,6,{i}: ");
+                //    TestTask(11, 1000, (4, 6, i));
+                //    Console.WriteLine();
+                //}
             }
         }
 
