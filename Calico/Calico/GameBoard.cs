@@ -237,7 +237,7 @@ namespace Calico
         private List<(int, int)> GetNeighbors(int row, int col)
         {
             List<(int, int)> neighbors;
-            if (row % 2 == 1)
+            if (row % 2 == 0)
             {
                 neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
             }
