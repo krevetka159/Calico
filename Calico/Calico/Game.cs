@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static Calico.AgentComplete;
+using System.Collections;
 
 namespace Calico
 {
@@ -44,8 +46,8 @@ namespace Calico
                     }
                 case 4:
                     {
-                        //TestAll();
-                        TestTopAgents();
+                        TestAll();
+                        //TestTopAgents();
                         break;
                     }
                 case 5:
@@ -263,7 +265,7 @@ namespace Calico
                 }
             }
         }
-        private void TestGame(bool withPrint, bool allResults, int agentType, int iterations)
+        private GameStats TestGame(bool withPrint, bool allResults, int agentType, int iterations)
         {
             int sum = 0;
             int max = 0;
@@ -334,6 +336,10 @@ namespace Calico
                     "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3)) ;
                 Console.WriteLine(" Lowest score: " + min);
             }
+
+            return new GameStats(agentType, Convert.ToDouble(sum) / Convert.ToDouble(iterations), Convert.ToDouble(buttons) / Convert.ToDouble(iterations), (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)), max, min);
+
+
         }
 
         private void TestMultiPlayerGame(int numOfPlayers, bool withPrint, bool allResults, int iterations)
@@ -443,6 +449,8 @@ namespace Calico
 
         private void TestAll()
         {
+            List<GameStats> stats = new List<GameStats>();
+
             Console.WriteLine(" Agents: ");
             Console.WriteLine("    1. Random");
             Console.WriteLine("    2. Easy color half-random agent");
@@ -459,8 +467,20 @@ namespace Calico
             for (int i = 1;i <= 11;i++)
             {
                 Console.WriteLine(" " + i + ": ");
-                TestGame(false, false,i, 100);
+                stats.Add(TestGame(false, false,i, 100));
                 Console.WriteLine();
+            }
+
+            // Set a variable to the Documents path.
+            //string docPath =
+            //  Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            // Write the string array to a new file named "WriteLines.txt".
+            using (StreamWriter outputFile = new StreamWriter("./testAll.csv"))
+            {
+                outputFile.WriteLine("agent;averageScore;buttons;cats;best;lowest");
+                foreach (GameStats gs in stats)
+                    outputFile.WriteLine($"{gs.AgentType};{gs.AvgScore};{gs.AvgButtons};{gs.AvgCats.Item1}/{gs.AvgCats.Item2}/{gs.AvgCats.Item3};{gs.BestScore};{gs.LowestScore}");
             }
 
         }
@@ -480,7 +500,7 @@ namespace Calico
             }
         }
 
-        private void TestTask(int agentType, int iterations, (int,int,int) tasks)
+        private GameStats TestTask(int agentType, int iterations, (int,int,int) tasks)
         {
             int sum = 0;
             int max = 0;
@@ -544,25 +564,46 @@ namespace Calico
                 //    "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3));
                 //Console.WriteLine(" Lowest score: " + min);
             }
+
+            return new GameStats(agentType, Convert.ToDouble(sum) / Convert.ToDouble(iterations), Convert.ToDouble(buttons) / Convert.ToDouble(iterations), (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)), max, min);
+
         }
 
         private void TestTasks()
         {
+            Dictionary<(int,int,int),List<GameStats>> statsDict = new Dictionary<(int, int, int), List<GameStats>>();
+
             for (int i = 1;  i <= 6; i++) 
             {
-                for (int j = 1; j <= 6; j++)
+                for (int j = i + 1; j <= 6; j++)
                 {
-                    if (i != j)
+                    for (int k = j + 1; k <= 6; k++)
                     {
-                        for (int k = 1; k <= 6; k++)
-                        {
-                            if (k != j && k != i)
-                            {
-                                Console.WriteLine($" {i},{j},{k}: ");
-                                TestTask(11, 1000, (i, j, k));
-                                Console.WriteLine();
-                            }
-                        }
+                        statsDict[(i,j,k)] = new List<GameStats>();
+
+                        Console.WriteLine($" {i},{j},{k}: ");
+                        statsDict[(i,j,k)].Add(TestTask(11, 1000, (i, j, k)));
+                        Console.WriteLine();
+
+                        Console.WriteLine($" {i},{k},{j}: ");
+                        statsDict[(i, j, k)].Add(TestTask(11, 1000, (i, k, j)));
+                        Console.WriteLine();
+
+                        Console.WriteLine($" {j},{i},{k}: ");
+                        statsDict[(i, j, k)].Add(TestTask(11, 1000, (j, i, k)));
+                        Console.WriteLine();
+
+                        Console.WriteLine($" {j},{k},{i}: ");
+                        statsDict[(i, j, k)].Add(TestTask(11, 1000, (j, k, i)));
+                        Console.WriteLine();
+
+                        Console.WriteLine($" {k},{i},{j}: ");
+                        statsDict[(i, j, k)].Add(TestTask(11, 1000, (k, i, j)));
+                        Console.WriteLine();
+
+                        Console.WriteLine($" {k},{j},{i}: ");
+                        statsDict[(i, j, k)].Add(TestTask(11, 1000, (k, j, i)));
+                        Console.WriteLine();
                     }
                 }
 
@@ -588,6 +629,63 @@ namespace Calico
                 //    Console.WriteLine();
                 //}
             }
+
+            // objListOrder.Sort((x, y) => x.OrderDate.CompareTo(y.OrderDate));
+
+            using (StreamWriter outputFile = new StreamWriter("./testTasks.csv"))
+            {
+                outputFile.WriteLine("tasks;averageScore");
+                foreach (KeyValuePair<(int,int,int),List<GameStats>> ds  in statsDict)
+                {
+                    outputFile.WriteLine($"{ds.Key.Item1},{ds.Key.Item2},{ds.Key.Item3};{ds.Value.Average(item => item.AvgScore)}");
+
+                }
+            }
+            using (StreamWriter outputFile = new StreamWriter("./testTasks123.csv"))
+            {
+                outputFile.WriteLine("tasks;score");
+
+                outputFile.WriteLine($"1,2,3;{statsDict[(1, 2, 3)][0].AvgScore}");
+                outputFile.WriteLine($"1,3,2;{statsDict[(1, 2, 3)][1].AvgScore}");
+                outputFile.WriteLine($"2,1,3;{statsDict[(1, 2, 3)][2].AvgScore}");
+                outputFile.WriteLine($"2,3,1;{statsDict[(1, 2, 3)][3].AvgScore}");
+                outputFile.WriteLine($"3,1,3;{statsDict[(1, 2, 3)][4].AvgScore}");
+                outputFile.WriteLine($"3,2,1;{statsDict[(1, 2, 3)][5].AvgScore}");
+            }
+            using (StreamWriter outputFile = new StreamWriter("./testTasks235.csv"))
+            {
+                outputFile.WriteLine("tasks;score");
+
+                outputFile.WriteLine($"2,3,5;{statsDict[(2, 3, 5)][0].AvgScore}");
+                outputFile.WriteLine($"2,5,3;{statsDict[(2, 3, 5)][1].AvgScore}");
+                outputFile.WriteLine($"3,2,5;{statsDict[(2, 3, 5)][2].AvgScore}");
+                outputFile.WriteLine($"3,5,2;{statsDict[(2, 3, 5)][3].AvgScore}");
+                outputFile.WriteLine($"5,2,3;{statsDict[(2, 3, 5)][4].AvgScore}");
+                outputFile.WriteLine($"5,3,2;{statsDict[(2, 3, 5)][5].AvgScore}");
+            }
+            using (StreamWriter outputFile = new StreamWriter("./testTasks146.csv"))
+            {
+                outputFile.WriteLine("tasks;score");
+
+                outputFile.WriteLine($"1,4,6;{statsDict[(1, 4, 6)][0].AvgScore}");
+                outputFile.WriteLine($"1,6,4;{statsDict[(1, 4, 6)][1].AvgScore}");
+                outputFile.WriteLine($"4,1,6;{statsDict[(1, 4, 6)][2].AvgScore}");
+                outputFile.WriteLine($"4,6,1;{statsDict[(1, 4, 6)][3].AvgScore}");
+                outputFile.WriteLine($"6,1,4;{statsDict[(1, 4, 6)][4].AvgScore}");
+                outputFile.WriteLine($"6,4,1;{statsDict[(1, 4, 6)][5].AvgScore}");
+            }
+            using (StreamWriter outputFile = new StreamWriter("./testTasks456.csv"))
+            {
+                outputFile.WriteLine("tasks;score");
+
+                outputFile.WriteLine($"4,5,6;{statsDict[(4, 5, 6)][0].AvgScore}");
+                outputFile.WriteLine($"4,6,5;{statsDict[(4, 5, 6)][1].AvgScore}");
+                outputFile.WriteLine($"5,4,6;{statsDict[(4, 5, 6)][2].AvgScore}");
+                outputFile.WriteLine($"5,6,4;{statsDict[(4, 5, 6)][3].AvgScore}");
+                outputFile.WriteLine($"6,4,5;{statsDict[(4, 5, 6)][4].AvgScore}");
+                outputFile.WriteLine($"6,5,4;{statsDict[(4, 5, 6)][5].AvgScore}");
+            }
+
         }
 
         private void TestMultiPlayer()
