@@ -177,8 +177,8 @@ namespace Calico
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
-            Dictionary<Color, int> colorN = NeighboringColors;
-            Dictionary<Pattern,int> patternsN = NeighboringPatterns;
+            Dictionary<Color, int> colorN = new Dictionary<Color,int>(NeighboringColors);
+            Dictionary<Pattern,int> patternsN = new Dictionary<Pattern,int>(NeighboringPatterns);
             colorN[gp.Color] += 1;
             patternsN[gp.Pattern] += 1;
 
@@ -187,6 +187,8 @@ namespace Calico
 
             colors.Sort((a, b) => b.CompareTo(a));
             patterns.Sort((a, b) => b.CompareTo(a));
+
+            // if (colors.Sum() == 1) return 0;
 
             if (colors.Sum() == 6)
             {
@@ -225,10 +227,46 @@ namespace Calico
                     }
                 }
 
-                if (!colorsFailed && !patternsFailed) return ScoreCompletedFully/2;
-                else if (!patternsFailed || !colorsFailed) return ScoreCompletedPartly/2;
+                if (!colorsFailed && !patternsFailed) return 2;
+                else if (!patternsFailed || !colorsFailed) return 1;
                 else return 0;
             }
+        }
+
+        public int CheckNeighboursUtility(GamePiece gp)
+        {
+            bool colorsFailed = false; ;
+            bool patternsFailed = false;
+            Dictionary<Color, int> colorN = new Dictionary<Color, int>(NeighboringColors);
+            Dictionary<Pattern, int> patternsN = new Dictionary<Pattern, int>(NeighboringPatterns);
+            colorN[gp.Color] += 1;
+            patternsN[gp.Pattern] += 1;
+
+            List<int> colors = colorN.Values.ToList();
+            List<int> patterns = patternsN.Values.ToList();
+
+            colors.Sort((a, b) => b.CompareTo(a));
+            patterns.Sort((a, b) => b.CompareTo(a));
+
+            // if (colors.Sum() == 1) return 0;
+
+            for (int i = 0; i < Task.Count(); i++)
+            {
+                if (colors[i] > Task[i]) // for colors.Sum() == 6 nastane když existuje pokud neplatí rovnosti u všeho
+                {
+                    if (patternsFailed) return 0;
+                    else colorsFailed = true;
+                }
+                if (patterns[i] > Task[i])
+                {
+                    if (colorsFailed) return 0;
+                    else patternsFailed = true;
+                }
+            }
+
+            if (!colorsFailed && !patternsFailed) return (ScoreCompletedFully / 6) * colors.Sum();
+            else if (!patternsFailed || !colorsFailed) return (ScoreCompletedPartly / 6) * colors.Sum();
+            else return 0;
         }
 
         public void AddNeighbor(GamePiece piece)

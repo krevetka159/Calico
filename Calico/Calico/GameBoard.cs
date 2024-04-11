@@ -418,7 +418,7 @@ namespace Calico
         /// <returns></returns>
         public int EvaluateNeighbors(GamePiece gp, int row, int col)
         {
-            return EvaluateNeighborsColorFixed(gp, row, col) + EvaluateNeighborsPatternFixed(gp, row, col);
+            return EvaluateNeighborsColorFixed(gp, row, col) + EvaluateNeighborsPatternFixed(gp, row, col) + EvaluateNeighboringTask(gp, row,col);
             
         }
 
@@ -619,6 +619,21 @@ namespace Calico
             return score;
         }
 
+        public int EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col)
+        {
+            int score = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+            foreach ((int r, int c) in neighbors)
+            {
+                if (IsTask(r, c))
+                {
+                    score += TaskPieces[(r, c)].CheckNeighboursUtility(gp);
+                }
+            }
+
+            return score;
+        }
+
         /// <summary>
         /// Counts how much score would change after adding gamepiece
         /// </summary>
@@ -628,7 +643,7 @@ namespace Calico
         /// <returns></returns>
         public int EvaluateNeighborsUtility(GamePiece gp, int row, int col)
         {
-            return EvaluateNeighborsColorUtility(gp, row, col) + EvaluateNeighborsPatternUtility(gp, row, col);
+            return EvaluateNeighborsColorUtility(gp, row, col) + EvaluateNeighborsPatternUtility(gp, row, col) + EvaluateNeighboringTaskUtility(gp,row,col);
 
         }
 
