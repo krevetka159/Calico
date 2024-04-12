@@ -23,6 +23,17 @@ namespace Calico
         private Scoring scoring;
         private GameStatePrinter gameStatePrinter;
 
+        private List<(int,string)> AgentDescription = new List<(int, string)>()
+        {
+            (1, " Kompletně náhodný agent "),
+            (2, " Nejlepší umístění vzhledek k barvám "),
+            (3, " Nejlepší umístění vzhledem ke vzorům "),
+            (4, " Nejlepší umístění "),
+            (5, " Nejlepší umístění s malou náhodou "),
+            (6, " Nejlepší umístění náhodného dílku "),
+            (7, " Utility fce")
+        };
+
 
         public Game(int mode) 
         {
@@ -148,24 +159,17 @@ namespace Calico
                 try
                 {
                     Console.WriteLine(" Agent options: ");
-                    Console.WriteLine("    1. Random");
-                    Console.WriteLine("    2. Easy color half-random agent");
-                    Console.WriteLine("    3. Easy pattern half-random agent");
-                    Console.WriteLine("    4. Easy half-random agent");
-                    Console.WriteLine("    5. Random position, count scores");
-                    Console.WriteLine("    6. Counting color scores");
-                    Console.WriteLine("    7. Counting pattern scores");
-                    Console.WriteLine("    8. Counting scores");
-                    Console.WriteLine("    9. 8 but with probability to do sth random");
-                    Console.WriteLine("    10. random patch tile, best position");
-                    Console.WriteLine("    11. Counting scores with utility");
-                    Console.WriteLine("    12. twoplayer");
+
+                    foreach ((int,string) ad in AgentDescription)
+                    {
+                        Console.WriteLine($"    {ad.Item1}. {ad.Item2}");
+                    }
                     Console.Write(" Pick agent: ");
 
                     agentOption = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine();
 
-                    if (1 <= agentOption && agentOption <= 11)
+                    if (1 <= agentOption && agentOption <= AgentDescription.Count())
                     {
                         return agentOption;
                     }
@@ -191,45 +195,29 @@ namespace Calico
                     }
                 case 2:
                     {
-                        return new RandomAgentColor(scoring);
+                        return new AgentColor(scoring);
                     }
                 case 3:
                     {
-                        return new RandomAgentPattern(scoring);
+                        return new AgentPattern(scoring);
                     }
                 case 4:
                     {
-                        return new RandomAgentComplete(scoring);
+                        return new AgentComplete(scoring);
                     }
                 case 5:
                     {
-                        return new RandomPositionAgent(scoring);
+                        return new AgentCompleteWithProb(scoring);
                     }
                 case 6:
                     {
-                        return new AgentColor(scoring);
+                        return new RandomPatchTileAgent(scoring);
                     }
                 case 7:
                     {
-                        return new AgentPattern(scoring);
-                    }
-                case 8:
-                    {
-                        return new AgentComplete(scoring);
-                    }
-                case 9:
-                    {
-                        return new AgentCompleteWithProb(scoring);
-                    }
-                case 10:
-                    {
-                        return new RandomPatchTileAgent(scoring);
-                    }
-                case 11:
-                    {
                         return new AgentCompleteWithUtility(scoring);
                     }
-                case 12:
+                case 8:
                     {
                         return new TwoPlayerAgent(scoring);
                     }
@@ -451,23 +439,17 @@ namespace Calico
         {
             List<GameStats> stats = new List<GameStats>();
 
-            Console.WriteLine(" Agents: ");
-            Console.WriteLine("    1. Random");
-            Console.WriteLine("    2. Easy color half-random agent");
-            Console.WriteLine("    3. Easy pattern half-random agent");
-            Console.WriteLine("    4. Easy half-random agent");
-            Console.WriteLine("    5. Random position, count scores");
-            Console.WriteLine("    6. Counting color scores");
-            Console.WriteLine("    7. Counting pattern scores");
-            Console.WriteLine("    8. Counting scores");
-            Console.WriteLine("    9. 8 but with probability to do sth random");
-            Console.WriteLine("    10. random patch tile, best position");
-            Console.WriteLine("    11. Counting scores with utility");
+            Console.WriteLine(" Agent options: ");
 
-            for (int i = 1;i <= 11;i++)
+            foreach ((int, string) ad in AgentDescription)
+            {
+                Console.WriteLine($"    {ad.Item1}. {ad.Item2}");
+            }
+
+            for (int i = 1;i <= AgentDescription.Count();i++)
             {
                 Console.WriteLine(" " + i + ": ");
-                stats.Add(TestGame(false, false,i, 100));
+                stats.Add(TestGame(false, false,i, 1000));
                 Console.WriteLine();
             }
 
@@ -480,7 +462,13 @@ namespace Calico
             {
                 outputFile.WriteLine("agent;averageScore;buttons;cats;best;lowest");
                 foreach (GameStats gs in stats)
-                    outputFile.WriteLine($"{gs.AgentType};{gs.AvgScore};{gs.AvgButtons};{gs.AvgCats.Item1}/{gs.AvgCats.Item2}/{gs.AvgCats.Item3};{gs.BestScore};{gs.LowestScore}");
+                    outputFile.WriteLine($"{gs.AgentType};" +
+                        $"{Math.Round(gs.AvgScore,3,MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(gs.AvgButtons,3,MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(gs.AvgCats.Item1,3,MidpointRounding.AwayFromZero).ToString("0.000")}|" +
+                        $"{Math.Round(gs.AvgCats.Item2,3,MidpointRounding.AwayFromZero).ToString("0.000")}|" +
+                        $"{Math.Round(gs.AvgCats.Item3,3,MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{gs.BestScore};{gs.LowestScore}");
             }
 
         }
@@ -632,59 +620,112 @@ namespace Calico
 
             // objListOrder.Sort((x, y) => x.OrderDate.CompareTo(y.OrderDate));
 
+            List<(string, double)> avgScores = new List<(string, double)> ();
+            foreach (KeyValuePair<(int, int, int), List<GameStats>> ds in statsDict)
+            {
+                avgScores.Add(($"{ds.Key.Item1},{ds.Key.Item2},{ds.Key.Item3}",ds.Value.Average(item => item.AvgScore)));
+
+            }
+            avgScores.Sort((x,y)=>x.Item2.CompareTo(y.Item2));
+
             using (StreamWriter outputFile = new StreamWriter("./testTasks.csv"))
             {
                 outputFile.WriteLine("tasks;averageScore");
-                foreach (KeyValuePair<(int,int,int),List<GameStats>> ds  in statsDict)
+                foreach ((string,double) ds  in avgScores)
                 {
-                    outputFile.WriteLine($"{ds.Key.Item1},{ds.Key.Item2},{ds.Key.Item3};{ds.Value.Average(item => item.AvgScore)}");
+                    outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
 
                 }
             }
+
+            avgScores = new List<(string, double)>();
+
+            avgScores.Add(($"1,2,3", statsDict[(1, 2, 3)][0].AvgScore));
+            avgScores.Add(($"1,3,2", statsDict[(1, 2, 3)][1].AvgScore));
+            avgScores.Add(($"2,1,3", statsDict[(1, 2, 3)][2].AvgScore));
+            avgScores.Add(($"2,3,1", statsDict[(1, 2, 3)][3].AvgScore));
+            avgScores.Add(($"3,1,2", statsDict[(1, 2, 3)][4].AvgScore));
+            avgScores.Add(($"3,2,1", statsDict[(1, 2, 3)][5].AvgScore));
+
+            avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+
             using (StreamWriter outputFile = new StreamWriter("./testTasks123.csv"))
             {
                 outputFile.WriteLine("tasks;score");
 
-                outputFile.WriteLine($"1,2,3;{statsDict[(1, 2, 3)][0].AvgScore}");
-                outputFile.WriteLine($"1,3,2;{statsDict[(1, 2, 3)][1].AvgScore}");
-                outputFile.WriteLine($"2,1,3;{statsDict[(1, 2, 3)][2].AvgScore}");
-                outputFile.WriteLine($"2,3,1;{statsDict[(1, 2, 3)][3].AvgScore}");
-                outputFile.WriteLine($"3,1,3;{statsDict[(1, 2, 3)][4].AvgScore}");
-                outputFile.WriteLine($"3,2,1;{statsDict[(1, 2, 3)][5].AvgScore}");
+                foreach ((string, double) ds in avgScores)
+                {
+                    outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+
+                }
             }
+
+            avgScores = new List<(string, double)>();
+
+            avgScores.Add(($"2,3,5", statsDict[(2, 3, 5)][0].AvgScore));
+            avgScores.Add(($"2,5,3", statsDict[(2, 3, 5)][1].AvgScore));
+            avgScores.Add(($"3,2,5", statsDict[(2, 3, 5)][2].AvgScore));
+            avgScores.Add(($"3,5,2", statsDict[(2, 3, 5)][3].AvgScore));
+            avgScores.Add(($"5,2,3", statsDict[(2, 3, 5)][4].AvgScore));
+            avgScores.Add(($"5,3,2", statsDict[(2, 3, 5)][5].AvgScore));
+
+            avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+
             using (StreamWriter outputFile = new StreamWriter("./testTasks235.csv"))
             {
                 outputFile.WriteLine("tasks;score");
 
-                outputFile.WriteLine($"2,3,5;{statsDict[(2, 3, 5)][0].AvgScore}");
-                outputFile.WriteLine($"2,5,3;{statsDict[(2, 3, 5)][1].AvgScore}");
-                outputFile.WriteLine($"3,2,5;{statsDict[(2, 3, 5)][2].AvgScore}");
-                outputFile.WriteLine($"3,5,2;{statsDict[(2, 3, 5)][3].AvgScore}");
-                outputFile.WriteLine($"5,2,3;{statsDict[(2, 3, 5)][4].AvgScore}");
-                outputFile.WriteLine($"5,3,2;{statsDict[(2, 3, 5)][5].AvgScore}");
+                foreach ((string, double) ds in avgScores)
+                {
+                    outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+
+                }
             }
+            avgScores = new List<(string, double)>();
+
+            avgScores.Add(($"1,4,6", statsDict[(1, 4, 6)][0].AvgScore));
+            avgScores.Add(($"1,6,4", statsDict[(1, 4, 6)][1].AvgScore));
+            avgScores.Add(($"4,1,6", statsDict[(1, 4, 6)][2].AvgScore));
+            avgScores.Add(($"4,6,1", statsDict[(1, 4, 6)][3].AvgScore));
+            avgScores.Add(($"6,1,4", statsDict[(1, 4, 6)][4].AvgScore));
+            avgScores.Add(($"6,4,1", statsDict[(1, 4, 6)][5].AvgScore));
+
+            avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
             using (StreamWriter outputFile = new StreamWriter("./testTasks146.csv"))
             {
                 outputFile.WriteLine("tasks;score");
 
-                outputFile.WriteLine($"1,4,6;{statsDict[(1, 4, 6)][0].AvgScore}");
-                outputFile.WriteLine($"1,6,4;{statsDict[(1, 4, 6)][1].AvgScore}");
-                outputFile.WriteLine($"4,1,6;{statsDict[(1, 4, 6)][2].AvgScore}");
-                outputFile.WriteLine($"4,6,1;{statsDict[(1, 4, 6)][3].AvgScore}");
-                outputFile.WriteLine($"6,1,4;{statsDict[(1, 4, 6)][4].AvgScore}");
-                outputFile.WriteLine($"6,4,1;{statsDict[(1, 4, 6)][5].AvgScore}");
+                foreach ((string, double) ds in avgScores)
+                {
+                    outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+
+                }
             }
+            avgScores = new List<(string, double)>();
+
+            avgScores.Add(($"4,5,6", statsDict[(4, 5, 6)][0].AvgScore));
+            avgScores.Add(($"4,6,5", statsDict[(4, 5, 6)][1].AvgScore));
+            avgScores.Add(($"5,4,6", statsDict[(4, 5, 6)][2].AvgScore));
+            avgScores.Add(($"5,6,4", statsDict[(4, 5, 6)][3].AvgScore));
+            avgScores.Add(($"6,4,5", statsDict[(4, 5, 6)][4].AvgScore));
+            avgScores.Add(($"6,5,4", statsDict[(4, 5, 6)][5].AvgScore));
+
+            avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
             using (StreamWriter outputFile = new StreamWriter("./testTasks456.csv"))
             {
                 outputFile.WriteLine("tasks;score");
 
-                outputFile.WriteLine($"4,5,6;{statsDict[(4, 5, 6)][0].AvgScore}");
-                outputFile.WriteLine($"4,6,5;{statsDict[(4, 5, 6)][1].AvgScore}");
-                outputFile.WriteLine($"5,4,6;{statsDict[(4, 5, 6)][2].AvgScore}");
-                outputFile.WriteLine($"5,6,4;{statsDict[(4, 5, 6)][3].AvgScore}");
-                outputFile.WriteLine($"6,4,5;{statsDict[(4, 5, 6)][4].AvgScore}");
-                outputFile.WriteLine($"6,5,4;{statsDict[(4, 5, 6)][5].AvgScore}");
+                foreach ((string, double) ds in avgScores)
+                {
+                    outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+
+                }
             }
+
+        }
+
+        private void TestBoards()
+        {
 
         }
 
