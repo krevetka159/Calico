@@ -47,6 +47,39 @@ namespace Calico
             
         }
 
+        public void SetProps(Dictionary<Color, int> b, int rb, Dictionary<PatternScoringPanel,int> c)
+        {
+            foreach(KeyValuePair<Color,int>button in b)
+            {
+                buttons[button.Key] = button.Value;
+            }
+            rainbowButtons = rb;
+            foreach (KeyValuePair<PatternScoringPanel,int> cat in c)
+            {
+                cats[cat.Key] = cat.Value;
+            }
+        }
+
+        public bool PatternUFContains(GamePiece gp)
+        {
+            return patternUF.Contains(gp);
+        }
+
+        public bool ColorUFContains(GamePiece gp)
+        {
+            return colorUF.Contains(gp);
+        }
+
+        public List<GamePiece> GetPatternCluster(GamePiece gp)
+        {
+            return patternUF.GetCluster(gp);
+        }
+
+        public List<GamePiece> GetColorCluster(GamePiece gp)
+        {
+            return colorUF.GetCluster(gp);
+        }
+
         /// <summary>
         /// Adds patchtile to color and pattern UnionFinds
         /// </summary>
@@ -55,6 +88,26 @@ namespace Calico
         {
             patternUF.Add(piece);
             colorUF.Add(piece);
+        }
+
+        public void AddToPatternUF(List<GamePiece> pieces)
+        {
+            patternUF.Add(pieces[0]);
+            for (int i = 1; i < pieces.Count; i++)
+            {
+                patternUF.Add(pieces[i]);
+                patternUF.Union(pieces[i], pieces[i - 1]);
+            }
+        }
+
+        public void AddToColorUF(List<GamePiece> pieces)
+        {
+            colorUF.Add(pieces[0]);
+            for (int i = 1; i < pieces.Count; i++)
+            {
+                colorUF.Add(pieces[i]);
+                colorUF.Union(pieces[i], pieces[i - 1]);
+            }
         }
 
         /// <summary>
