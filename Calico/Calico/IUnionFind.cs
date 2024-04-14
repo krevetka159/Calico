@@ -23,6 +23,12 @@ namespace Calico
         {
         }
 
+        public UnionFind(UnionFind<T> uf)
+        {
+            lastCluster = uf.lastCluster;
+            clusters = new Dictionary<T,int>(uf.clusters);
+        }
+
         public void Add(T x)
         {
             clusters.Add(x, ++lastCluster);
@@ -34,6 +40,11 @@ namespace Calico
                 clusters.ContainsKey(x) &&
                 clusters.ContainsKey(y) &&
                 clusters[x] == clusters[y];
+        }
+
+        public bool Contains(T x)
+        {
+            return clusters.ContainsKey(x);
         }
 
         public int Count(T x)
@@ -51,6 +62,19 @@ namespace Calico
             return cnt;
         }
 
+        public List<T> GetCluster(T x)
+        {
+            int xCluster = clusters[x];
+            List<T> cluster = new List<T>();
+            foreach ((T z, int zCluster) in clusters)
+            {
+                if (zCluster == xCluster)
+                {
+                    cluster.Add(z);
+                }
+            }
+            return cluster;
+        }
 
         public void Union(T x, T y)
         {
