@@ -570,4 +570,74 @@ namespace Calico
         }
     }
 
+
+    public class MinimaxAgent : Agent
+    {
+        public MinimaxAgent(Scoring scoring) : base(scoring) 
+        {
+        }
+
+        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            double max = 0;
+            (int, int) maxPosition = RandomPosition();
+            int pieceIndex = RandomGamePiece(Opts);
+
+            // pro každou permutaci opts udělám následující: pro každý empty spot na desce udělám kopii desky a pošlu ji do dalšího forcyklu
+
+            List<(int, int, int)> perms = new List<(int, int, int)>() { (0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0) };
+
+            foreach ((int,int,int) optPermutation in perms)
+            {
+                for (int i1 = 1; i1 < Board.Size - 1; i1++)
+                {
+                    for (int j1=1; j1 < Board.Size -1; j1++)
+                    {
+                        if (Board.IsEmpty(i1, j1))
+                        { 
+
+                            for (int i2 = 1; i2 < Board.Size - 1; i2++)
+                            {
+                                for (int j2 = 1; j2 < Board.Size - 1; j2++)
+                                {
+                                    if (Board.IsEmpty(i2, j2) && (i1,j1) != (i2,j2))
+                                    {
+
+                                        for (int i3 = 1; i3 < Board.Size - 1; i3++)
+                                        {
+                                            for (int j3 = 1; j3 < Board.Size - 1; j3++)
+                                            {
+                                                if (Board.IsEmpty(i3, j3) && (i1, j1) != (i3, j3) && (i2, j2) != (i3, j3))
+                                                {
+                                                    List<(GamePiece,(int,int))> toAdd = new List<(GamePiece, (int, int))>()
+                                                    {
+                                                        (Opts[optPermutation.Item1], (i1, j1)),
+                                                        (Opts[optPermutation.Item2], (i2, j2)),
+                                                        (Opts[optPermutation.Item3], (i3, j3))
+                                                    };
+
+                                                    double eval = Board.EvaluateMinimax(toAdd);
+                                                    if (eval > max)
+                                                    {
+                                                        max = eval;
+                                                        maxPosition = (i1, j1);
+                                                        pieceIndex = optPermutation.Item1;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+
+            return (pieceIndex, maxPosition);
+        }
+    }
+
 }
