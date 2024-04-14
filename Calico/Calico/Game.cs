@@ -31,7 +31,8 @@ namespace Calico
             (4, " Nejlepší umístění "),
             (5, " Nejlepší umístění s malou náhodou "),
             (6, " Nejlepší umístění náhodného dílku "),
-            (7, " Utility fce")
+            (7, " Utility fce"),
+            (8, " Minimax")
         };
 
 
@@ -219,7 +220,7 @@ namespace Calico
                     }
                 case 8:
                     {
-                        return new TwoPlayerAgent(scoring);
+                        return new MinimaxAgent(scoring);
                     }
                 default:
                     {
@@ -239,7 +240,7 @@ namespace Calico
 
                 if (newGame == "n")
                 {
-                    TestGame(false, true, agentOption, 50);
+                    TestGame(false, true, agentOption, 1000);
                     break;
                 }
                 else if (newGame == "y") 
@@ -294,7 +295,12 @@ namespace Calico
 
                 }
 
-                if(allResults) gameStatePrinter.PrintStats(agent);
+                if (allResults)
+                {
+                    if (j % 10 == 0) Console.WriteLine(j);
+                    gameStatePrinter.PrintStats(agent);
+                }
+                
                 score = agent.Board.ScoreCounter.GetScore();
                 sum += score;
                 if (score > max)
@@ -449,7 +455,7 @@ namespace Calico
             for (int i = 1;i <= AgentDescription.Count();i++)
             {
                 Console.WriteLine(" " + i + ": ");
-                stats.Add(TestGame(false, false,i, 1000));
+                stats.Add(TestGame(false, false,i, 50));
                 Console.WriteLine();
             }
 
