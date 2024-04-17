@@ -429,7 +429,7 @@ namespace Calico
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             int maxPieceIndex = RandomGamePiece(Opts);
-            int max = 0;
+            double max = 0;
             (int, int) maxPosition = RandomPosition();
 
             for (int o = 0; o < Opts.Length; o++)

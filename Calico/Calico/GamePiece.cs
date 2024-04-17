@@ -234,7 +234,7 @@ namespace Calico
             }
         }
 
-        public int CheckNeighboursUtility(GamePiece gp)
+        public double CheckNeighboursUtility(GamePiece gp)
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
@@ -265,12 +265,12 @@ namespace Calico
                 }
             }
 
-            if (!colorsFailed && !patternsFailed) return (ScoreCompletedFully / 6) * colors.Sum();
-            else if (!patternsFailed || !colorsFailed) return (ScoreCompletedPartly / 6) * colors.Sum();
+            if (!colorsFailed && !patternsFailed) return (Convert.ToDouble(ScoreCompletedFully) / 6) * colors.Sum();
+            else if (!patternsFailed || !colorsFailed) return (Convert.ToDouble(ScoreCompletedPartly) / 6) * colors.Sum();
             else return 0;
         }
 
-        public int CheckNeighboursUtilityMinimax(List<GamePiece> gamePieces)
+        public double CheckNeighboursUtilityMinimax(List<GamePiece> gamePieces)
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
@@ -305,8 +305,8 @@ namespace Calico
                 }
             }
 
-            if (!colorsFailed && !patternsFailed) return (ScoreCompletedFully / 6) * colors.Sum();
-            else if (!patternsFailed || !colorsFailed) return (ScoreCompletedPartly / 6) * colors.Sum();
+            if (!colorsFailed && !patternsFailed) return (Convert.ToDouble(ScoreCompletedFully) / 6) * colors.Sum();
+            else if (!patternsFailed || !colorsFailed) return (Convert.ToDouble(ScoreCompletedPartly) / 6) * colors.Sum();
             else return 0;
         }
 
