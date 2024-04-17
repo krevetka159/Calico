@@ -282,7 +282,10 @@ namespace Calico
 
                 agent = UseAgent(agentType);
 
+                //agent.AddTaskPieces(1,4,6); //best option
+
                 agent.ChooseTaskPieces();
+
                 if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
 
