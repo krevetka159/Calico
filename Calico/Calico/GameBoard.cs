@@ -620,9 +620,9 @@ namespace Calico
             return score;
         }
 
-        public int EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col)
+        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col)
         {
-            int score = 0;
+            double score = 0;
             List<(int, int)> neighbors = GetNeighbors(row, col);
             foreach ((int r, int c) in neighbors)
             {
@@ -642,7 +642,7 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsUtility(GamePiece gp, int row, int col)
+        public double EvaluateNeighborsUtility(GamePiece gp, int row, int col)
         {
             return EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter) + EvaluateNeighboringTaskUtility(gp, row, col);
 
@@ -688,6 +688,7 @@ namespace Calico
             }
 
             double score = 0;
+            int div = 1;
 
             for( int i = 0; i < gamePieces.Count; i++)
             {
@@ -712,15 +713,17 @@ namespace Calico
                     if (IsTask(nr, nc))
                     {
                         taskNeighbors[(nr, nc)].Add(gp);
-                        score += Convert.ToDouble(TaskPieces[(nr, nc)].CheckNeighboursUtilityMinimax(taskNeighbors[(nr, nc)]))/(i+1);
+                        score += Convert.ToDouble(TaskPieces[(nr, nc)].CheckNeighboursUtilityMinimax(taskNeighbors[(nr, nc)]))/div;
                     }
                 }
 
-                score += Convert.ToDouble(EvaluateNeighborsColorUtility(gp, r, c, mockSC))/(i+1) + Convert.ToDouble(EvaluateNeighborsPatternUtility(gp, r, c, mockSC))/ (i + 1);
+                score += Convert.ToDouble(EvaluateNeighborsColorUtility(gp, r, c, mockSC))/div + Convert.ToDouble(EvaluateNeighborsPatternUtility(gp, r, c, mockSC))/div;
 
                 mockSC.AddToUF(gp);
 
                 mockSC.EvaluateNew(gp, neighbors);
+
+                div *= 2;
             }
 
             return score;
