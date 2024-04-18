@@ -14,14 +14,14 @@ namespace Calico
     // git test
     internal class Game
     {
-        private Bag bag;
-        private Player player;
-        private Agent agent;
+        public Bag bag;
+        public Player player;
+        public Agent agent;
         private Agent agent2;
         private List<Agent> multiAgents;
-        private GamePiece[] Opts = new GamePiece[3];
-        private Scoring scoring;
-        private GameStatePrinter gameStatePrinter;
+        public GamePiece[] Opts = new GamePiece[3];
+        public Scoring scoring;
+        public GameStatePrinter gameStatePrinter;
 
         private List<(int,string)> AgentDescription = new List<(int, string)>()
         {
@@ -34,6 +34,11 @@ namespace Calico
             (7, " Utility fce"),
             (8, " Minimax")
         };
+
+        public Game()
+        {
+
+        }
 
 
         public Game(int mode) 
@@ -186,7 +191,7 @@ namespace Calico
                 }
             }
         }
-        private Agent UseAgent(int agentOption)
+        public Agent UseAgent(int agentOption)
         {
             switch (agentOption)
             {
@@ -240,7 +245,7 @@ namespace Calico
 
                 if (newGame == "n")
                 {
-                    TestGame(false, true, agentOption, 1000);
+                    TestGame(false, true, agentOption, 500);
                     break;
                 }
                 else if (newGame == "y") 
@@ -359,11 +364,12 @@ namespace Calico
                 min.Add(-1);
                 wins.Add(0);
                 score.Add(0);
-                multiAgents.Add(UseAgent(a));
+                multiAgents.Add(null);
             }
 
             for (int j = 0; j < iterations; j++)
             {
+                Console.WriteLine(j);
 
                 bag = new Bag();
 
@@ -378,6 +384,7 @@ namespace Calico
                 for (int i = 0; i < numOfPlayers; i++)
                 {
                     multiAgents[i] = UseAgent(agentOptions[i]);
+                    multiAgents[i].ChooseTaskPieces();
                 }
 
                 for (int i = 0; i < numOfPlayers; i++)
@@ -756,7 +763,7 @@ namespace Calico
 
                             if (newGame == "n")
                             {
-                                TestMultiPlayerGame(numOfPlayers, false, false, 1000);
+                                TestMultiPlayerGame(numOfPlayers, false, false, 500);
                                 break;
                             }
                             else if (newGame == "y")
@@ -791,7 +798,7 @@ namespace Calico
 // ----------------------------------------------- GET COMMAND ------------------------------------------------------------
 
 
-        private void MakeMove(Player p)
+        public void MakeMove(Player p)
         {
             
             (int next, (int row, int col)) = p.ChooseNextMove(Opts);
