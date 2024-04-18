@@ -524,6 +524,47 @@ namespace Calico
             else return count;
         }
 
+        public int EvaluateNeighborsColorUtility(GamePiece gp, int row, int col, ScoreCounter sc, List<GamePiece> neighbors)
+        {
+            int count = 0;
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                if (neighbors[i].Color == gp.Color)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        if (sc.CheckColorUnion(neighbors[i], neighbors[j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (sc.GetColorCount(neighbors[i]) >= sc.Scoring.ColorScoring.ClusterSize) return 0;
+                        count += sc.GetColorCount(neighbors[i]);
+                    }
+                }
+            }
+
+            if (count + 1 >= sc.Scoring.ColorClusterSize)
+            {
+                if (sc.GetsRainbowButton(gp.Color))
+                {
+                    return sc.Scoring.ColorScoring.Points + 1 + 3;
+                }
+                else
+                {
+                    return sc.Scoring.ColorScoring.Points + 1;
+                }
+            }
+            else return count;
+        }
+
         /// <summary>
         /// Counts how much pattern score would change after adding gamepiece
         /// </summary>
@@ -605,6 +646,38 @@ namespace Calico
             else return count;
         }
 
+        public int EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, List<GamePiece> neighbors)
+        {
+            int count = 0;
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                if (neighbors[i].Pattern == gp.Pattern)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        if (sc.CheckPatternUnion(neighbors[i], neighbors[j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (sc.GetPatternCount(neighbors[i]) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                        count += sc.GetPatternCount(neighbors[i]);
+                    }
+                }
+
+            }
+
+            if (count + 1 >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
+            else return count;
+        }
+
         public int EvaluateNeighboringTask(GamePiece gp, int row, int col)
         {
             int score = 0;
@@ -645,6 +718,12 @@ namespace Calico
         public double EvaluateNeighborsUtility(GamePiece gp, int row, int col)
         {
             return EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter) + EvaluateNeighboringTaskUtility(gp, row, col);
+
+        }
+
+        public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, EvolutionGameProps e)
+        {
+            return e.ButtonConst*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + e.CatsConst*EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter) + e.TaskConst*EvaluateNeighboringTaskUtility(gp, row, col);
 
         }
 
@@ -695,7 +774,7 @@ namespace Calico
                 (GamePiece gp, (int r, int c)) = gamePieces[i];
 
                 List<(int, int)> neighborsPositions = GetNeighbors(r, c);
-                List<GamePiece> neighbors = new List<GamePiece>();
+                List<GamePiece> neighbors = new List<GamePiece>(); // co tady actually dělám s tímhle?
                 for (int j = 0; j < i; j++)
                 {
                     if (neighborsPositions.Contains(gamePieces[j].Item2))
@@ -717,13 +796,13 @@ namespace Calico
                     }
                 }
 
-                score += Convert.ToDouble(EvaluateNeighborsColorUtility(gp, r, c, mockSC))/div + Convert.ToDouble(EvaluateNeighborsPatternUtility(gp, r, c, mockSC))/div;
+                score += Convert.ToDouble(EvaluateNeighborsColorUtility(gp, r, c, mockSC, neighbors))/div + Convert.ToDouble(EvaluateNeighborsPatternUtility(gp, r, c, mockSC, neighbors))/div;
 
                 mockSC.AddToUF(gp);
 
                 mockSC.EvaluateNew(gp, neighbors);
 
-                div *= 2;
+                div *= 10;
             }
 
             return score;
