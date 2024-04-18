@@ -18,6 +18,12 @@ namespace Calico
             TaskIds = new int[] { 0, 0, 0 };
         }
 
+        public Player(Scoring scoring, int boardId)
+        {
+            Board = new GameBoard(scoring, boardId);
+            TaskIds = new int[] { 0, 0, 0 };
+        }
+
         /// <summary>
         /// Add patchtile to gameboard
         /// </summary>
