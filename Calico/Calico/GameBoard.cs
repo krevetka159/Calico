@@ -20,7 +20,7 @@ namespace Calico
         private Scoring scoring;
         public ScoreCounter ScoreCounter { get; private set; }
 
-// ----------------------------------------------- INIT ------------------------------------------------------------
+        #region Init
         public GameBoard(Scoring scoring)
         {
             Random random = new Random();
@@ -181,9 +181,9 @@ namespace Calico
             TaskPieces[(row,col)]=task;
         }
 
+        #endregion
 
-
-// ----------------------------------------------- ADD PIECE ------------------------------------------------------------
+        #region AddPiece
 
         /// <summary>
         /// Add patchtile to gameboard and to unionfind
@@ -229,7 +229,9 @@ namespace Calico
             }
         }
 
-        // ----------------------------------------------------- GET NEIGHBORS -------------------------------------------------------
+        #endregion
+
+        #region GetNeighbors
 
         /// <summary>
         /// Return a list of neighboring positions
@@ -251,7 +253,9 @@ namespace Calico
             return neighbors;
         }
 
-        // ----------------------------------------------- CHECK FOR SIMILAR NEIGHBORS ------------------------------------------------------------
+        #endregion
+
+        #region Check For Similar Neighbors
 
         /// <summary>
         /// Checks whether a position on a gameboard has a neighbor with a certain color
@@ -309,7 +313,9 @@ namespace Calico
 
         }
 
-        // ----------------------------------------------- EVALUATE NEIGHBORS -----------------------------------------------------
+        #endregion
+
+        #region Basic evaluation
 
         /// <summary>
         /// Counts how much color score would change after adding gamepiece
@@ -438,7 +444,9 @@ namespace Calico
             
         }
 
-        // ----------------------------------------------- EVALUATE NEIGHBORS UTILITY -----------------------------------------------------
+        #endregion
+
+        #region Utility evaluation
 
 
         public int EvaluateNeighborsColorUtility(GamePiece gp, int row, int col, ScoreCounter sc)
@@ -623,12 +631,19 @@ namespace Calico
 
         }
 
+        #endregion
+
+        #region Evolution Evaluation
+
         public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, EvolutionGameProps e)
         {
             return e.ButtonConst*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + e.CatsConst*EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter) + e.TaskConst*EvaluateNeighboringTaskUtility(gp, row, col);
 
         }
 
+        #endregion
+
+        #region Few Steps Ahead Evaluation
         public double EvaluateMinimax(List<(GamePiece, (int,int))> gamePieces)
         {
             if (gamePieces.Count == 1)
@@ -710,11 +725,13 @@ namespace Calico
             return score;
 
         }
-                
-                
-    
 
-        // ----------------------------------------------- CHECK POSITION ------------------------------------------------------------
+        #endregion
+
+
+
+
+        #region Check Position
         /// <summary>
         /// Checks whether the position is empty
         /// </summary>
@@ -746,6 +763,8 @@ namespace Calico
         {
             return (board[row][col].Type == Type.Task);
         }
+
+        #endregion
 
     }
 }
