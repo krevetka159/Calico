@@ -20,7 +20,9 @@ namespace Calico
 
                 int mode = GetGameMode();
 
-                Game game = new Game(mode);
+                if (mode == 7) { Evolution evol = new Evolution(); }
+                else { Game game = new Game(mode); }
+                
 
                 while (true)
                 {
@@ -91,6 +93,10 @@ namespace Calico
                         case 6:
                             {
                                 return 6;
+                            }
+                        case 7:
+                            {
+                                return 7;
                             }
                         default:
                             {
