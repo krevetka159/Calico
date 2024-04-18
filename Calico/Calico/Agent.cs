@@ -315,10 +315,10 @@ namespace Calico
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighborsColor(gp, i, j) > max)
+                            if (Board.EvaluateNeighborsColorFixed(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighborsColor(gp, i, j);
+                                max = Board.EvaluateNeighborsColorFixed(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
@@ -357,10 +357,10 @@ namespace Calico
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighborsPattern(gp, i, j) > max)
+                            if (Board.EvaluateNeighborsPatternFixed(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighborsPattern(gp, i, j);
+                                max = Board.EvaluateNeighborsPatternFixed(gp, i, j);
                                 maxPosition = (i, j);
                             }
 
