@@ -27,6 +27,10 @@ namespace Calico
         {
         }
 
+        public Agent(Scoring scoring, int boardId) : base(scoring,boardId)
+        {
+        }
+
         /// <summary>
         /// Choose a random patchtile from options
         /// </summary>
@@ -288,7 +292,7 @@ namespace Calico
         }
     }
 
-// ----------------------------------------------- FIND LARGEST SCORE CHANGE ------------------------------------------------------------
+    #region Basic Evaluation
 
     public class AgentColor : Agent
     {
@@ -416,6 +420,59 @@ namespace Calico
 
         }
     }
+
+    public class AgentCompleteWithProb : Agent
+    {
+        /// <summary>
+        /// picks patchtile and position that increases score the most, but with a small probability make random move
+        /// </summary>
+        /// <param name="scoring"></param>
+
+        public AgentCompleteWithProb(Scoring scoring) : base(scoring)
+        {
+        }
+
+        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            int maxPieceIndex = RandomGamePiece(Opts);
+            int max = 0;
+            (int, int) maxPosition = RandomPosition();
+
+            for (int o = 0; o < Opts.Length; o++)
+            {
+                GamePiece gp = Opts[o];
+                for (int i = 1; i < Board.Size - 1; i++)
+                {
+                    for (int j = 1; j < Board.Size - 1; j++)
+                    {
+                        if (Board.IsEmpty(i, j))
+                        {
+                            if (Board.EvaluateNeighbors(gp, i, j) > max)
+                            {
+                                maxPieceIndex = o;
+                                max = Board.EvaluateNeighbors(gp, i, j);
+                                maxPosition = (i, j);
+                            }
+                        }
+
+                    }
+                }
+            }
+            if (random.NextDouble() > 0.05)
+            {
+                return (maxPieceIndex, maxPosition);
+            }
+            return (RandomGamePiece(Opts), RandomPosition());
+
+
+
+        }
+
+    }
+
+    #endregion
+
+    #region Utility Evaluation
     public class AgentCompleteWithUtility : Agent
     {
         /// <summary>
@@ -423,6 +480,9 @@ namespace Calico
         /// </summary>
         /// <param name="scoring"></param>
         public AgentCompleteWithUtility(Scoring scoring) : base(scoring)
+        {
+        }
+        public AgentCompleteWithUtility(Scoring scoring, int boardId) : base(scoring,boardId)
         {
         }
 
@@ -457,56 +517,10 @@ namespace Calico
 
         }
     }
-    public class AgentCompleteWithProb : Agent
-        {
-            /// <summary>
-            /// picks patchtile and position that increases score the most, but with a small probability make random move
-            /// </summary>
-            /// <param name="scoring"></param>
 
-            public AgentCompleteWithProb(Scoring scoring) : base(scoring)
-            {
-            }
+    #endregion
 
-            public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
-            {
-                int maxPieceIndex = RandomGamePiece(Opts);
-                int max = 0;
-                (int, int) maxPosition = RandomPosition();
-
-                for (int o = 0; o < Opts.Length; o++)
-                {
-                    GamePiece gp = Opts[o];
-                    for (int i = 1; i < Board.Size - 1; i++)
-                    {
-                        for (int j = 1; j < Board.Size - 1; j++)
-                        {
-                            if (Board.IsEmpty(i, j))
-                            {
-                                if (Board.EvaluateNeighbors(gp, i, j) > max)
-                                {
-                                    maxPieceIndex = o;
-                                    max = Board.EvaluateNeighbors(gp, i, j);
-                                    maxPosition = (i, j);
-                                }
-                            }
-
-                        }
-                    }
-                }
-                if (random.NextDouble() > 0.05)
-                {
-                    return (maxPieceIndex, maxPosition);
-                }
-                return (RandomGamePiece(Opts), RandomPosition());
-
-
-
-            }
-
-        }
-
-    // ----------------------------------------------- MULTIPLAYER AGENT ------------------------------------------------------------
+    #region Opponents best
     public class TwoPlayerAgent : Agent
     {
         /// <summary>
@@ -570,6 +584,10 @@ namespace Calico
         }
     }
 
+    #endregion
+
+
+    #region Few Steps Ahead
 
     public class MinimaxAgent : Agent
     {
@@ -589,27 +607,27 @@ namespace Calico
 
             foreach ((int,int,int) optPermutation in perms)
             {
-                for (int i1 = 1; i1 < Board.Size - 1; i1++)
+                Parallel.For(1, Board.Size - 1, i1 =>
                 {
-                    for (int j1=1; j1 < Board.Size -1; j1++)
+                    Parallel.For(1, Board.Size - 1, j1 =>
                     {
                         if (Board.IsEmpty(i1, j1))
                         {
 
-                            for (int i2 = 1; i2 < Board.Size - 1; i2++)
+                            Parallel.For(1, Board.Size - 1, i2 =>
                             {
-                                for (int j2 = 1; j2 < Board.Size - 1; j2++)
+                                Parallel.For(1, Board.Size - 1, j2 =>
                                 {
                                     if (Board.IsEmpty(i2, j2) && (i1, j1) != (i2, j2))
                                     {
 
-                                        for (int i3 = 1; i3 < Board.Size - 1; i3++)
+                                        Parallel.For(1, Board.Size - 1, i3 =>
                                         {
-                                            for (int j3 = 1; j3 < Board.Size - 1; j3++)
+                                            Parallel.For(1, Board.Size - 1, j3 =>
                                             {
                                                 if (Board.IsEmpty(i3, j3) && (i1, j1) != (i3, j3) && (i2, j2) != (i3, j3))
                                                 {
-                                                    List<(GamePiece,(int,int))> toAdd = new List<(GamePiece, (int, int))>()
+                                                    List<(GamePiece, (int, int))> toAdd = new List<(GamePiece, (int, int))>()
                                                     {
                                                         (Opts[optPermutation.Item1], (i1, j1)),
                                                         (Opts[optPermutation.Item2], (i2, j2)),
@@ -624,21 +642,25 @@ namespace Calico
                                                         pieceIndex = optPermutation.Item1;
                                                     }
                                                 }
-                                            }
-                                        }
+                                            });
+                                        });
                                     }
-                                }
-                            }
+                                });
+                            });
 
                         }
-                    }
-                }
+                    });
+                });
             }
 
 
             return (pieceIndex, maxPosition);
         }
     }
+
+    #endregion
+
+    #region Evolution
 
     public class EvolutionAgent : Agent
     {
@@ -679,4 +701,6 @@ namespace Calico
 
         }
     }
+
+    #endregion
 }
