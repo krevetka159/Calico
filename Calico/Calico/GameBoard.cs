@@ -309,121 +309,7 @@ namespace Calico
 
         }
 
-// ----------------------------------------------- EVALUATE NEIGHBORS -----------------------------------------------------
-
-        /// <summary>
-        /// Counts how much color score would change after adding gamepiece
-        /// </summary>
-        /// <param name="gp"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public int EvaluateNeighborsColor(GamePiece gp, int row, int col)
-        {
-
-            int score = 0;
-            int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-
-            for (int i = 0; i < neighbors.Count; i++)
-            {
-                
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
-                if (board[row_i][col_i].Color == gp.Color)
-                {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (ScoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
-
-                    if (separate)
-                    {
-                        count += ScoreCounter.GetColorCount(board[row_i][col_i]);
-                        score += ScoreCounter.GetColorScore(board[row_i][col_i]);
-                    }
-                }
-
-            }
-
-            int newScore = ScoreCounter.CountColorScore(count + 1);
-
-            
-            if (count == 0) return 0;
-
-
-            return (newScore - score + 1);
-        }
-
-        /// <summary>
-        /// Counts how much pattern score would change after adding gamepiece
-        /// </summary>
-        /// <param name="gp"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public int EvaluateNeighborsPattern(GamePiece gp, int row, int col)
-        {
-            int score = 0;
-            int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-
-            for (int i = 0; i < neighbors.Count; i++)
-            {
-
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
-                if (board[row_i][col_i].Pattern == gp.Pattern)
-                {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
-
-                    if (separate)
-                    {
-                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
-                        score += ScoreCounter.GetPatternScore(board[row_i][col_i]);
-                    }
-                }
-
-            }
-
-            int newScore = ScoreCounter.CountPatternScore(count + 1, gp.Pattern);
-
-
-            if (count == 0) return 0;
-
-
-            return (newScore - score + 1);
-        }
-
-        /// <summary>
-        /// Counts how much score would change after adding gamepiece
-        /// </summary>
-        /// <param name="gp"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public int EvaluateNeighbors(GamePiece gp, int row, int col)
-        {
-            return EvaluateNeighborsColorFixed(gp, row, col) + EvaluateNeighborsPatternFixed(gp, row, col) + EvaluateNeighboringTask(gp, row,col);
-            
-        }
-
-        // ----------------------------------------------- EVALUATE NEIGHBORS NEW -----------------------------------------------------
+        // ----------------------------------------------- EVALUATE NEIGHBORS -----------------------------------------------------
 
         /// <summary>
         /// Counts how much color score would change after adding gamepiece
@@ -474,10 +360,86 @@ namespace Calico
                 else
                 {
                     return ScoreCounter.Scoring.ColorScoring.Points + 1;
-                }   
+                }
             }
             else return 1;
         }
+
+        /// <summary>
+        /// Counts how much pattern score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public int EvaluateNeighborsPatternFixed(GamePiece gp, int row, int col)
+        {
+            int count = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Pattern == gp.Pattern)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
+                    }
+                }
+
+            }
+
+
+            if (count == 0) return 0;
+            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
+            else return 1;
+        }
+
+        public int EvaluateNeighboringTask(GamePiece gp, int row, int col)
+        {
+            int score = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+            foreach ((int r, int c) in neighbors)
+            {
+                if (IsTask(r, c))
+                {
+                    score += TaskPieces[(r, c)].CheckNeighbours(gp);
+                }
+            }
+
+            return score;
+        }
+
+        /// <summary>
+        /// Counts how much score would change after adding gamepiece
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public int EvaluateNeighbors(GamePiece gp, int row, int col)
+        {
+            return EvaluateNeighborsColorFixed(gp, row, col) + EvaluateNeighborsPatternFixed(gp, row, col) + EvaluateNeighboringTask(gp, row,col);
+            
+        }
+
+        // ----------------------------------------------- EVALUATE NEIGHBORS UTILITY -----------------------------------------------------
+
 
         public int EvaluateNeighborsColorUtility(GamePiece gp, int row, int col, ScoreCounter sc)
         {
@@ -565,51 +527,6 @@ namespace Calico
             else return count;
         }
 
-        /// <summary>
-        /// Counts how much pattern score would change after adding gamepiece
-        /// </summary>
-        /// <param name="gp"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public int EvaluateNeighborsPatternFixed(GamePiece gp, int row, int col)
-        {
-            int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-
-            for (int i = 0; i < neighbors.Count; i++)
-            {
-
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
-                if (board[row_i][col_i].Pattern == gp.Pattern)
-                {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
-
-                    if (separate)
-                    {
-                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
-                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
-                    }
-                }
-
-            }
-
-
-            if (count == 0) return 0;
-            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
-            else return 1;
-        }
-
         public int EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc)
         {
             int count = 0;
@@ -676,21 +593,6 @@ namespace Calico
 
             if (count + 1 >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
             else return count;
-        }
-
-        public int EvaluateNeighboringTask(GamePiece gp, int row, int col)
-        {
-            int score = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-            foreach ((int r, int c) in neighbors)
-            {
-                if (IsTask(r, c))
-                {
-                    score += TaskPieces[(r, c)].CheckNeighbours(gp);
-                }
-            }
-
-            return score;
         }
 
         public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col)
