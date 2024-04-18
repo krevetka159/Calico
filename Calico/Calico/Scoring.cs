@@ -97,24 +97,6 @@ namespace Calico
             PatternScoringPanels = new List<PatternScoringPanel>();
             PatternScoringDict = new Dictionary<Pattern, PatternScoringPanel>();
 
-            //foreach ((int size, int score) in patternProps)
-            //{
-            //    PatternScoringToString.Append($" {size} patchtiles = {score} points for patterns ");
-            //    for (int i = 0; i < 2; i++)
-            //    {
-            //        int randInt = random.Next(patterns.Count);
-            //        PatternClusterSizes[patterns[randInt]] = size;
-            //        PatternClusterScores[patterns[randInt]] = score;
-
-            //        PatternScoringToString.Append((char)(64 + (int)patterns[randInt]));
-            //        PatternScoringToString.Append(", ");
-
-            //        patterns.RemoveAt(randInt);
-            //    }
-            //    PatternScoringToString.Append("\n");
-
-            //}
-
             for (int i = 1; i <= 3; i++)
             {
                 int randInt = random.Next(patterns.Count);
