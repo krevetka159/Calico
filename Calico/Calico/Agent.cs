@@ -594,13 +594,13 @@ namespace Calico
                     for (int j1=1; j1 < Board.Size -1; j1++)
                     {
                         if (Board.IsEmpty(i1, j1))
-                        { 
+                        {
 
                             for (int i2 = 1; i2 < Board.Size - 1; i2++)
                             {
                                 for (int j2 = 1; j2 < Board.Size - 1; j2++)
                                 {
-                                    if (Board.IsEmpty(i2, j2) && (i1,j1) != (i2,j2))
+                                    if (Board.IsEmpty(i2, j2) && (i1, j1) != (i2, j2))
                                     {
 
                                         for (int i3 = 1; i3 < Board.Size - 1; i3++)
@@ -640,4 +640,43 @@ namespace Calico
         }
     }
 
+    public class EvolutionAgent : Agent
+    {
+        EvolutionGameProps gameProps;
+        public EvolutionAgent(Scoring scoring, EvolutionGameProps e) : base(scoring)
+        {
+            gameProps = e;
+        }
+
+        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            int maxPieceIndex = RandomGamePiece(Opts);
+            double max = 0;
+            (int, int) maxPosition = RandomPosition();
+
+            for (int o = 0; o < Opts.Length; o++)
+            {
+                GamePiece gp = Opts[o];
+                for (int i = 1; i < Board.Size - 1; i++)
+                {
+                    for (int j = 1; j < Board.Size - 1; j++)
+                    {
+                        if (Board.IsEmpty(i, j))
+                        {
+                            double eval = Board.EvaluateNeighborsEvolution(gp, i, j, gameProps);
+                            if (eval > max)
+                            {
+                                maxPieceIndex = o;
+                                max = eval;
+                                maxPosition = (i, j);
+                            }
+                        }
+
+                    }
+                }
+            }
+            return (maxPieceIndex, maxPosition);
+
+        }
+    }
 }
