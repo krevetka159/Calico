@@ -61,6 +61,7 @@ namespace Calico
                     Console.WriteLine("   4. All agent testing");
                     Console.WriteLine("   5. Multiplayer testing");
                     Console.WriteLine("   6. Task analysis");
+                    Console.WriteLine("   7. Evolution");
 
                     Console.Write(" Choose game mode: ");
 
