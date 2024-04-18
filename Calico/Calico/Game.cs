@@ -11,7 +11,6 @@ using System.Collections;
 
 namespace Calico
 {
-    // git test
     internal class Game
     {
         public Bag bag;
@@ -86,7 +85,8 @@ namespace Calico
             
         }
 
-// ----------------------------------------------- SINGLEPLAYER ------------------------------------------------------------
+    #region SinglePlayer
+
         private void SinglePlayer()
         {
             bag = new Bag();
@@ -118,8 +118,9 @@ namespace Calico
 
             gameStatePrinter.PrintStats(player);
         }
+        #endregion
 
-// ----------------------------------------------- MULTIPLAYER ------------------------------------------------------------
+    #region MultiPlayer
         private void MultiPlayer() 
         {
             bag = new Bag();
@@ -154,7 +155,11 @@ namespace Calico
             gameStatePrinter.PrintStats(agent);
         }
 
-        // ----------------------------------------------- TESTING ------------------------------------------------------------
+        #endregion
+
+    #region Testing
+
+        #region AgentChoice
 
         private int PickAgent(bool multiPlayer)
         {
@@ -233,6 +238,10 @@ namespace Calico
                     }
             }
         }
+
+        #endregion
+
+        #region TestMode
         private void Testing()
         {
             int agentOption = PickAgent(false);
@@ -259,6 +268,113 @@ namespace Calico
                 }
             }
         }
+
+        private void TestAll()
+        {
+            List<GameStats> stats = new List<GameStats>();
+
+            Console.WriteLine(" Agent options: ");
+
+            foreach ((int, string) ad in AgentDescription)
+            {
+                Console.WriteLine($"    {ad.Item1}. {ad.Item2}");
+            }
+
+            for (int i = 1; i <= AgentDescription.Count(); i++)
+            {
+                Console.WriteLine(" " + i + ": ");
+                stats.Add(TestGame(false, false, i, 50));
+                Console.WriteLine();
+            }
+
+            // Set a variable to the Documents path.
+            //string docPath =
+            //  Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            // Write the string array to a new file named "WriteLines.txt".
+            using (StreamWriter outputFile = new StreamWriter("./testAll.csv"))
+            {
+                outputFile.WriteLine("agent;averageScore;buttons;cats;best;lowest");
+                foreach (GameStats gs in stats)
+                    outputFile.WriteLine($"{gs.AgentType};" +
+                        $"{Math.Round(gs.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(gs.AvgButtons, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(gs.AvgCats.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")}|" +
+                        $"{Math.Round(gs.AvgCats.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}|" +
+                        $"{Math.Round(gs.AvgCats.Item3, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{gs.BestScore};{gs.LowestScore}");
+            }
+
+        }
+
+        private void TestTopAgents()
+        {
+            Console.WriteLine("    8. Counting scores");
+            Console.WriteLine("    9. 8 but with probability to do sth random");
+            Console.WriteLine("    11. Counting scores with utility");
+
+
+            foreach (int i in new List<int>() { 8, 9, 11 })
+            {
+                Console.WriteLine(" " + i + ": ");
+                TestGame(false, false, i, 1000);
+                Console.WriteLine();
+            }
+        }
+
+        private void TestMultiPlayer()
+        {
+            while (true)
+            {
+                Console.Write("Number of players (2-4): ");
+                try
+                {
+                    int numOfPlayers = Convert.ToInt32(Console.ReadLine());
+
+                    if (numOfPlayers == 2)
+                    {
+                        while (true)
+                        {
+                            Console.Write(" Print progress (y/n): ");
+                            string newGame = Console.ReadLine();
+
+                            if (newGame == "n")
+                            {
+                                TestMultiPlayerGame(numOfPlayers, false, false, 500);
+                                break;
+                            }
+                            else if (newGame == "y")
+                            {
+                                TestMultiPlayerGame(numOfPlayers, true, true, 1);
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine(" Invalid expression");
+                            }
+                        }
+                    }
+                    else if (numOfPlayers == 3 || numOfPlayers == 4)
+                    {
+                        TestMultiPlayerGame(numOfPlayers, false, false, 1000);
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine(" Invalid number of players");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine(" Invalid expression");
+                }
+
+            }
+        }
+
+        #endregion
+
+        #region Game
         private GameStats TestGame(bool withPrint, bool allResults, int agentType, int iterations)
         {
             int sum = 0;
@@ -287,9 +403,9 @@ namespace Calico
 
                 agent = UseAgent(agentType);
 
-                //agent.AddTaskPieces(1,4,6); //best option
+                agent.AddTaskPieces(1,4,6); //best option
 
-                agent.ChooseTaskPieces();
+                //agent.ChooseTaskPieces();
 
                 if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
@@ -451,58 +567,9 @@ namespace Calico
             }
         }
 
-        private void TestAll()
-        {
-            List<GameStats> stats = new List<GameStats>();
+        #endregion
 
-            Console.WriteLine(" Agent options: ");
-
-            foreach ((int, string) ad in AgentDescription)
-            {
-                Console.WriteLine($"    {ad.Item1}. {ad.Item2}");
-            }
-
-            for (int i = 1;i <= AgentDescription.Count();i++)
-            {
-                Console.WriteLine(" " + i + ": ");
-                stats.Add(TestGame(false, false,i, 50));
-                Console.WriteLine();
-            }
-
-            // Set a variable to the Documents path.
-            //string docPath =
-            //  Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-            // Write the string array to a new file named "WriteLines.txt".
-            using (StreamWriter outputFile = new StreamWriter("./testAll.csv"))
-            {
-                outputFile.WriteLine("agent;averageScore;buttons;cats;best;lowest");
-                foreach (GameStats gs in stats)
-                    outputFile.WriteLine($"{gs.AgentType};" +
-                        $"{Math.Round(gs.AvgScore,3,MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                        $"{Math.Round(gs.AvgButtons,3,MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                        $"{Math.Round(gs.AvgCats.Item1,3,MidpointRounding.AwayFromZero).ToString("0.000")}|" +
-                        $"{Math.Round(gs.AvgCats.Item2,3,MidpointRounding.AwayFromZero).ToString("0.000")}|" +
-                        $"{Math.Round(gs.AvgCats.Item3,3,MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                        $"{gs.BestScore};{gs.LowestScore}");
-            }
-
-        }
-
-        private void TestTopAgents()
-        {
-            Console.WriteLine("    8. Counting scores");
-            Console.WriteLine("    9. 8 but with probability to do sth random");
-            Console.WriteLine("    11. Counting scores with utility");
-
-
-            foreach (int i in new List<int>(){ 8, 9, 11 })
-            {
-                Console.WriteLine(" " + i + ": ");
-                TestGame(false, false, i, 1000);
-                Console.WriteLine();
-            }
-        }
+        #region Tasks
 
         private GameStats TestTask(int agentType, int iterations, (int,int,int) tasks)
         {
@@ -740,62 +807,19 @@ namespace Calico
 
         }
 
+        #endregion
+
+        #region Boards
         private void TestBoards()
         {
 
         }
 
-        private void TestMultiPlayer()
-        {
-            while (true)
-            {
-                Console.Write("Number of players (2-4): ");
-                try
-                {
-                    int numOfPlayers = Convert.ToInt32(Console.ReadLine());
+        #endregion
 
-                    if (numOfPlayers == 2) 
-                    {
-                        while (true)
-                        {
-                            Console.Write(" Print progress (y/n): ");
-                            string newGame = Console.ReadLine();
+    #endregion
 
-                            if (newGame == "n")
-                            {
-                                TestMultiPlayerGame(numOfPlayers, false, false, 500);
-                                break;
-                            }
-                            else if (newGame == "y")
-                            {
-                                TestMultiPlayerGame(numOfPlayers, true, true, 1);
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine(" Invalid expression");
-                            }
-                        }
-                    }
-                    else if ( numOfPlayers == 3 || numOfPlayers == 4)
-                    {
-                        TestMultiPlayerGame(numOfPlayers, false, false, 1000);
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine(" Invalid number of players");
-                    }
-                }
-                catch
-                {
-                    Console.WriteLine(" Invalid expression");
-                }
-
-            }
-        }
-
-// ----------------------------------------------- GET COMMAND ------------------------------------------------------------
+    #region Move
 
 
         public void MakeMove(Player p)
@@ -807,6 +831,7 @@ namespace Calico
 
             Opts[next] = bag.Next();
         }
+        #endregion
 
     }
 }
