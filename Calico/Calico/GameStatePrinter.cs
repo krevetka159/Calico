@@ -88,7 +88,7 @@ namespace Calico
             Console.WriteLine("");
             Console.WriteLine("");
 
-            Console.WriteLine(scoring.PatternScoringToString);
+            Console.WriteLine(scoring.PatternScoring.PatternScoringPrint);
 
             Console.WriteLine(" Player score: " + p.Board.ScoreCounter.GetScore());
 
@@ -114,7 +114,7 @@ namespace Calico
             Console.WriteLine("");
             Console.WriteLine("");
 
-            Console.WriteLine(scoring.PatternScoringToString);
+            Console.WriteLine(scoring.PatternScoring.PatternScoringPrint);
 
             Console.WriteLine(" Agent 1 score: " + a1.Board.ScoreCounter.GetScore());
 
