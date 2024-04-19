@@ -246,6 +246,8 @@ namespace Calico
         private void Testing()
         {
             int agentOption = PickAgent(false);
+
+            List<GameStats> stats = new List<GameStats>();
             
             while (true)
             {
@@ -255,7 +257,32 @@ namespace Calico
 
                 if (newGame == "n")
                 {
-                    TestGame(false, true, agentOption, 2000);
+                    for (int i = 0; i< 50; i++)
+                    {
+                        Console.WriteLine($"Iteration {i}");
+                        GameStats gs = TestGame(false, true, agentOption, 5000);
+                        stats.Add(gs);
+                    }
+
+                    using (StreamWriter outputFile = new StreamWriter($"./testAgent{agentOption}.csv"))
+                    {
+                        outputFile.WriteLine("mean;avgButtons;avgC1;avgC2;avgC3;best;lowest");
+
+                        foreach (GameStats gs in stats)
+                        {
+                            outputFile.WriteLine(
+                                $"{Math.Round(gs.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                $"{Math.Round(gs.AvgButtons, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                $"{Math.Round(gs.AvgCats.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                $"{Math.Round(gs.AvgCats.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                $"{Math.Round(gs.AvgCats.Item3, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                $"{gs.BestScore};" +
+                                $"{gs.LowestScore}"
+                                );
+
+                        }
+                    }
+
                     break;
                 }
                 else if (newGame == "y") 
@@ -402,11 +429,11 @@ namespace Calico
                     Opts[i] = bag.Next();
                 }
 
-                agent = new AgentCompleteWithUtility(scoring,2);
+                agent = UseAgent(agentType);
 
-                agent.AddTaskPieces(1,6,4); //best option
+                //agent.AddTaskPieces(1,6,4); //best option
 
-                //agent.ChooseTaskPieces();
+                agent.ChooseTaskPieces();
 
                 if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
@@ -422,8 +449,8 @@ namespace Calico
 
                 if (allResults)
                 {
-                    if (j % 10 == 0) Console.WriteLine(j);
-                    gameStatePrinter.PrintStats(agent);
+                    if (j % 1000 == 0) Console.WriteLine(j);
+                    //gameStatePrinter.PrintStats(agent);
                 }
                 
                 score = agent.Board.ScoreCounter.GetScore();
