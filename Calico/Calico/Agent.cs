@@ -112,6 +112,9 @@ namespace Calico
         public RandomPositionAgent(Scoring scoring) : base(scoring)
         {
         }
+        public RandomPositionAgent(Scoring scoring,int boardId) : base(scoring,boardId)
+        {
+        }
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
@@ -144,6 +147,9 @@ namespace Calico
         /// </summary>
         /// <param name="scoring"></param>
         public RandomPatchTileAgent(Scoring scoring) : base(scoring)
+        {
+        }
+        public RandomPatchTileAgent(Scoring scoring, int boardId) : base(scoring,boardId)
         {
         }
 
@@ -185,6 +191,9 @@ namespace Calico
         public RandomAgentColor(Scoring scoring) : base(scoring)
         {
         }
+        public RandomAgentColor(Scoring scoring, int boardId) : base(scoring,boardId)
+        {
+        }
 
         private (int, int) ChoosePosition(GamePiece gp)
         {
@@ -223,6 +232,9 @@ namespace Calico
         public RandomAgentPattern(Scoring scoring) : base(scoring)
         {
         }
+        public RandomAgentPattern(Scoring scoring, int boardId) : base(scoring,boardId)
+        {
+        }
 
         private (int, int) ChoosePosition(GamePiece gp)
         {
@@ -259,6 +271,9 @@ namespace Calico
         /// </summary>
         /// <param name="scoring"></param>
         public RandomAgentComplete(Scoring scoring) : base(scoring)
+        {
+        }
+        public RandomAgentComplete(Scoring scoring, int boardId) : base(scoring, boardId)
         {
         }
 
@@ -303,6 +318,9 @@ namespace Calico
         public AgentColor(Scoring scoring) : base(scoring)
         {
         }
+        public AgentColor(Scoring scoring, int boardId) : base(scoring, boardId)
+        {
+        }
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
@@ -343,6 +361,9 @@ namespace Calico
         /// </summary>
         /// <param name="scoring"></param>
         public AgentPattern(Scoring scoring) : base(scoring)
+        {
+        }
+        public AgentPattern(Scoring scoring, int boardId) : base(scoring, boardId)
         {
         }
 
@@ -388,6 +409,9 @@ namespace Calico
         public AgentComplete(Scoring scoring) : base(scoring)
         {
         }
+        public AgentComplete(Scoring scoring, int boardId) : base(scoring, boardId)
+        {
+        }
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
@@ -429,6 +453,9 @@ namespace Calico
         /// <param name="scoring"></param>
 
         public AgentCompleteWithProb(Scoring scoring) : base(scoring)
+        {
+        }
+        public AgentCompleteWithProb(Scoring scoring,int boardId) : base(scoring, boardId)
         {
         }
 
@@ -594,6 +621,10 @@ namespace Calico
         public MinimaxAgent(Scoring scoring) : base(scoring) 
         {
         }
+        public MinimaxAgent(Scoring scoring, int boardId) : base(scoring,boardId)
+        {
+        }
+
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
@@ -666,6 +697,10 @@ namespace Calico
     {
         EvolutionGameProps gameProps;
         public EvolutionAgent(Scoring scoring, EvolutionGameProps e) : base(scoring)
+        {
+            gameProps = e;
+        }
+        public EvolutionAgent(Scoring scoring, EvolutionGameProps e, int boardId) : base(scoring, boardId)
         {
             gameProps = e;
         }
