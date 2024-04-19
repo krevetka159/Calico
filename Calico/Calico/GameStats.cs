@@ -9,13 +9,30 @@ namespace Calico
     internal class GameStats
     {
         public int AgentType;
+        public int Score;
+        public int Buttons;
+        public (int, int, int) Cats;
+        public int TaskPoints;
+
+        public GameStats(int score, int buttons, (int,int,int) cats)
+        {
+            Score = score;
+            Buttons = buttons;
+            Cats = cats;
+        }
+    }
+
+    public class AverageGameStats
+    {
+        public int AgentType;
         public double AvgScore;
         public double AvgButtons;
         public (double, double, double) AvgCats;
+        public double AvgTaskPoints;
         public int BestScore;
         public int LowestScore;
 
-        public GameStats(int agentType, double avgScore, double avgButtons, (double, double, double) avgCats, int bestScore, int lowestScore)
+        public AverageGameStats(int agentType, double avgScore, double avgButtons, (double, double, double) avgCats, int bestScore, int lowestScore)
         {
             AgentType = agentType;
             AvgScore = avgScore;
