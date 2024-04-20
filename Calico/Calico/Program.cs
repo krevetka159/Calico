@@ -20,8 +20,7 @@ namespace Calico
 
                 int mode = GetGameMode();
 
-                if (mode == 7) { Evolution evol = new Evolution(); }
-                else { Game game = new Game(mode); }
+                GameModeController game = new GameModeController(mode);
                 
 
                 while (true)
