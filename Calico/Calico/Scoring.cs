@@ -123,6 +123,7 @@ namespace Calico
 
     public class PatternScoringPanel
     {
+        public int Id;
         public int Points;
         public int ClusterSize;
         public (Pattern, Pattern) Patterns;
@@ -131,6 +132,7 @@ namespace Calico
         public PatternScoringPanel(int id, Pattern p1, Pattern p2)
         {
             Patterns = (p1,p2);
+            Id = id;
             switch (id)
             {
                 case 1:
