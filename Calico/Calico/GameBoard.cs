@@ -635,9 +635,92 @@ namespace Calico
 
         #region Evolution Evaluation
 
+        public double EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, EvolutionGameProps e)
+        {
+            int count = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+
+                bool separate = true;
+
+                (int row_i, int col_i) = neighbors[i];
+
+                if (board[row_i][col_i].Pattern == gp.Pattern)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        (int row_j, int col_j) = neighbors[j];
+                        if (sc.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
+                        {
+                            separate = false;
+                        };
+                    }
+
+                    if (separate)
+                    {
+                        if (sc.GetPatternCount(board[row_i][col_i]) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                        count += sc.GetPatternCount(board[row_i][col_i]);
+                    }
+                }
+
+            }
+
+            double evol_konst = 0;
+            switch (sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Id)
+            {
+                case 1:
+                    evol_konst = e.CatsConst.Item1;
+                    break;
+                case 2:
+                    evol_konst = e.CatsConst.Item2;
+                    break;
+                case 3:
+                    evol_konst = e.CatsConst.Item3;
+                    break;
+            }
+
+            if (count + 1 >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize)
+            {
+                return (sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1)*evol_konst;
+            }
+            else return count*evol_konst;
+        }
+
+        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col, EvolutionGameProps e)
+        {
+            double score = 0;
+            List<(int, int)> neighbors = GetNeighbors(row, col);
+
+            double evol_const = 0;
+            foreach ((int r, int c) in neighbors)
+            {
+                if (IsTask(r, c))
+                {
+                    switch (TaskPieceSpots.IndexOf((r, c)))
+                    {
+                        case 0:
+                            evol_const = e.TaskConst.Item1;
+                            break;
+                        case 1:
+                            evol_const = e.TaskConst.Item2;
+                            break;
+                        case 2:
+                            evol_const = e.TaskConst.Item3;
+                            break;
+
+                    }
+                    score += (TaskPieces[(r, c)].CheckNeighboursUtility(gp))*evol_const;
+                }
+            }
+
+            return score;
+        }
+
         public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, EvolutionGameProps e)
         {
-            return e.ButtonConst*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + e.CatsConst*EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter) + e.TaskConst*EvaluateNeighboringTaskUtility(gp, row, col);
+            return e.ButtonConst*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,e) + EvaluateNeighboringTaskUtility(gp, row, col,e);
 
         }
 
