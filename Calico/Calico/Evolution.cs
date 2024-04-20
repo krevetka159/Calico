@@ -6,18 +6,16 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class Evolution : Game
+    internal class Evolution
     {
         private int population_size = 500;
-        private int generations = 1000;
-        private double mutation_switch = 0.2;
-        private double mutation_flip = 0.25;
+        private int generations = 100;
+        private double mutation_prob = 1;
         private double tournament_prob = 0.8;
-        private double crossover_prob = 0.7;
 
         private Random random;
 
-        public Evolution() : base()
+        public Evolution()
         {
             random = new Random();
 
@@ -27,14 +25,21 @@ namespace Calico
             for (int g = 0; g < generations; g++)
             {
                 Console.WriteLine($" Generation {g}");
+
                 fitness = EvolutionGames(population);
 
-                List<EvolutionGameProps> newPopulation = Selection(population, fitness);
+                //for (int i = 0; i < population_size; i++)
+                //{
+                //    Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst} : {fitness[i]}");
+                //}
 
-                population = Mutation(newPopulation);
+                population = new List<EvolutionGameProps>(Mutation(Selection(population, fitness)));
+
+                Console.WriteLine(fitness.Average());
+                Console.WriteLine(fitness.Max());
             }
 
-            for ( int i = 0; i < 10; i++)
+            for (int i = 0; i < population_size; i++)
             {
                 Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst} : {fitness[i]}");
             }
@@ -47,7 +52,11 @@ namespace Calico
 
             for (int i = 0; i < population_size; i++)
             {
-                population.Add(new EvolutionGameProps(random.NextDouble(),random.NextDouble(), random.NextDouble()));
+                population.Add(new EvolutionGameProps(
+                    random.NextDouble(),
+                    (random.NextDouble(), random.NextDouble(), random.NextDouble()), 
+                    (random.NextDouble(), random.NextDouble(), random.NextDouble())
+                    ));
             }
 
             return population;
@@ -96,24 +105,23 @@ namespace Calico
 
             for (int i = 0; i < population_size; i++)
             {
-                EvolutionGameProps e = population[i];
+                //Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst}");
+                EvolutionGameProps e = new EvolutionGameProps(population[i].ButtonConst, population[i].CatsConst, population[i].TaskConst);
 
-                if (random.NextDouble() < mutation_switch)
+                if (random.NextDouble() < mutation_prob)
                 {
-                    int constChange = random.Next(3);
-
-                    switch (constChange)
-                    {
-                        case 0:
-                            e.ButtonConst = random.NextDouble(); break;
-                        case 1:
-                            e.CatsConst = random.NextDouble(); break;
-                        case 2:
-                            e.TaskConst = random.NextDouble(); break;
-                    }
+                    // pro každou proměnnou přidat číslo z normálního rozdělelní
+                    e.ButtonConst += SampleGaussian(0, 0.01);
+                    e.CatsConst.Item1 += SampleGaussian(0, 0.01);
+                    e.CatsConst.Item2 += SampleGaussian(0, 0.01);
+                    e.CatsConst.Item3 += SampleGaussian(0, 0.01);
+                    e.TaskConst.Item1 += SampleGaussian(0, 0.01);
+                    e.TaskConst.Item2 += SampleGaussian(0, 0.01);
+                    e.TaskConst.Item3 += SampleGaussian(0, 0.01);
                 }
 
-                newPopulation.Add(e);
+                newPopulation.Add(e); 
+                //Console.WriteLine($" {newPopulation[i].ButtonConst}, {newPopulation[i].CatsConst}, {newPopulation[i].TaskConst}");
             }
 
             return newPopulation;
@@ -122,79 +130,55 @@ namespace Calico
         private List<double> EvolutionGames (List<EvolutionGameProps> population)
         {
             List<double> fitness = new List<double>();
-            foreach (EvolutionGameProps e in population)
+            for (int i = 0; i < population_size; i++)
             {
-                GameStats gs = Game(e, 50);
-                fitness.Add(gs.AvgScore);
+                fitness.Add(0);
             }
+            Parallel.For(0, population_size, i =>
+            {
+                AverageGameStats gs = Game(population[i], 500);
+                fitness[i] = gs.AvgScore;
+            });
             return fitness;
         }
 
-        private GameStats Game (EvolutionGameProps e, int iterations)
+        private AverageGameStats Game (EvolutionGameProps e, int iterations)
         {
-            int sum = 0;
-            int max = 0;
-            int min = -1;
-            int score;
-            int buttons = 0;
-            (int, int, int) cats = (0, 0, 0);
+            List<GameStats> stats = new List<GameStats>();
+            for (int i = 0; i < iterations; i++)
+            {
+                stats.Add(null);
+            }
 
             for (int j = 0; j < iterations; j++)
             {
-
-
-                bag = new Bag();
-
-                scoring = new Scoring();
-
-                gameStatePrinter = new GameStatePrinter(scoring);
-
-                for (int i = 0; i < 3; i++)
-                {
-                    Opts[i] = bag.Next();
-                }
-
-                agent = new EvolutionAgent(scoring, e);
-
-                //agent.AddTaskPieces(1,4,6); //best option
-
-                agent.ChooseTaskPieces();
-
-
-
-                for (int i = 0; i < 22; i++)
-                {
-                    MakeMove(agent);
-
-                }
-
-                score = agent.Board.ScoreCounter.GetScore();
-                sum += score;
-                if (score > max)
-                {
-                    max = score;
-                }
-                if (score < min || min == -1) min = score;
-
-                buttons += agent.Board.ScoreCounter.GetButtonsCount();
-                var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
-                cats.Item1 += catsTemp.Item1;
-                cats.Item2 += catsTemp.Item2;
-                cats.Item3 += catsTemp.Item3;
+                Game g = new Game();
+                g.EvolutionGame(false, e);
+                stats[j] = g.Stats;
             }
 
-            return new GameStats(0, Convert.ToDouble(sum) / Convert.ToDouble(iterations), Convert.ToDouble(buttons) / Convert.ToDouble(iterations), (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)), max, min);
+            return new AverageGameStats(0, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
+        }
 
+        public double SampleGaussian(double mean, double stddev)
+        {
+            // The method requires sampling from a uniform random of (0,1]
+            // but Random.NextDouble() returns a sample of [0,1).
+            double x1 = 1 - random.NextDouble();
+            double x2 = 1 - random.NextDouble();
+
+            double y1 = Math.Sqrt(-2.0 * Math.Log(x1)) * Math.Cos(2.0 * Math.PI * x2);
+            return y1 * stddev + mean;
         }
     }
 
     public class EvolutionGameProps
     {
         public double ButtonConst;
-        public double CatsConst;
-        public double TaskConst;
+        public (double,double,double) CatsConst;
+        public (double,double,double) TaskConst;
 
-        public EvolutionGameProps(double b, double c, double t) 
+        public EvolutionGameProps(double b, (double,double,double) c, (double,double,double) t) 
         {
             ButtonConst = b;
             CatsConst = c;
