@@ -149,7 +149,7 @@ namespace Calico
                 taskAvailable = true;
                 try
                 {
-                    Console.Write(" Choose TaskPiece for row " + (index + 3) + ":");
+                    Console.Write(" Choose TaskPiece for row " + (index + 3) + ": ");
                     gamepiece = Convert.ToInt32(Console.ReadLine());
 
                     for (int i = 0; i < index; i++)
