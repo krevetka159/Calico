@@ -849,5 +849,22 @@ namespace Calico
 
         #endregion
 
+        public Dictionary<int, int> TasksCompleted()
+        {
+            Dictionary<int, int> tc = new Dictionary<int, int>();
+
+            for (int i = 1; i <= 6; i++)
+            {
+                tc[i] = -1;
+            }
+
+            foreach(TaskPiece t in TaskPieces.Values)
+            {
+                tc[t.Id] = t.Completed();
+            }
+
+            return tc;
+        }
+
     }
 }

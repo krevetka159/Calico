@@ -79,6 +79,7 @@ namespace Calico
 
     public class TaskPiece : GamePiece
     {
+        public int Id;
         public int ScoreCompletedFully;
         public int ScoreCompletedPartly;
         public List<int> Task;
@@ -100,6 +101,7 @@ namespace Calico
 
         public TaskPiece(int TaskId) : base(TaskId) 
         {
+            Id = TaskId;
             switch (TaskId)
             {
                 case 1:
@@ -130,7 +132,7 @@ namespace Calico
                     ScoreCompletedFully = 11;
                     ScoreCompletedPartly = 7;
                     Task = new List<int>() { 2, 2, 2, 0, 0, 0 };
-                    Description = " 2:2:21 7/11 ";
+                    Description = " 2:2:2 7/11 ";
                     break;
                 case 6:
                     ScoreCompletedFully = 7;
@@ -171,6 +173,35 @@ namespace Calico
 
             if (!colorsFailed && !patternsFailed) return ScoreCompletedFully;
             else if (!patternsFailed || !colorsFailed) return ScoreCompletedPartly;
+            else return 0;
+        }
+
+        public int Completed()
+        {
+            bool colorsFailed = false; ;
+            bool patternsFailed = false;
+            List<int> colors = NeighboringColors.Values.ToList();
+            List<int> patterns = NeighboringPatterns.Values.ToList();
+
+            colors.Sort((a, b) => b.CompareTo(a));
+            patterns.Sort((a, b) => b.CompareTo(a));
+
+            for (int i = 0; i < Task.Count(); i++)
+            {
+                if (colors[i] != Task[i])
+                {
+                    if (patternsFailed) return 0;
+                    else colorsFailed = true;
+                }
+                if (patterns[i] != Task[i])
+                {
+                    if (colorsFailed) return 0;
+                    else patternsFailed = true;
+                }
+            }
+
+            if (!colorsFailed && !patternsFailed) return 2;
+            else if (!patternsFailed || !colorsFailed) return 1;
             else return 0;
         }
 
