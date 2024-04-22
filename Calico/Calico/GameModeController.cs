@@ -30,6 +30,8 @@ namespace Calico
             {
                 case 1:
                     {
+                        Game g = new Game();
+                        g.SinglePlayer();
                         //SinglePlayer();
                         break;
                     }

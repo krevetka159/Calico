@@ -65,14 +65,8 @@ namespace Calico
 
     #region SinglePlayer
 
-        private void SinglePlayer()
+        public void SinglePlayer()
         {
-            bag = new Bag();
-
-            scoring = new Scoring();
-
-            gameStatePrinter = new GameStatePrinter(scoring);
-
             for (int i = 0; i < 3; i++)
             {
                 Opts[i] = bag.Next();
@@ -93,8 +87,8 @@ namespace Calico
                 gameStatePrinter.PrintStateSingle(player, Opts);
 
             }
-
             gameStatePrinter.PrintStats(player);
+            gameStatePrinter.PrintDetailedStatsToCSV(player);
         }
         #endregion
 
@@ -534,10 +528,10 @@ namespace Calico
 
         #region Evolution
 
-        public void EvolutionGame(bool withPrint, EvolutionGameProps e)
+        public void EvolutionGame(bool withPrint, EvolutionGameProps e, (int,int,int) tasks, int boardId)
         {
-            agent = new EvolutionAgent(scoring,e,2);
-            agent.AddTaskPieces(1, 2, 3);
+            agent = new EvolutionAgent(scoring,e,boardId);
+            agent.AddTaskPieces(tasks.Item1, tasks.Item2, tasks.Item3);
 
             if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 

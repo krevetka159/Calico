@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -22,6 +23,17 @@ namespace Calico
         /// <param name="Opts"></param>
         public void PrintStateSingle(Player p, GamePiece[] Opts)
         {
+            Console.WriteLine(" --------------------------------------------------------------------------------------------- ");
+            Console.WriteLine();
+
+            foreach (TaskPiece t in p.Board.TaskPieces.Values)
+            {
+                Console.WriteLine($"{t.Print}: {t.Description}");
+            }
+            //Console.WriteLine(scoring.PatternScoringToString);
+            Console.WriteLine(PrintPartialScoreStats(p));
+
+            Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
             Console.WriteLine();
 
             Console.Write(" Patch tiles to use: ");
@@ -33,15 +45,6 @@ namespace Calico
             Console.WriteLine();
             Console.WriteLine();
 
-            foreach (TaskPiece t in p.Board.TaskPieces.Values)
-            {
-                Console.WriteLine($" {t.Print}: {t.Description}");
-            }
-            Console.WriteLine(scoring.PatternScoringToString);
-            Console.WriteLine(PrintPartialScoreStats(p));
-
-            Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
-            Console.WriteLine();
             PrintBoard(p);
             Console.WriteLine();
         }
@@ -57,12 +60,12 @@ namespace Calico
 
             Console.WriteLine(" Task piece options: ");
  
-            Console.WriteLine(" 1: all different, 10/15");
-            Console.WriteLine(" 2: 4:2, 7/14");
-            Console.WriteLine(" 3: 3:3, 7/13");
-            Console.WriteLine(" 4: 3:2:1, 7/11");
-            Console.WriteLine(" 5: 2:2:2, 7/11");
-            Console.WriteLine(" 6: 2:2:1:1, 5/7");
+            Console.WriteLine("  1: all different, 10/15");
+            Console.WriteLine("  2: 4:2, 7/14");
+            Console.WriteLine("  3: 3:3, 7/13");
+            Console.WriteLine("  4: 3:2:1, 7/11");
+            Console.WriteLine("  5: 2:2:2, 7/11");
+            Console.WriteLine("  6: 2:2:1:1, 5/7");
 
             Console.WriteLine();
             PrintBoard(p);
@@ -229,12 +232,25 @@ namespace Calico
             // finální výsledky
             Console.WriteLine(" Final score: " + p.Board.ScoreCounter.GetScore());
         }
+        public void PrintDetailedStatsToCSV(Player p)
+        {
+            (int, int, int) cats = p.Board.ScoreCounter.GetCatsCount();
+            Dictionary<int, int> tasks = p.Board.TasksCompleted();
+            Console.WriteLine(
+                $"{p.Board.ScoreCounter.GetScore()};" +
+                $"{p.Board.ScoreCounter.GetButtonsCount()};" +
+                $"{cats.Item1};" +
+                $"{cats.Item2};" +
+                $"{cats.Item3};" +
+                $"{tasks[1]};{tasks[2]};{tasks[3]};{tasks[4]};{tasks[5]};{tasks[6]}"
+                );
+
+        }
         public void PrintStats(Player p, Agent a)
         {
             // finální výsledky
             Console.WriteLine(" Final score: " + p.Board.ScoreCounter.GetScore() + " : " + a.Board.ScoreCounter.GetScore());
         }
-
 
         public string PrintPartialScoreStats(Player p)
         {
@@ -243,7 +259,7 @@ namespace Calico
             {
                 if (c != Color.None)
                 {
-                    partialScore.Append($" {(int)c} : {p.Board.ScoreCounter.buttons[c]},");
+                    partialScore.Append($" {(int)c} : {p.Board.ScoreCounter.buttons[c]} | ");
                 }
             }
             partialScore.Append($" RB : {p.Board.ScoreCounter.rainbowButtons}");
@@ -251,7 +267,7 @@ namespace Calico
 
             foreach (KeyValuePair<PatternScoringPanel,int> panel in p.Board.ScoreCounter.cats)
             {
-                partialScore.Append($" {(char)(64 + (int)panel.Key.Patterns.Item1)},{(char)(64 + (int)panel.Key.Patterns.Item2)} : {panel.Value},");
+                partialScore.Append($" {(char)(64 + (int)panel.Key.Patterns.Item1)}, {(char)(64 + (int)panel.Key.Patterns.Item2)} : {panel.Value} | ");
             }
             partialScore.Append('\n');
 
