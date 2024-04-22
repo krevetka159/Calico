@@ -21,7 +21,10 @@ namespace Calico
                 int mode = GetGameMode();
 
                 GameModeController game = new GameModeController(mode);
-                
+
+                // pro publikaci na testování lidmi
+                //Game g = new Game();
+                //g.SinglePlayer();
 
                 while (true)
                 {
