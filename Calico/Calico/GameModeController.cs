@@ -32,12 +32,12 @@ namespace Calico
                     {
                         Game g = new Game();
                         g.SinglePlayer();
-                        //SinglePlayer();
                         break;
                     }
                 case 2:
                     {
-                        //MultiPlayer();
+                        Game g = new Game();
+                        g.MultiPlayer();
                         break;
                     }
                 case 3:

@@ -93,19 +93,8 @@ namespace Calico
         #endregion
 
     #region MultiPlayer
-        private void MultiPlayer() 
+        public void MultiPlayer() 
         {
-            bag = new Bag();
-
-            scoring = new Scoring();
-
-            gameStatePrinter = new GameStatePrinter(scoring);
-
-            for (int i = 0; i < 3; i++)
-            {
-                Opts[i] = bag.Next();
-            }
-
             player = new Player(scoring);
             agent = new AgentComplete(scoring);
 
