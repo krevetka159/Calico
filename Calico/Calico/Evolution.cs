@@ -66,8 +66,8 @@ namespace Calico
                         $"{Math.Round(res.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
                         $"{Math.Round(res.Item2.ButtonConst, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(res.Item2.CatsConst.Item1, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsConst.Item2, 5, MidpointRounding.AwayFromZero).ToString("0.00000")}|" +
-                        $"{Math.Round(res.Item2.CatsConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")}|" +
+                        $"{Math.Round(res.Item2.CatsConst.Item2, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.CatsConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(res.Item2.TaskConst.Item1, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(res.Item2.TaskConst.Item2, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(res.Item2.TaskConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};");
