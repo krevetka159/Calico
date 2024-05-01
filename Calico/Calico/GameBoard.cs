@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -202,9 +203,10 @@ namespace Calico
 
         private void UnionWithNeighbors(GamePiece piece,int row, int col)
         {
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            //List<(int, int)> neighbors = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
             List<GamePiece> neighborsToEvaluate = new List<GamePiece>();
-            foreach ((int r, int c) in neighbors) 
+            foreach ((int r, int c) in n) 
             {
                 if (IsOccupied(r, c))
                 {
@@ -218,8 +220,9 @@ namespace Calico
 
         private void AddToTaskNeighbors(GamePiece piece, int row, int col)
         {
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-            foreach ((int r, int c) in neighbors)
+            // List<(int, int)> neighbors = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+            foreach ((int r, int c) in n)
             {
                 if (IsTask(r, c))
                 {
@@ -241,16 +244,18 @@ namespace Calico
         /// <returns></returns>
         private List<(int, int)> GetNeighbors(int row, int col)
         {
-            List<(int, int)> neighbors;
-            if (row % 2 == 0)
-            {
-                neighbors = new List<(int, int)>() { (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col) };
-            }
-            else
-            {
-                neighbors = new List<(int, int)>() { (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col), (row + 1, col + 1) };
-            }
+            List<(int, int)> neighbors = new List<(int, int)>() { (row - 1, col - 1 + (row%2)), (row - 1, col + (row % 2)), (row, col - 1), (row, col + 1), (row + 1, col - 1 + (row % 2) ), (row + 1, col + (row % 2)) };          
             return neighbors;
+        }
+
+        private IEnumerable<(int,int)> IterateNeighbors(int row, int col)
+        {
+            yield return (row - 1, col - 1 + (row % 2));
+            yield return (row - 1, col + (row % 2));
+            yield return (row, col - 1);
+            yield return (row, col + 1);
+            yield return (row + 1, col - 1 + (row % 2));
+            yield return (row + 1, col + (row % 2));
         }
 
         #endregion
@@ -266,8 +271,9 @@ namespace Calico
         /// <returns></returns>
         public bool CheckNeighborsColor(Color color, int row, int col)
         {
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-            foreach ((int r, int c) in neighbors)
+            // List<(int, int)> neighbors = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+            foreach ((int r, int c) in n)
             {
                 if (board[r][c].Color == color)
                 {
@@ -287,8 +293,9 @@ namespace Calico
         /// <returns></returns>
         public bool CheckNeighborsPattern(Pattern pattern, int row, int col)
         {
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-            foreach ((int r, int c) in neighbors)
+            //List<(int, int)> neighbors = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+            foreach ((int r, int c) in n)
             {
                 if (board[r][c].Pattern == pattern)
                 {
@@ -327,30 +334,24 @@ namespace Calico
         public int EvaluateNeighborsColorFixed(GamePiece gp, int row, int col)
         {
             int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            //List<(int, int)> neighbors = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
 
-            for (int i = 0; i < neighbors.Count; i++)
+            List<int> clusters = new List<int>(new int[6]);
+
+            int i = 0;
+
+            foreach ((int row_i, int col_i) in n )
             {
-
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
                 if (board[row_i][col_i].Color == gp.Color)
                 {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (ScoreCounter.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
-
-                    if (separate)
+                    if (!clusters.Contains(ScoreCounter.GetColorClusterId(board[row_i][col_i])))
                     {
                         if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorScoring.ClusterSize) return 0;
                         count += ScoreCounter.GetColorCount(board[row_i][col_i]);
+
+                        clusters[i] = ScoreCounter.GetColorClusterId(board[row_i][col_i]);
+                        i++;
                     }
                 }
 
@@ -381,30 +382,25 @@ namespace Calico
         public int EvaluateNeighborsPatternFixed(GamePiece gp, int row, int col)
         {
             int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            // List<(int, int)> neighbors = GetNeighbors(row, col);
 
-            for (int i = 0; i < neighbors.Count; i++)
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+
+            List<int> clusters = new List<int>(new int[6]);
+
+            int i = 0;
+
+            foreach ((int row_i, int col_i) in n)
             {
-
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
                 if (board[row_i][col_i].Pattern == gp.Pattern)
                 {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (ScoreCounter.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
-
-                    if (separate)
+                    if (!clusters.Contains(ScoreCounter.GetPatternClusterId(board[row_i][col_i])))
                     {
                         if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
                         count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
+
+                        clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
+                        i++;
                     }
                 }
 
@@ -419,8 +415,9 @@ namespace Calico
         public int EvaluateNeighboringTask(GamePiece gp, int row, int col)
         {
             int score = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-            foreach ((int r, int c) in neighbors)
+            //List<(int, int)> neighbors = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+            foreach ((int r, int c) in n)
             {
                 if (IsTask(r, c))
                 {
@@ -452,32 +449,28 @@ namespace Calico
         public int EvaluateNeighborsColorUtility(GamePiece gp, int row, int col, ScoreCounter sc)
         {
             int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            //List<(int, int)> n = GetNeighbors(row, col);
 
-            for (int i = 0; i < neighbors.Count; i++)
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+
+            List<int> clusters = new List<int>();
+
+            int i = 0;
+
+            foreach ((int row_i, int col_i) in n)
             {
-
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
                 if (board[row_i][col_i].Color == gp.Color)
                 {
-                    for (int j = 0; j < i; j++)
+                    if (! clusters.Contains(sc.GetColorClusterId(board[row_i][col_i])))
                     {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (sc.CheckColorUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
-
-                    if (separate)
-                    {
-                        if (sc.GetColorCount(board[row_i][col_i]) >=sc.Scoring.ColorScoring.ClusterSize) return 0;
+                        if (sc.GetColorCount(board[row_i][col_i]) >= sc.Scoring.ColorScoring.ClusterSize) return 0;
                         count += sc.GetColorCount(board[row_i][col_i]);
+
+                        clusters.Add( sc.GetColorClusterId(board[row_i][col_i]));
+                        i++;
                     }
                 }
+
             }
 
             if (count + 1 >= sc.Scoring.ColorClusterSize)
@@ -538,33 +531,35 @@ namespace Calico
         public int EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc)
         {
             int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            //List<(int, int)> neighbors = GetNeighbors(row, col);
 
-            for (int i = 0; i < neighbors.Count; i++)
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+
+            List<int> clusters = new List<int>(new int[6]);
+
+            int i = 0;
+
+            foreach ((int row_i, int col_i) in n)
             {
-
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
                 if (board[row_i][col_i].Pattern == gp.Pattern)
                 {
-                    for (int j = 0; j < i; j++)
-                    {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (sc.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
+                    clusters[i] = sc.GetPatternClusterId(board[row_i][col_i]);
+                    i++;
+                    //if (! clusters.Contains(sc.GetPatternClusterId(board[row_i][col_i])))
+                    //{
+                    //    if (sc.GetPatternCount(board[row_i][col_i]) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                    //    count += sc.GetPatternCount(board[row_i][col_i]);
 
-                    if (separate)
-                    {
-                        if (sc.GetPatternCount(board[row_i][col_i]) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
-                        count += sc.GetPatternCount(board[row_i][col_i]);
-                    }
+                    //    clusters[i] =  sc.GetPatternClusterId(board[row_i][col_i]);
+                    //    i++;
+                    //}
                 }
+            }
 
+            foreach (int c in clusters.Distinct())
+            {
+                if (sc.GetPatternCount(c) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                count += sc.GetPatternCount(c);
             }
 
             if (count + 1 >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
@@ -606,8 +601,9 @@ namespace Calico
         public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col)
         {
             double score = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
-            foreach ((int r, int c) in neighbors)
+            //List<(int, int)> neighbors = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+            foreach ((int r, int c) in n)
             {
                 if (IsTask(r, c))
                 {
@@ -638,34 +634,39 @@ namespace Calico
         public double EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, EvolutionGameProps e)
         {
             int count = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            //List<(int, int)> n = GetNeighbors(row, col);
 
-            for (int i = 0; i < neighbors.Count; i++)
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+
+            List<int> clusters = new List<int>(new int[6]);
+
+            int i = 0;
+
+            foreach ((int row_i, int col_i) in n)
             {
-
-                bool separate = true;
-
-                (int row_i, int col_i) = neighbors[i];
-
                 if (board[row_i][col_i].Pattern == gp.Pattern)
                 {
-                    for (int j = 0; j < i; j++)
+                    //clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
+                    //i++;
+                    if (!clusters.Contains(ScoreCounter.GetPatternClusterId(board[row_i][col_i])))
                     {
-                        (int row_j, int col_j) = neighbors[j];
-                        if (sc.CheckPatternUnion(board[row_i][col_i], board[row_j][col_j]))
-                        {
-                            separate = false;
-                        };
-                    }
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                        count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
 
-                    if (separate)
-                    {
-                        if (sc.GetPatternCount(board[row_i][col_i]) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
-                        count += sc.GetPatternCount(board[row_i][col_i]);
+                        clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
+                        i++;
                     }
                 }
 
             }
+
+            //foreach (int c in clusters.Distinct())
+            //{
+            //    if (sc.GetPatternCount(c) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+            //    count += sc.GetPatternCount(c);
+            //}
+
+
 
             double evol_konst = 0;
             switch (sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Id)
@@ -691,10 +692,11 @@ namespace Calico
         public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col, EvolutionGameProps e)
         {
             double score = 0;
-            List<(int, int)> neighbors = GetNeighbors(row, col);
+            //List<(int, int)> n = GetNeighbors(row, col);
+            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
 
             double evol_const = 0;
-            foreach ((int r, int c) in neighbors)
+            foreach ((int r, int c) in n)
             {
                 if (IsTask(r, c))
                 {
@@ -744,14 +746,13 @@ namespace Calico
                 taskNeighbors[t] = new List<GamePiece>();
             }
 
-            foreach((GamePiece _, (int r, int c)) in gamePieces)
+            foreach((GamePiece _, (int row, int col)) in gamePieces)
             {
-                List<(int, int)> neighbors = GetNeighbors(r, c);
+                //List<(int, int)> neighbors = GetNeighbors(r, c);
+                IEnumerable<(int, int)> n = IterateNeighbors(row, col);
 
-                for (int i = 0; i < neighbors.Count; i++)
+                foreach ((int row_i, int col_i) in n)
                 {
-                    (int row_i, int col_i) = neighbors[i];
-
                     if (IsOccupied(row_i,col_i))
                     {
                         if (!mockSC.PatternUFContains(board[row_i][col_i]))
@@ -774,6 +775,7 @@ namespace Calico
                 (GamePiece gp, (int r, int c)) = gamePieces[i];
 
                 List<(int, int)> neighborsPositions = GetNeighbors(r, c);
+                //IEnumerable<(int, int)> n = IterateNeighbors(row, col);
                 List<GamePiece> neighbors = new List<GamePiece>(); // co tady actually dělám s tímhle?
                 for (int j = 0; j < i; j++)
                 {
@@ -802,7 +804,7 @@ namespace Calico
 
                 mockSC.EvaluateNew(gp, neighbors);
 
-                div *= 10;
+                div *= 4;
             }
 
             return score;
