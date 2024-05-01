@@ -18,20 +18,24 @@ namespace Calico
     {
         private int lastCluster;
         private Dictionary<T, int> clusters = new();
+        private int[] clusterSizes;
 
         public UnionFind()
         {
+            clusterSizes = new int[49];
         }
 
         public UnionFind(UnionFind<T> uf)
         {
             lastCluster = uf.lastCluster;
             clusters = new Dictionary<T,int>(uf.clusters);
-        }
+            clusterSizes = new int[49];
+    }
 
         public void Add(T x)
         {
             clusters.Add(x, ++lastCluster);
+            clusterSizes[lastCluster] = 1;
         }
 
         public bool Find(T x, T y)
@@ -49,17 +53,33 @@ namespace Calico
 
         public int Count(T x)
         {
-            int xCluster = clusters[x];
-            int cnt = 0;
-            foreach ((T z, int zCluster) in clusters)
-            {
-                if (zCluster == xCluster)
-                {
-                    cnt++;
-                }
-            }
+            //int xCluster = clusters[x];
+            //int cnt = 0;
+            //foreach ((T z, int zCluster) in clusters)
+            //{
+            //    if (zCluster == xCluster)
+            //    {
+            //        cnt++;
+            //    }
+            //}
 
-            return cnt;
+            //return cnt;
+            return clusterSizes[clusters[x]];
+        }
+        public int Count(int x)
+        {
+            //int xCluster = clusters[x];
+            //int cnt = 0;
+            //foreach ((T z, int zCluster) in clusters)
+            //{
+            //    if (zCluster == xCluster)
+            //    {
+            //        cnt++;
+            //    }
+            //}
+
+            //return cnt;
+            return clusterSizes[x];
         }
 
         public List<T> GetCluster(T x)
@@ -74,6 +94,11 @@ namespace Calico
                 }
             }
             return cluster;
+        }
+
+        public int GetClusterId(T x)
+        {
+            return clusters[x];
         }
 
         public void Union(T x, T y)
@@ -91,8 +116,11 @@ namespace Calico
                 if (zCluster == yCluster)
                 {
                     clusters[z] = xCluster;
+                    clusterSizes[xCluster] += 1;
+                    clusterSizes[yCluster] -= 1;
                 }
             }
+           
         }
 
 
