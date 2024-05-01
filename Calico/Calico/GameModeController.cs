@@ -178,7 +178,7 @@ namespace Calico
                 else if (newGame == "y")
                 {
                     Game g = new Game();
-                    g.AgentGame(7, true);
+                    g.AgentGame(agentType, true);
                 }
                 else
                 {
