@@ -8,8 +8,8 @@ namespace Calico
 {
     internal class Evolution
     {
-        private int population_size = 500;
-        private int generations = 100;
+        private int population_size = 100;
+        private int generations = 200;
         private double mutation_prob = 1;
         private double tournament_prob = 0.8;
 
@@ -24,8 +24,8 @@ namespace Calico
 
         private void EvolutionRun((int,int,int) tasks, int boardId)
         {
-            List<EvolutionGameProps> population = RandomPopulation();
-            List<double> fitness = new List<double>();
+            EvolutionGameProps[] population = RandomPopulation();
+            double[] fitness = new double[population_size];
 
             for (int g = 0; g < generations - 1; g++)
             {
@@ -38,7 +38,7 @@ namespace Calico
                 //    Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst} : {fitness[i]}");
                 //}
 
-                population = new List<EvolutionGameProps>(Mutation(Selection(population, fitness)));
+                population = Mutation(Selection(population, fitness));
 
                 Console.WriteLine(fitness.Average());
                 Console.WriteLine(fitness.Max());
@@ -58,7 +58,7 @@ namespace Calico
             results.Sort((x, y) => y.Item1.CompareTo(x.Item1));
 
             Directory.CreateDirectory("./Evol");
-            using (StreamWriter outputFile = new StreamWriter($"./Evol/evol_{boardId}_{tasks.Item1}{tasks.Item2}{tasks.Item3}.csv"))
+            using (StreamWriter outputFile = new StreamWriter($"./Evol/test-evol_{boardId}_{tasks.Item1}{tasks.Item2}{tasks.Item3}.csv"))
             {
                 outputFile.WriteLine("fitness;buttons;catsA;catsB;catsC;taskA;taskB;taskC");
                 foreach ((double, EvolutionGameProps) res in results)
@@ -70,7 +70,7 @@ namespace Calico
                         $"{Math.Round(res.Item2.CatsConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(res.Item2.TaskConst.Item1, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(res.Item2.TaskConst.Item2, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};");
+                        $"{Math.Round(res.Item2.TaskConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
             }
         }
 
@@ -80,63 +80,98 @@ namespace Calico
 
             for (int b = 0; b < 4; b++)
             {
+                //        statsDict.Add(new Dictionary<(int, int, int), List<AverageGameStats>>());
+                //        for (int i = 1; i <= 6; i++)
+                //        {
+                //            for (int j = i + 1; j <= 6; j++)
+                //            {
+                //                for (int k = j + 1; k <= 6; k++)
+                //                {
+                //                    statsDict[b][(i, j, k)] = new List<AverageGameStats>();
+
+                //                    Console.WriteLine($" {b} - {i},{j},{k}: ");
+                //                    EvolutionRun((i, j, k), b);
+                //                    Console.WriteLine();
+
+                //                    Console.WriteLine($" {b} - {i},{k},{j}: ");
+                //                    EvolutionRun((i, k, j), b);
+                //                    Console.WriteLine();
+
+                //                    Console.WriteLine($" {b} - {j},{i},{k}: ");
+                //                    EvolutionRun((j, i, k), b);
+                //                    Console.WriteLine();
+
+                //                    Console.WriteLine($" {b} - {j},{k},{i}: ");
+                //                    EvolutionRun((j, k, i), b);
+                //                    Console.WriteLine();
+
+                //                    Console.WriteLine($" {b} - {k},{i},{j}: ");
+                //                    EvolutionRun((k, i, j), b);
+                //                    Console.WriteLine();
+
+                //                    Console.WriteLine($" {b} - {k},{j},{i}: ");
+                //                    EvolutionRun((k, j, i), b);
+                //                    Console.WriteLine();
+                //                }
+                //            }
+                //        }
+
+                int i = 1;
+                int j = 2;
+                int k = 3;
+
                 statsDict.Add(new Dictionary<(int, int, int), List<AverageGameStats>>());
-                for (int i = 1; i <= 6; i++)
-                {
-                    for (int j = i + 1; j <= 6; j++)
-                    {
-                        for (int k = j + 1; k <= 6; k++)
-                        {
-                            statsDict[b][(i, j, k)] = new List<AverageGameStats>();
 
-                            Console.WriteLine($" {b} - {i},{j},{k}: ");
-                            EvolutionRun((i, j, k), b);
-                            Console.WriteLine();
+                statsDict[b][(i, j, k)] = new List<AverageGameStats>();
 
-                            Console.WriteLine($" {b} - {i},{k},{j}: ");
-                            EvolutionRun((i, k, j), b);
-                            Console.WriteLine();
+                Console.WriteLine($" {b} - {i},{j},{k}: ");
+                EvolutionRun((i, j, k), b);
+                Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {j},{i},{k}: ");
-                            EvolutionRun((j, i, k), b);
-                            Console.WriteLine();
+                Console.WriteLine($" {b} - {i},{k},{j}: ");
+                EvolutionRun((i, k, j), b);
+                Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {j},{k},{i}: ");
-                            EvolutionRun((j, k, i), b);
-                            Console.WriteLine();
+                Console.WriteLine($" {b} - {j},{i},{k}: ");
+                EvolutionRun((j, i, k), b);
+                Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {k},{i},{j}: ");
-                            EvolutionRun((k, i, j), b);
-                            Console.WriteLine();
+                Console.WriteLine($" {b} - {j},{k},{i}: ");
+                EvolutionRun((j, k, i), b);
+                Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {k},{j},{i}: ");
-                            EvolutionRun((k, j, i), b);
-                            Console.WriteLine();
-                        }
-                    }
-                }
+                Console.WriteLine($" {b} - {k},{i},{j}: ");
+                EvolutionRun((k, i, j), b);
+                Console.WriteLine();
+
+                Console.WriteLine($" {b} - {k},{j},{i}: ");
+                EvolutionRun((k, j, i), b);
+                Console.WriteLine();
             }
+
+            
         }
 
-        private List<EvolutionGameProps> RandomPopulation()
+
+        private EvolutionGameProps[] RandomPopulation()
         {
-            List<EvolutionGameProps> population = new List<EvolutionGameProps>();
+            EvolutionGameProps[] population = new EvolutionGameProps[population_size];
 
             for (int i = 0; i < population_size; i++)
             {
-                population.Add(new EvolutionGameProps(
+                population[i] = new EvolutionGameProps(
                     random.NextDouble(),
                     (random.NextDouble(), random.NextDouble(), random.NextDouble()), 
                     (random.NextDouble(), random.NextDouble(), random.NextDouble())
-                    ));
+                    );
             }
 
             return population;
         }
 
-        private List<EvolutionGameProps> Selection(List<EvolutionGameProps> population, List<double> fitness)
+        private EvolutionGameProps[] Selection(EvolutionGameProps[] population, double[] fitness)
         {
-            List<EvolutionGameProps> newPopulation = new List<EvolutionGameProps>();
+            EvolutionGameProps[] newPopulation = new EvolutionGameProps[population_size];
 
             for (int i = 0; i < population_size; i++)
             {
@@ -147,22 +182,22 @@ namespace Calico
                 {
                     if (random.NextDouble() < tournament_prob)
                     {
-                        newPopulation.Add(population[e1]);
+                        newPopulation[i] = population[e1];
                     }
                     else
                     {
-                        newPopulation.Add(population[e2]);
+                        newPopulation[i] = population[e2];
                     }
                 }
                 else
                 {
                     if (random.NextDouble() < tournament_prob)
                     {
-                        newPopulation.Add(population[e2]);
+                        newPopulation[i] = population[e2];
                     }
                     else
                     {
-                        newPopulation.Add(population[e1]);
+                        newPopulation[i] = population[e1];
                     }
                 }
             }
@@ -170,11 +205,8 @@ namespace Calico
             return newPopulation;
         }
 
-        private List<EvolutionGameProps> Mutation(List<EvolutionGameProps> population)
+        private EvolutionGameProps[] Mutation(EvolutionGameProps[] population)
         {
-            List<EvolutionGameProps> newPopulation = new List<EvolutionGameProps>();
-
-
             for (int i = 0; i < population_size; i++)
             {
                 //Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst}");
@@ -192,23 +224,20 @@ namespace Calico
                     e.TaskConst.Item3 += SampleGaussian(0, 0.01);
                 }
 
-                newPopulation.Add(e); 
+                population[i] = e; 
                 //Console.WriteLine($" {newPopulation[i].ButtonConst}, {newPopulation[i].CatsConst}, {newPopulation[i].TaskConst}");
             }
 
-            return newPopulation;
+            return population;
         }
 
-        private List<double> EvolutionGames (List<EvolutionGameProps> population, (int,int,int) tasks, int boardId)
+        private double[] EvolutionGames (EvolutionGameProps[] population, (int,int,int) tasks, int boardId)
         {
-            List<double> fitness = new List<double>();
-            for (int i = 0; i < population_size; i++)
-            {
-                fitness.Add(0);
-            }
+            double[] fitness = new double[population_size];
+
             Parallel.For(0, population_size, i =>
             {
-                AverageGameStats gs = Game(population[i], 500, tasks, boardId);
+                AverageGameStats gs = Game(population[i], 200, tasks, boardId);
                 fitness[i] = gs.AvgScore;
             });
             return fitness;
@@ -216,13 +245,9 @@ namespace Calico
 
         private AverageGameStats Game (EvolutionGameProps e, int iterations, (int,int,int) tasks, int boardId)
         {
-            List<GameStats> stats = new List<GameStats>();
-            for (int i = 0; i < iterations; i++)
-            {
-                stats.Add(null);
-            }
+            List<GameStats> stats = new List<GameStats>(new GameStats[iterations]);
 
-            for (int j = 0; j < iterations; j++)
+            for ( int j = 0; j < iterations; j++)
             {
                 Game g = new Game();
                 g.EvolutionGame(false, e, tasks, boardId);
