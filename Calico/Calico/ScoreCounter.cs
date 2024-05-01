@@ -80,6 +80,16 @@ namespace Calico
             return colorUF.GetCluster(gp);
         }
 
+        public int GetPatternClusterId(GamePiece gp)
+        {
+            return patternUF.GetClusterId(gp);
+        }
+
+        public int GetColorClusterId(GamePiece gp)
+        {
+            return colorUF.GetClusterId(gp);
+        }
+
         /// <summary>
         /// Adds patchtile to color and pattern UnionFinds
         /// </summary>
@@ -232,6 +242,11 @@ namespace Calico
             return colorUF.Count(p);
         }
 
+        public int GetColorCount(int p)
+        {
+            return colorUF.Count(p);
+        }
+
         /// <summary>
         /// Returns scoring of color cluster that the patchtile is a part of
         /// </summary>
@@ -248,6 +263,11 @@ namespace Calico
         /// <param name="p"></param>
         /// <returns></returns>
         public int GetPatternCount(GamePiece p)
+        {
+            return patternUF.Count(p);
+        }
+
+        public int GetPatternCount(int p)
         {
             return patternUF.Count(p);
         }
