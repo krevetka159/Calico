@@ -853,18 +853,12 @@ namespace Calico
 
         public Dictionary<int, int> TasksCompleted()
         {
-            Dictionary<int, int> tc = new Dictionary<int, int>();
-
-            for (int i = 1; i <= 6; i++)
-            {
-                tc[i] = -1;
-            }
+            Dictionary<int, int> tc = new Dictionary<int, int>() { { 1, -1 }, { 2, -1 },{ 3, -1 },{ 4, -1 },{ 5, -1 },{ 6, -1 } };
 
             foreach(TaskPiece t in TaskPieces.Values)
             {
                 tc[t.Id] = t.Completed();
             }
-
             return tc;
         }
 
