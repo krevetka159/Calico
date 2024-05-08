@@ -28,8 +28,8 @@ namespace Calico
         public UnionFind(UnionFind<T> uf)
         {
             lastCluster = uf.lastCluster;
-            clusters = new Dictionary<T,int>(uf.clusters);
-            clusterSizes = new int[49];
+            clusters = new Dictionary<T, int>(uf.clusters);
+            clusterSizes = (int[])uf.clusterSizes.Clone();
     }
 
         public void Add(T x)
