@@ -33,11 +33,11 @@ namespace CalicoTests
             GameBoard board = new GameBoard(new Scoring(), 0);
             Pattern p = Pattern.Flowers;
             
-            for (int i = 0; i < board.ScoreCounter.Scoring.PatternClusterSizes[p] - 1; i++){
+            for (int i = 0; i < board.ScoreCounter.Scoring.pcSizes[(int)p-1] - 1; i++){
                 board.AddPiece(new GamePiece((Color)(i+1), p), 1, i+1);
             }
             
-            Assert.AreEqual(board.ScoreCounter.GetScore(), board.ScoreCounter.Scoring.PatternClusterScores[p]);
+            Assert.AreEqual(board.ScoreCounter.GetScore(), board.ScoreCounter.Scoring.pcScores[(int)p-1]);
         }
 
         [TestMethod]
@@ -119,12 +119,12 @@ namespace CalicoTests
             GamePiece gp1 = new GamePiece(Color.Purple, Pattern.Flowers);
 
 
-            for (int i = 0; i < board.ScoreCounter.Scoring.PatternClusterSizes[Pattern.Flowers] - 2; i++)
+            for (int i = 0; i < board.ScoreCounter.Scoring.pcSizes[(int)Pattern.Flowers-1] - 2; i++)
             {
                 board.AddPiece(new GamePiece((Color)(i+1), Pattern.Flowers), 1, i + 2);
             }
 
-            Assert.AreEqual(board.EvaluateNeighborsPattern(gp1, 1, 1), board.ScoreCounter.Scoring.PatternClusterScores[Pattern.Flowers] + 1);
+            Assert.AreEqual(board.EvaluateNeighborsPattern(gp1, 1, 1), board.ScoreCounter.Scoring.pcScores[(int)Pattern.Flowers-1] + 1);
         }
     }
 }
