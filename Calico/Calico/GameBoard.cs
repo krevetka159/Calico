@@ -150,6 +150,18 @@ namespace Calico
 
         }
 
+        public GameBoard(GameBoard b)
+        {
+            scoring = b.scoring;
+            ScoreCounter = new ScoreCounter(b.ScoreCounter);
+            board = (b.board).Select(row => row.Select(gp => gp).ToList()).ToList();
+            //task pieces copy
+            foreach ((int,int)pos in TaskPieceSpots)
+            {
+                TaskPieces[pos] = new TaskPiece(b.TaskPieces[pos]);
+            }
+        }
+
         private void BorderUF()
         {
             //Add corners to unionfind
@@ -396,7 +408,7 @@ namespace Calico
                 {
                     if (!clusters.Contains(ScoreCounter.GetPatternClusterId(board[row_i][col_i])))
                     {
-                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return 0;
                         count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
 
                         clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
@@ -408,7 +420,7 @@ namespace Calico
 
 
             if (count == 0) return 0;
-            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
+            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1;
             else return 1;
         }
 
@@ -558,11 +570,11 @@ namespace Calico
 
             foreach (int c in clusters.Distinct())
             {
-                if (sc.GetPatternCount(c) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                if (sc.GetPatternCount(c) >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return 0;
                 count += sc.GetPatternCount(c);
             }
 
-            if (count + 1 >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
+            if (count + 1 >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1;
             else return count;
         }
 
@@ -587,14 +599,14 @@ namespace Calico
 
                     if (separate)
                     {
-                        if (sc.GetPatternCount(neighbors[i]) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                        if (sc.GetPatternCount(neighbors[i]) >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return 0;
                         count += sc.GetPatternCount(neighbors[i]);
                     }
                 }
 
             }
 
-            if (count + 1 >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1;
+            if (count + 1 >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1;
             else return count;
         }
 
@@ -650,7 +662,7 @@ namespace Calico
                     //i++;
                     if (!clusters.Contains(ScoreCounter.GetPatternClusterId(board[row_i][col_i])))
                     {
-                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return 0;
                         count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
 
                         clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
@@ -669,7 +681,7 @@ namespace Calico
 
 
             double evol_konst = 0;
-            switch (sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Id)
+            switch (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Id)
             {
                 case 1:
                     evol_konst = e.CatsConst.Item1;
@@ -682,9 +694,9 @@ namespace Calico
                     break;
             }
 
-            if (count + 1 >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize)
+            if (count + 1 >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize)
             {
-                return (sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].Points + 1)*evol_konst;
+                return (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1)*evol_konst;
             }
             else return count*evol_konst;
         }
@@ -728,90 +740,90 @@ namespace Calico
 
         #endregion
 
-        #region Few Steps Ahead Evaluation
-        public double EvaluateMinimax(List<(GamePiece, (int,int))> gamePieces)
-        {
-            if (gamePieces.Count == 1)
-            {
-                return EvaluateNeighborsUtility(gamePieces[0].Item1, gamePieces[0].Item2.Item1, gamePieces[0].Item2.Item2);
-            }
+        //#region Few Steps Ahead Evaluation
+        //public double EvaluateMinimax(List<(GamePiece, (int,int))> gamePieces)
+        //{
+        //    if (gamePieces.Count == 1)
+        //    {
+        //        return EvaluateNeighborsUtility(gamePieces[0].Item1, gamePieces[0].Item2.Item1, gamePieces[0].Item2.Item2);
+        //    }
 
-            ScoreCounter mockSC = new ScoreCounter(scoring);
-            mockSC.SetProps(ScoreCounter.buttons, ScoreCounter.rainbowButtons, ScoreCounter.cats);
+        //    ScoreCounter mockSC = new ScoreCounter(scoring);
+        //    mockSC.SetProps(ScoreCounter.butts, ScoreCounter.rainbowButtons, ScoreCounter.catts);
 
-            Dictionary<(int, int), List<GamePiece>> taskNeighbors = new Dictionary<(int, int), List<GamePiece>>();
+        //    Dictionary<(int, int), List<GamePiece>> taskNeighbors = new Dictionary<(int, int), List<GamePiece>>();
 
-            foreach((int,int) t in TaskPieces.Keys)
-            {
-                taskNeighbors[t] = new List<GamePiece>();
-            }
+        //    foreach((int,int) t in TaskPieces.Keys)
+        //    {
+        //        taskNeighbors[t] = new List<GamePiece>();
+        //    }
 
-            foreach((GamePiece _, (int row, int col)) in gamePieces)
-            {
-                //List<(int, int)> neighbors = GetNeighbors(r, c);
-                IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+        //    foreach((GamePiece _, (int row, int col)) in gamePieces)
+        //    {
+        //        //List<(int, int)> neighbors = GetNeighbors(r, c);
+        //        IEnumerable<(int, int)> n = IterateNeighbors(row, col);
 
-                foreach ((int row_i, int col_i) in n)
-                {
-                    if (IsOccupied(row_i,col_i))
-                    {
-                        if (!mockSC.PatternUFContains(board[row_i][col_i]))
-                        {
-                            mockSC.AddToPatternUF(ScoreCounter.GetPatternCluster(board[row_i][col_i]));
-                        }
-                        if (!mockSC.ColorUFContains(board[row_i][col_i]))
-                        {
-                            mockSC.AddToColorUF(ScoreCounter.GetColorCluster(board[row_i][col_i]));
-                        }
-                    }
-                }
-            }
+        //        foreach ((int row_i, int col_i) in n)
+        //        {
+        //            if (IsOccupied(row_i,col_i))
+        //            {
+        //                if (!mockSC.PatternUFContains(board[row_i][col_i]))
+        //                {
+        //                    mockSC.AddToPatternUF(ScoreCounter.GetPatternCluster(board[row_i][col_i]));
+        //                }
+        //                if (!mockSC.ColorUFContains(board[row_i][col_i]))
+        //                {
+        //                    mockSC.AddToColorUF(ScoreCounter.GetColorCluster(board[row_i][col_i]));
+        //                }
+        //            }
+        //        }
+        //    }
 
-            double score = 0;
-            int div = 1;
+        //    double score = 0;
+        //    int div = 1;
 
-            for( int i = 0; i < gamePieces.Count; i++)
-            {
-                (GamePiece gp, (int r, int c)) = gamePieces[i];
+        //    for( int i = 0; i < gamePieces.Count; i++)
+        //    {
+        //        (GamePiece gp, (int r, int c)) = gamePieces[i];
 
-                List<(int, int)> neighborsPositions = GetNeighbors(r, c);
-                //IEnumerable<(int, int)> n = IterateNeighbors(row, col);
-                List<GamePiece> neighbors = new List<GamePiece>(); // co tady actually dělám s tímhle?
-                for (int j = 0; j < i; j++)
-                {
-                    if (neighborsPositions.Contains(gamePieces[j].Item2))
-                    {
-                        neighbors.Add(gamePieces[j].Item1);
-                    }
-                }
+        //        List<(int, int)> neighborsPositions = GetNeighbors(r, c);
+        //        //IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+        //        List<GamePiece> neighbors = new List<GamePiece>(); // co tady actually dělám s tímhle?
+        //        for (int j = 0; j < i; j++)
+        //        {
+        //            if (neighborsPositions.Contains(gamePieces[j].Item2))
+        //            {
+        //                neighbors.Add(gamePieces[j].Item1);
+        //            }
+        //        }
 
-                foreach((int nr, int nc) in neighborsPositions)
-                {
-                    if (IsOccupied(nr, nc)) 
-                    {
-                        neighbors.Add(board[nr][nc]);
-                    }
-                    if (IsTask(nr, nc))
-                    {
-                        taskNeighbors[(nr, nc)].Add(gp);
-                        score += Convert.ToDouble(TaskPieces[(nr, nc)].CheckNeighboursUtilityMinimax(taskNeighbors[(nr, nc)]))/div;
-                    }
-                }
+        //        foreach((int nr, int nc) in neighborsPositions)
+        //        {
+        //            if (IsOccupied(nr, nc)) 
+        //            {
+        //                neighbors.Add(board[nr][nc]);
+        //            }
+        //            if (IsTask(nr, nc))
+        //            {
+        //                taskNeighbors[(nr, nc)].Add(gp);
+        //                score += Convert.ToDouble(TaskPieces[(nr, nc)].CheckNeighboursUtilityMinimax(taskNeighbors[(nr, nc)]))/div;
+        //            }
+        //        }
 
-                score += Convert.ToDouble(EvaluateNeighborsColorUtility(gp, r, c, mockSC, neighbors))/div + Convert.ToDouble(EvaluateNeighborsPatternUtility(gp, r, c, mockSC, neighbors))/div;
+        //        score += Convert.ToDouble(EvaluateNeighborsColorUtility(gp, r, c, mockSC, neighbors))/div + Convert.ToDouble(EvaluateNeighborsPatternUtility(gp, r, c, mockSC, neighbors))/div;
 
-                mockSC.AddToUF(gp);
+        //        mockSC.AddToUF(gp);
 
-                mockSC.EvaluateNew(gp, neighbors);
+        //        mockSC.EvaluateNew(gp, neighbors);
 
-                div *= 4;
-            }
+        //        div *= 4;
+        //    }
 
-            return score;
+        //    return score;
 
-        }
+        //}
 
-        #endregion
+        //#endregion
 
 
 

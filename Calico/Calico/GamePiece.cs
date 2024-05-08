@@ -75,6 +75,16 @@ namespace Calico
 
             Print = $" T{TaskId} ";
         }
+
+        public GamePiece(GamePiece gp)
+        {
+            // init for TaskPiece
+
+            Type = gp.Type;
+            Color = gp.Color;
+            Pattern = gp.Pattern;
+            Print = gp.Print;
+        }
     }
 
     public class TaskPiece : GamePiece
@@ -82,21 +92,23 @@ namespace Calico
         public int Id;
         public int ScoreCompletedFully;
         public int ScoreCompletedPartly;
-        public List<int> Task;
-        public Dictionary<Color, int> NeighboringColors = new Dictionary<Color, int>(){
-                { Color.Yellow, 0 },
-                { Color.Green, 0 },
-                { Color.Cyan, 0 },
-                { Color.Blue, 0 },
-                { Color.Purple, 0 },
-                { Color.Pink, 0 }};
-        public Dictionary<Pattern, int> NeighboringPatterns = new Dictionary<Pattern, int>(){
-                { Pattern.Dots, 0 },
-                { Pattern.Stripes, 0 },
-                { Pattern.Fern, 0 },
-                { Pattern.Flowers, 0 },
-                { Pattern.Vines, 0 },
-                { Pattern.Quatrefoil, 0 } };
+        public int[] Task;
+        public int[] Colors = new int[6] { 0, 0, 0, 0, 0, 0 };
+        //public Dictionary<Color, int> NeighboringColors = new Dictionary<Color, int>(){
+        //        { Color.Yellow, 0 },
+        //        { Color.Green, 0 },
+        //        { Color.Cyan, 0 },
+        //        { Color.Blue, 0 },
+        //        { Color.Purple, 0 },
+        //        { Color.Pink, 0 }};
+        public int[] Patterns = new int[6] { 0, 0, 0, 0, 0, 0 };
+        //public Dictionary<Pattern, int> NeighboringPatterns = new Dictionary<Pattern, int>(){
+        //        { Pattern.Dots, 0 },
+        //        { Pattern.Stripes, 0 },
+        //        { Pattern.Fern, 0 },
+        //        { Pattern.Flowers, 0 },
+        //        { Pattern.Vines, 0 },
+        //        { Pattern.Quatrefoil, 0 } };
         public string Description;
 
         public TaskPiece(int TaskId) : base(TaskId) 
@@ -107,40 +119,51 @@ namespace Calico
                 case 1:
                     ScoreCompletedFully = 15;
                     ScoreCompletedPartly = 10;
-                    Task = new List<int>() { 1, 1, 1, 1, 1, 1 };
+                    Task = new int[6] { 1, 1, 1, 1, 1, 1 };
                     Description = " all different, 10/15 ";
                     break;
                 case 2:
                     ScoreCompletedFully = 14;
                     ScoreCompletedPartly = 7;
-                    Task = new List<int>() { 4, 2, 0, 0, 0, 0 };
+                    Task = new int[6] { 4, 2, 0, 0, 0, 0 };
                     Description = " 4:2, 7/14 ";
                     break;
                 case 3:
                     ScoreCompletedFully = 13;
                     ScoreCompletedPartly = 7;
-                    Task = new List<int>() { 3, 3, 0, 0, 0, 0 };
+                    Task = new int[6] { 3, 3, 0, 0, 0, 0 };
                     Description = " 3:3, 7/13 ";
                     break;
                 case 4:
                     ScoreCompletedFully = 11;
                     ScoreCompletedPartly = 7;
-                    Task = new List<int>() { 3, 2, 1, 0, 0, 0 };
+                    Task = new int[6] { 3, 2, 1, 0, 0, 0 };
                     Description = " 3:2:1, 7/11 ";
                     break;
                 case 5:
                     ScoreCompletedFully = 11;
                     ScoreCompletedPartly = 7;
-                    Task = new List<int>() { 2, 2, 2, 0, 0, 0 };
+                    Task = new int[6] { 2, 2, 2, 0, 0, 0 };
                     Description = " 2:2:2 7/11 ";
                     break;
                 case 6:
                     ScoreCompletedFully = 7;
                     ScoreCompletedPartly = 5;
-                    Task = new List<int>() { 2, 2, 1, 1, 0, 0 };
+                    Task = new int[6] { 2, 2, 1, 1, 0, 0 };
                     Description = " 2:2:1:1, 5/7 ";
                     break;
             }
+        }
+
+        public TaskPiece(TaskPiece piece) : base(piece)
+        {
+            Id = piece.Id;
+            ScoreCompletedFully = piece.ScoreCompletedFully;
+            ScoreCompletedPartly = piece.ScoreCompletedPartly;
+            Task = piece.Task;
+            Description = piece.Description;
+            Colors = (int[])piece.Colors.Clone();
+            Patterns = (int[])piece.Patterns.Clone();
         }
 
         /// <summary>
@@ -151,11 +174,13 @@ namespace Calico
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
-            List<int> colors = NeighboringColors.Values.ToList();
-            List<int> patterns = NeighboringPatterns.Values.ToList();
+            int[] colors = (int[])Colors.Clone();
+            int[] patterns = (int[])Patterns.Clone();
 
-            colors.Sort((a, b) => b.CompareTo(a));
-            patterns.Sort((a, b) => b.CompareTo(a));
+            Array.Sort(colors);
+            Array.Reverse(colors);
+            Array.Sort(patterns);
+            Array.Reverse(patterns);
 
             for (int i = 0; i < Task.Count(); i++)
             {
@@ -180,11 +205,13 @@ namespace Calico
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
-            List<int> colors = NeighboringColors.Values.ToList();
-            List<int> patterns = NeighboringPatterns.Values.ToList();
+            int[] colors = (int[])Colors.Clone();
+            int[] patterns = (int[])Patterns.Clone();
 
-            colors.Sort((a, b) => b.CompareTo(a));
-            patterns.Sort((a, b) => b.CompareTo(a));
+            Array.Sort(colors);
+            Array.Reverse(colors);
+            Array.Sort(patterns);
+            Array.Reverse(patterns);
 
             for (int i = 0; i < Task.Count(); i++)
             {
@@ -209,16 +236,26 @@ namespace Calico
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
-            Dictionary<Color, int> colorN = new Dictionary<Color,int>(NeighboringColors);
-            Dictionary<Pattern,int> patternsN = new Dictionary<Pattern,int>(NeighboringPatterns);
-            colorN[gp.Color] += 1;
-            patternsN[gp.Pattern] += 1;
+            //Dictionary<Color, int> colorN = new Dictionary<Color,int>(NeighboringColors);
+            //Dictionary<Pattern,int> patternsN = new Dictionary<Pattern,int>(NeighboringPatterns);
+            //colorN[gp.Color] += 1;
+            //patternsN[gp.Pattern] += 1;
 
-            List<int> colors = colorN.Values.ToList();
-            List<int> patterns = patternsN.Values.ToList();
+            //List<int> colors = colorN.Values.ToList();
+            //List<int> patterns = patternsN.Values.ToList();
 
-            colors.Sort((a, b) => b.CompareTo(a));
-            patterns.Sort((a, b) => b.CompareTo(a));
+            //colors.Sort((a, b) => b.CompareTo(a));
+            //patterns.Sort((a, b) => b.CompareTo(a));
+
+            int[] colors = (int[])Colors.Clone();
+            colors[(int)gp.Color - 1] += 1;
+            int[] patterns = (int[])Patterns.Clone();
+            patterns[(int)gp.Pattern-1] += 1;
+
+            Array.Sort(colors);
+            Array.Reverse(colors);
+            Array.Sort(patterns);
+            Array.Reverse(patterns);
 
             // if (colors.Sum() == 1) return 0;
 
@@ -267,18 +304,19 @@ namespace Calico
 
         public double CheckNeighboursUtility(GamePiece gp)
         {
-            bool colorsFailed = false; ;
+            bool colorsFailed = false;
             bool patternsFailed = false;
-            Dictionary<Color, int> colorN = new Dictionary<Color, int>(NeighboringColors);
-            Dictionary<Pattern, int> patternsN = new Dictionary<Pattern, int>(NeighboringPatterns);
-            colorN[gp.Color] += 1;
-            patternsN[gp.Pattern] += 1;
+            //Dictionary<Color, int> colorN = new Dictionary<Color, int>(NeighboringColors);
+            //Dictionary<Pattern, int> patternsN = new Dictionary<Pattern, int>(NeighboringPatterns);
+            int[] colors = (int[])Colors.Clone();
+            colors[(int)gp.Color-1] += 1;
+            int[] patterns = (int[])Patterns.Clone();
+            patterns[(int)gp.Pattern-1] += 1;
 
-            List<int> colors = colorN.Values.ToList();
-            List<int> patterns = patternsN.Values.ToList();
-
-            colors.Sort((a, b) => b.CompareTo(a));
-            patterns.Sort((a, b) => b.CompareTo(a));
+            Array.Sort(colors);
+            Array.Reverse(colors);
+            Array.Sort(patterns);
+            Array.Reverse(patterns);
 
             // if (colors.Sum() == 1) return 0;
 
@@ -305,20 +343,22 @@ namespace Calico
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
-            Dictionary<Color, int> colorN = new Dictionary<Color, int>(NeighboringColors);
-            Dictionary<Pattern, int> patternsN = new Dictionary<Pattern, int>(NeighboringPatterns);
+            //Dictionary<Color, int> colorN = new Dictionary<Color, int>(NeighboringColors);
+            //Dictionary<Pattern, int> patternsN = new Dictionary<Pattern, int>(NeighboringPatterns);
+
+            int[] colors = (int[])Colors.Clone();
+            int[] patterns = (int[])Patterns.Clone();
 
             foreach (GamePiece gp in gamePieces)
             {
-                colorN[gp.Color] += 1;
-                patternsN[gp.Pattern] += 1;
+                colors[(int)gp.Color-1] += 1;
+                patterns[(int)gp.Pattern-1] += 1;
             }
 
-            List<int> colors = colorN.Values.ToList();
-            List<int> patterns = patternsN.Values.ToList();
-
-            colors.Sort((a, b) => b.CompareTo(a));
-            patterns.Sort((a, b) => b.CompareTo(a));
+            Array.Sort(colors);
+            Array.Reverse(colors);
+            Array.Sort(patterns);
+            Array.Reverse(patterns);
 
             // if (colors.Sum() == 1) return 0;
 
@@ -343,8 +383,10 @@ namespace Calico
 
         public void AddNeighbor(GamePiece piece)
         {
-            NeighboringColors[piece.Color] += 1;
-            NeighboringPatterns[piece.Pattern] += 1;
+            //NeighboringColors[piece.Color] += 1;
+            Colors[(int)piece.Color-1] += 1;
+            //NeighboringPatterns[piece.Pattern] += 1;
+            Patterns[(int)piece.Pattern-1] += 1;
         }
     }
 }

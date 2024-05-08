@@ -15,9 +15,11 @@ namespace Calico
         private UnionFind<GamePiece> colorUF;
         private UnionFind<GamePiece> patternUF;
 
-        public Dictionary<Color, int> buttons;
+        //public Dictionary<Color, int> buttons;
+        public int[] butts;
         public int rainbowButtons { get; private set; }
-        public Dictionary<PatternScoringPanel, int> cats; 
+        //public Dictionary<PatternScoringPanel, int> cats;
+        public int[] catts;
 
         public Scoring Scoring { get; private set; }
 
@@ -29,34 +31,54 @@ namespace Calico
             colorUF = new UnionFind<GamePiece>();
             patternUF = new UnionFind<GamePiece>();
 
-            buttons = new Dictionary<Color, int>(){ 
-                { Color.Yellow, 0 },
-                { Color.Green, 0 },
-                { Color.Cyan, 0 },
-                { Color.Blue, 0 },
-                { Color.Purple, 0 },
-                { Color.Pink, 0 },
-            };
+            //buttons = new Dictionary<Color, int>(){ 
+            //    { Color.Yellow, 0 },
+            //    { Color.Green, 0 },
+            //    { Color.Cyan, 0 },
+            //    { Color.Blue, 0 },
+            //    { Color.Purple, 0 },
+            //    { Color.Pink, 0 },
+            //};
+
+            butts = new int[6] {0,0,0,0,0,0};
             rainbowButtons = 0;
 
-            cats = new Dictionary<PatternScoringPanel, int>();
-            foreach (PatternScoringPanel panel in Scoring.PatternScoring.PatternScoringPanels)
+            //cats = new Dictionary<PatternScoringPanel, int>();
+            catts = new int[3];
+            foreach (PatternScoringPanel panel in Scoring.PatternScoring.ps)
             {
-                cats[panel] = 0;
+                catts[panel.Id] = 0;
             }
             
         }
 
-        public void SetProps(Dictionary<Color, int> b, int rb, Dictionary<PatternScoringPanel,int> c)
+        public ScoreCounter(ScoreCounter sc)
         {
-            foreach(KeyValuePair<Color,int>button in b)
-            {
-                buttons[button.Key] = button.Value;
-            }
+
+            Score = sc.Score;
+            Scoring = sc.Scoring;
+            colorUF = new UnionFind<GamePiece>(sc.colorUF);
+            patternUF = new UnionFind<GamePiece>(sc.patternUF);
+
+            butts = (int[])sc.butts.Clone();
+            rainbowButtons = sc.rainbowButtons;
+
+            catts = (int[])sc.catts.Clone();
+
+        }
+
+        public void SetProps(int[] b, int rb, Dictionary<PatternScoringPanel,int> c)
+        {
+            //foreach(KeyValuePair<Color,int>button in b)
+            //{
+            //    //buttons[button.Key] = button.Value;
+            //    butts[(int)button.Key-1] = button.Value;
+            //}
+            butts = b;
             rainbowButtons = rb;
             foreach (KeyValuePair<PatternScoringPanel,int> cat in c)
             {
-                cats[cat.Key] = cat.Value;
+                catts[cat.Key.Id] = cat.Value;
             }
         }
 
@@ -178,7 +200,7 @@ namespace Calico
 
                 if (p.Pattern == n.Pattern)
                 {
-                    if (GetPatternCount(n) >= Scoring.PatternScoring.PatternScoringDict[n.Pattern].ClusterSize)
+                    if (GetPatternCount(n) >= Scoring.PatternScoring.psDict[(int)n.Pattern-1].ClusterSize)
                     {
                         possible_cat = false;
                     }
@@ -196,9 +218,9 @@ namespace Calico
                 Score += Scoring.ColorScoring.Points;
                 AddAndUpdateButtons(p.Color);
             }
-            if (possible_cat && GetPatternCount(p) >= Scoring.PatternScoring.PatternScoringDict[p.Pattern].ClusterSize)
+            if (possible_cat && GetPatternCount(p) >= Scoring.PatternScoring.psDict[(int)p.Pattern-1].ClusterSize)
             {
-                Score += Scoring.PatternScoring.PatternScoringDict[p.Pattern].Points;
+                Score += Scoring.PatternScoring.psDict[(int)p.Pattern-1].Points;
                 AddCat(p.Pattern);
             }
 
@@ -279,7 +301,7 @@ namespace Calico
         /// <returns></returns>
         public int GetPatternScore(GamePiece p)
         {
-            return (patternUF.Count(p) / Scoring.PatternClusterSizes[p.Pattern]) * Scoring.PatternClusterScores[p.Pattern];
+            return (patternUF.Count(p) / Scoring.pcSizes[(int)p.Pattern-1]) * Scoring.pcScores[(int)p.Pattern-1];
         }
 
         /// <summary>
@@ -299,7 +321,7 @@ namespace Calico
         /// <returns></returns>
         public int CountPatternScore(int count, Pattern p) 
         {
-            return (count / Scoring.PatternClusterSizes[p]) * Scoring.PatternClusterScores[p];
+            return (count / Scoring.pcSizes[(int)p-1]) * Scoring.pcScores[(int)p-1];
         }
 
 
@@ -319,16 +341,16 @@ namespace Calico
         /// <returns></returns>
         public bool GetsRainbowButton(Color c)
         {
-            int min = buttons.Values.Min();
-            foreach (KeyValuePair<Color,int> pair in buttons)
+            int min = butts.Min();
+            for (int i = 0; i<butts.Length; i++)
             {
-                if (pair.Key == c)
+                if (i == (int)c-1)
                 {
-                    if (pair.Value != min) return false;
+                    if (butts[i] != min) return false;
                 }
                 else
                 {
-                    if (pair.Value <= min) return false;
+                    if (butts[i] <= min) return false;
                 }
             }
             return true;
@@ -345,22 +367,22 @@ namespace Calico
                 Score += Scoring.ColorClusterScore;
                 rainbowButtons += 1;
             }
-            buttons[c] += 1;
+            butts[(int)c-1] += 1;
         }
         
         public void AddCat(Pattern p)
         {
-            cats[Scoring.PatternScoring.PatternScoringDict[p]] += 1;
+            catts[Scoring.PatternScoring.psDict[(int)p-1].Id] += 1;
         }
 
         public int GetButtonsCount()
         {
-            return buttons.Values.Sum() + rainbowButtons;
+            return butts.Sum() + rainbowButtons;
         }
 
         public (int, int, int) GetCatsCount()
         {
-            return (cats[Scoring.PatternScoring.PatternScoringPanels[0]], cats[Scoring.PatternScoring.PatternScoringPanels[1]], cats[Scoring.PatternScoring.PatternScoringPanels[2]]);
+            return (catts[0], catts[1], catts[2]);
         }
     }
 }
