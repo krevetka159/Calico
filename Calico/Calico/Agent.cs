@@ -625,6 +625,28 @@ namespace Calico
         {
         }
 
+        public List<(int,int)> TopPositions(GamePiece gp, int num, GameBoard board)
+        {
+            List<((int,int),double)> positions = new List<((int,int),double)>(new ((int, int), double)[board.EmptySpotsCount]);
+
+            int index = 0;
+            for (int i = 1; i < Board.Size - 1; i++)
+            {
+                for (int j = 1; j < Board.Size - 1; j++)
+                {
+                    if (Board.IsEmpty(i, j))
+                    {
+                        positions[index] = ((i,j), board.EvaluateNeighborsUtility(gp, i, j));
+                        index++;
+                    }
+                }
+            }
+
+            positions.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
+            return positions.Select(item => item.Item1).Take(Math.Max((board.EmptySpotsCount+1)/2,5)).ToList();
+        }
+
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
@@ -636,55 +658,111 @@ namespace Calico
 
             List<(int, int, int)> perms = new List<(int, int, int)>() { (0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0) };
 
-            foreach ((int,int,int) optPermutation in perms)
+            if (Board.EmptySpotsCount > 1)
             {
-                Parallel.For(1, Board.Size - 1, i1 =>
+
+                foreach ((int, int, int) optPermutation in perms)
                 {
-                    Parallel.For(1, Board.Size - 1, j1 =>
-                    {
-                        if (Board.IsEmpty(i1, j1))
+                    //Parallel.For(1, Board.Size - 1, i1 =>
+                    //{
+                    //    Parallel.For(1, Board.Size - 1, j1 =>
+                    //    {
+                        Parallel.ForEach(TopPositions(Opts[optPermutation.Item1], 10, Board), pos =>
                         {
+                            (int i1, int j1) = pos;
 
-                            Parallel.For(1, Board.Size - 1, i2 =>
+                            if (Board.IsEmpty(i1, j1))
                             {
-                                Parallel.For(1, Board.Size - 1, j2 =>
+                                GameBoard gb_new = new GameBoard(Board);
+                                double eval = gb_new.EvaluateNeighborsUtility(Opts[optPermutation.Item1], i1, j1);
+                                gb_new.AddPiece(Opts[optPermutation.Item1], i1, j1);
+
+                                for (int i2 = 1; i2 < Board.Size - 1; i2++)
                                 {
-                                    if (Board.IsEmpty(i2, j2) && (i1, j1) != (i2, j2))
+                                    for (int j2 = 1; j2 < Board.Size - 1; j2++)
                                     {
-
-                                        Parallel.For(1, Board.Size - 1, i3 =>
+                                        if (Board.IsEmpty(i2, j2) && ((i1, j1) != (i2, j2)))
                                         {
-                                            Parallel.For(1, Board.Size - 1, j3 =>
+
+                                            //Parallel.For(1, Board.Size - 1, i3 =>
+                                            //{
+                                            //    Parallel.For(1, Board.Size - 1, j3 =>
+                                            //    {
+                                            //        if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
+                                            //        {
+                                            //List<(GamePiece, (int, int))> toAdd = new List<(GamePiece, (int, int))>()
+                                            //{
+                                            //    (Opts[optPermutation.Item1], (i1, j1)),
+                                            //    (Opts[optPermutation.Item2], (i2, j2)),
+                                            //    // (Opts[optPermutation.Item3], (i3, j3))
+                                            //};
+
+                                            //double eval = Board.EvaluateMinimax(toAdd);
+                                            GameBoard gb_new2 = new GameBoard(gb_new);
+                                            double eval2 = eval + (gb_new2.EvaluateNeighborsUtility(Opts[optPermutation.Item2], i2, j2) / 4);
+
+                                            if (eval2 > max)
                                             {
-                                                if (Board.IsEmpty(i3, j3) && (i1, j1) != (i3, j3) && (i2, j2) != (i3, j3))
-                                                {
-                                                    List<(GamePiece, (int, int))> toAdd = new List<(GamePiece, (int, int))>()
-                                                    {
-                                                        (Opts[optPermutation.Item1], (i1, j1)),
-                                                        (Opts[optPermutation.Item2], (i2, j2)),
-                                                        (Opts[optPermutation.Item3], (i3, j3))
-                                                    };
+                                                max = eval2;
+                                                maxPosition = (i1, j1);
+                                                pieceIndex = optPermutation.Item1;
+                                            }
+                                            //gb_new2.AddPiece(Opts[optPermutation.Item2], i2, j2);
 
-                                                    double eval = Board.EvaluateMinimax(toAdd);
-                                                    if (eval > max)
-                                                    {
-                                                        max = eval;
-                                                        maxPosition = (i1, j1);
-                                                        pieceIndex = optPermutation.Item1;
-                                                    }
-                                                }
-                                            });
-                                        });
+                                            //for (int i3 = 1; i3 < Board.Size - 1; i3++)
+                                            //{
+                                            //    for (int j3 = 1; j3 < Board.Size - 1; j3++)
+                                            //    {
+                                            //        if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
+                                            //        {
+
+                                            //            GameBoard gb_new3 = new GameBoard(gb_new2);
+                                            //            double eval3 = eval2 + (gb_new3.EvaluateNeighborsUtility(Opts[optPermutation.Item3], i3, j3) / 16);
+
+                                            //            if (eval3 > max)
+                                            //            {
+                                            //                max = eval3;
+                                            //                maxPosition = (i1, j1);
+                                            //                pieceIndex = optPermutation.Item1;
+                                            //            }
+                                            //        }
+                                            //    }
+                                            //}
+                                        }
                                     }
-                                });
-                            });
+                                }
 
-                        }
-                    });
-                });
+                            }
+                        });
+                    //    });
+                    //});
+                }
+
             }
 
+            else 
+            {
+                for (int o = 0; o < Opts.Length; o++)
+                {
+                    GamePiece gp = Opts[o];
+                    for (int i = 1; i < Board.Size - 1; i++)
+                    {
+                        for (int j = 1; j < Board.Size - 1; j++)
+                        {
+                            if (Board.IsEmpty(i, j))
+                            {
+                                if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
+                                {
+                                    pieceIndex = o;
+                                    max = Board.EvaluateNeighborsUtility(gp, i, j);
+                                    maxPosition = (i, j);
+                                }
+                            }
 
+                        }
+                    }
+                }
+            }
             return (pieceIndex, maxPosition);
         }
     }
