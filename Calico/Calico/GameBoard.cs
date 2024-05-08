@@ -21,6 +21,8 @@ namespace Calico
         private Scoring scoring;
         public ScoreCounter ScoreCounter { get; private set; }
 
+        public int EmptySpotsCount { get; private set; }
+
         #region Init
         public GameBoard(Scoring scoring)
         {
@@ -82,6 +84,8 @@ namespace Calico
                     break;
             }
             BorderUF();
+
+            EmptySpotsCount = 22;
 
         }
         /// <summary>
@@ -148,6 +152,9 @@ namespace Calico
             }
             BorderUF();
 
+            EmptySpotsCount = 22;
+
+
         }
 
         public GameBoard(GameBoard b)
@@ -160,6 +167,7 @@ namespace Calico
             {
                 TaskPieces[pos] = new TaskPiece(b.TaskPieces[pos]);
             }
+            EmptySpotsCount = b.EmptySpotsCount;
         }
 
         private void BorderUF()
@@ -210,7 +218,7 @@ namespace Calico
             ScoreCounter.AddToUF(piece);
             UnionWithNeighbors(piece, row, col);
             AddToTaskNeighbors(piece, row, col);
-            
+            EmptySpotsCount--;
         }
 
         private void UnionWithNeighbors(GamePiece piece,int row, int col)
