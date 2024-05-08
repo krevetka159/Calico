@@ -133,6 +133,7 @@ namespace Calico
 
                     //Parallel.For(0, 20, j =>
                     //{
+                    double[] scores = new double[10];
                     for (int j = 0; j < 10; j++)
                     {
                         Console.WriteLine(j);
@@ -149,8 +150,12 @@ namespace Calico
                             stats[i] = g.Stats;
                         });
 
-                        Console.WriteLine(stats.Average(item => item.Score));
+                        
+                        scores[j] = stats.Average(item => item.Score);
+                        Console.WriteLine(scores[j]);
                     }
+
+                    Console.WriteLine($"Celkem: {scores.Average()}");
                         
                     //});
 
