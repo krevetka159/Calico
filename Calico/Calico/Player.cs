@@ -8,7 +8,7 @@ namespace Calico
 {
     public class Player
     {
-        public GameBoard Board { get; private set; }
+        public GameBoard Board { get; set; }
 
         public int[] TaskIds;
 

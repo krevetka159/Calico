@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class GameStats
+    public class GameStats
     {
         public int AgentType;
         public int Score;

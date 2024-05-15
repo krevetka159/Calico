@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class GameStatePrinter
+    public class GameStatePrinter
     {
         private Scoring scoring;
         public GameStatePrinter(Scoring scoring) 
