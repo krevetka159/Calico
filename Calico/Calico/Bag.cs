@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
-    internal class Bag
+    public class Bag
 
     {
         private List<GamePiece> pieces;
@@ -30,6 +30,11 @@ namespace Calico
                     pieces.Add(new GamePiece((Color)i, (Pattern)j));
                 }
             }
+        }
+        public Bag(Bag b)
+        {
+            random = new Random();
+            pieces = new List<GamePiece>(b.pieces);
         }
         /// <summary>
         /// Randomly picks a patchtile from bag
