@@ -769,6 +769,154 @@ namespace Calico
 
     #endregion
 
+    public class MonteCarloAgent : Agent
+    {
+        public MonteCarloAgent(Scoring scoring) : base(scoring)
+        {
+        }
+        public MonteCarloAgent(Scoring scoring, int boardId) : base(scoring, boardId)
+        {
+        }
+
+        public List<(int, int)> TopPositions(GamePiece gp, GameBoard board)
+        {
+            List<((int, int), double)> positions = new List<((int, int), double)>(new ((int, int), double)[board.EmptySpotsCount]);
+
+            int index = 0;
+            for (int i = 1; i < board.Size - 1; i++)
+            {
+                for (int j = 1; j < board.Size - 1; j++)
+                {
+                    if (board.IsEmpty(i, j))
+                    {
+                        positions[index] = ((i, j), board.EvaluateNeighborsUtility(gp, i, j));
+                        index++;
+                    }
+                }
+            }
+
+            positions.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
+            return positions.Select(item => item.Item1).Take(5).ToList();
+        }
+
+        public double Simulation(GameBoard gb, GamePiece[] Opts)
+        {
+            int[] scores = new int[10];
+            Parallel.For(0, 10, i =>
+            {
+                SimulationGame sg = new SimulationGame(new GameBoard(gb), Opts, gb.ScoreCounter.Scoring);
+                scores[i] = sg.Game();
+            });
+            return scores.Average();
+        }
+
+
+        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
+        {
+            double max = 0;
+            (int, int) maxPosition = RandomPosition();
+            int pieceIndex = RandomGamePiece(Opts);
+
+            // pro každou permutaci opts udělám následující: pro každý empty spot na desce udělám kopii desky a pošlu ji do dalšího forcyklu
+
+            List<(int, int, int)> perms = new List<(int, int, int)>() { (0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0) };
+
+            if (Board.EmptySpotsCount > 4)
+            {
+                foreach ((int, int, int) optPermutation in perms)
+                {
+                    Parallel.ForEach(TopPositions(Opts[optPermutation.Item1], Board), pos =>
+                    {
+                        (int i1, int j1) = pos;
+
+                        if (Board.IsEmpty(i1, j1))
+                        {
+                            GameBoard gb_new = new GameBoard(Board);
+                            gb_new.AddPiece(Opts[optPermutation.Item1], i1, j1);
+
+                                
+                            Parallel.ForEach(TopPositions(Opts[optPermutation.Item2], gb_new), pos1 =>
+                            {
+                                (int i2, int j2) = pos1;
+                                if (Board.IsEmpty(i2, j2) && ((i1, j1) != (i2, j2)))
+                                {
+                                    GameBoard gb_new2 = new GameBoard(gb_new);
+                                    gb_new2.AddPiece(Opts[optPermutation.Item2], i2, j2);
+
+                                    Parallel.ForEach(TopPositions(Opts[optPermutation.Item3], gb_new2), pos2 =>
+                                    {
+                                        (int i3, int j3) = pos2;
+                                        if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
+                                        {
+
+                                            GameBoard gb_new3 = new GameBoard(gb_new2);
+                                            gb_new3.AddPiece(Opts[optPermutation.Item3], i3, j3);
+
+                                            // SIMULACE
+
+                                            double eval = Simulation(gb_new3, new GamePiece[0]);
+
+                                            if (eval > max)
+                                            {
+                                                max = eval;
+                                                maxPosition = (i1, j1);
+                                                pieceIndex = optPermutation.Item1;
+                                            }
+                                        }
+                                    });
+
+                                    double eval = Simulation(gb_new2, new GamePiece[1] { Opts[optPermutation.Item3] });
+
+                                    if (eval > max)
+                                    {
+                                        max = eval;
+                                        maxPosition = (i1, j1);
+                                        pieceIndex = optPermutation.Item1;
+                                    }
+                                }
+                            });
+
+                            double eval = Simulation(gb_new, new GamePiece[2] { Opts[optPermutation.Item2], Opts[optPermutation.Item3] });
+
+                            if (eval > max)
+                            {
+                                max = eval;
+                                maxPosition = (i1, j1);
+                                pieceIndex = optPermutation.Item1;
+                            }
+                        }
+                    });
+                }
+            }
+
+            else
+            {
+                for (int o = 0; o < Opts.Length; o++)
+                {
+                    GamePiece gp = Opts[o];
+                    for (int i = 1; i < Board.Size - 1; i++)
+                    {
+                        for (int j = 1; j < Board.Size - 1; j++)
+                        {
+                            if (Board.IsEmpty(i, j))
+                            {
+                                if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
+                                {
+                                    pieceIndex = o;
+                                    max = Board.EvaluateNeighborsUtility(gp, i, j);
+                                    maxPosition = (i, j);
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            return (pieceIndex, maxPosition);
+        }
+    }
+
     #region Evolution
 
     public class EvolutionAgent : Agent
