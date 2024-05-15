@@ -11,7 +11,7 @@ using System.Collections;
 
 namespace Calico
 {
-    internal class Game
+    public class Game
     {
         public Bag bag;
         public Player player;
@@ -31,7 +31,8 @@ namespace Calico
             (5, " Nejlepší umístění s malou náhodou "),
             (6, " Nejlepší umístění náhodného dílku "),
             (7, " Utility fce"),
-            (8, " Minimax")
+            (8, " Minimax"),
+            (9, " MC")
         };
 
         public Game()
@@ -62,6 +63,7 @@ namespace Calico
             agent = UseAgent(agentType);
             agent.ChooseTaskPieces();
         }
+        
 
     #region SinglePlayer
 
@@ -156,6 +158,10 @@ namespace Calico
                 case 8:
                     {
                         return new MinimaxAgent(scoring);
+                    }
+                case 9:
+                    {
+                        return new MonteCarloAgent(scoring);
                     }
                 default:
                     {

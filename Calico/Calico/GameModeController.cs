@@ -18,7 +18,8 @@ namespace Calico
             (5, " Nejlepší umístění s malou náhodou "),
             (6, " Nejlepší umístění náhodného dílku "),
             (7, " Utility fce"),
-            (8, " Minimax")
+            (8, " Minimax"),
+            (9, " MC")
         };
 
         private AverageGameStats avgStats;
@@ -143,13 +144,21 @@ namespace Calico
                         {
                             stats.Add(null);
                         }
-                        Parallel.For(0, iterations, i =>
+                        //Parallel.For(0, iterations, i =>
+                        //{
+                        //    Game g = new Game();
+                        //    g.AgentGame(agentType, false);
+                        //    stats[i] = g.Stats;
+                        //    Console.WriteLine(i);
+                        //});
+
+                        for (int i = 0;i < iterations; i++)
                         {
                             Game g = new Game();
                             g.AgentGame(agentType, false);
                             stats[i] = g.Stats;
-                        });
-
+                            Console.WriteLine($" {i} : {g.Stats.Score}");
+                        }
                         
                         scores[j] = stats.Average(item => item.Score);
                         Console.WriteLine(scores[j]);
