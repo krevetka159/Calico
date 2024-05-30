@@ -235,14 +235,14 @@ namespace Calico
         public void PrintDetailedStatsToCSV(Player p)
         {
             (int, int, int) cats = p.Board.ScoreCounter.GetCatsCount();
-            Dictionary<int, int> tasks = p.Board.TasksCompleted();
+            int[] tasks = p.Board.TasksCompleted();
             Console.WriteLine(
                 $"{p.Board.ScoreCounter.GetScore()};" +
                 $"{p.Board.ScoreCounter.GetButtonsCount()};" +
                 $"{cats.Item1};" +
                 $"{cats.Item2};" +
                 $"{cats.Item3};" +
-                $"{tasks[1]};{tasks[2]};{tasks[3]};{tasks[4]};{tasks[5]};{tasks[6]}"
+                $"{tasks[0]};{tasks[1]};{tasks[2]};{tasks[3]};{tasks[4]};{tasks[5]}"
                 );
 
         }
