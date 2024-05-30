@@ -8,7 +8,7 @@ namespace Calico
 {
     internal class Evolution
     {
-        private int population_size = 100;
+        private int population_size = 200;
         private int generations = 200;
         private double mutation_prob = 1;
         private double tournament_prob = 0.8;
@@ -22,35 +22,46 @@ namespace Calico
             EvolveAllSettings();
         }
 
-        private void EvolutionRun((int,int,int) tasks, int boardId)
+        private void EvolutionRun()
         {
-            EvolutionGameProps[] population = RandomPopulation();
+            UtilityConsts[] population = RandomPopulation();
             double[] fitness = new double[population_size];
+
+            double[] avg = new double[generations];
+            double[] max = new double[generations];
 
             for (int g = 0; g < generations - 1; g++)
             {
-                Console.WriteLine($" Generation {g+1}");
+                Console.WriteLine($" Generation {g + 1}");
 
-                fitness = EvolutionGames(population, tasks, boardId);
+                fitness = EvolutionGames(population);
 
                 //for (int i = 0; i < population_size; i++)
                 //{
                 //    Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst} : {fitness[i]}");
                 //}
+                //for (int i = 0; i < population_size; i++)
+                //{
+                //    Console.WriteLine($" {population[i].TaskConst[0]}, {population[i].TaskConst[1]}, {population[i].TaskConst[2]} : {fitness[i]}");
+                //}
 
                 population = Mutation(Selection(population, fitness));
 
                 Console.WriteLine(fitness.Average());
+                avg[g] = fitness.Average();
                 Console.WriteLine(fitness.Max());
+                max[g] = fitness.Max();
             }
 
             Console.WriteLine($" Generation {generations}");
 
-            fitness = EvolutionGames(population, tasks, boardId);
+            fitness = EvolutionGames(population);
             Console.WriteLine(fitness.Average());
+            avg[generations - 1] = fitness.Average();
             Console.WriteLine(fitness.Max());
+            max[generations - 1] = fitness.Max();
 
-            List<(double, EvolutionGameProps)> results = new List<(double, EvolutionGameProps)>();
+            List<(double, UtilityConsts)> results = new List<(double, UtilityConsts)>();
             for (int i = 0; i < population_size; i++)
             {
                 results.Add((fitness[i], population[i]));
@@ -58,120 +69,113 @@ namespace Calico
             results.Sort((x, y) => y.Item1.CompareTo(x.Item1));
 
             Directory.CreateDirectory("./Evol");
-            using (StreamWriter outputFile = new StreamWriter($"./Evol/test-evol_{boardId}_{tasks.Item1}{tasks.Item2}{tasks.Item3}.csv"))
+            using (StreamWriter outputFile = new StreamWriter($"./Evol/finalGen_mixed.csv"))
             {
                 outputFile.WriteLine("fitness;buttons;catsA;catsB;catsC;taskA;taskB;taskC");
-                foreach ((double, EvolutionGameProps) res in results)
+                foreach ((double, UtilityConsts) res in results)
+                {
+                    double normSum =
+                        (res.Item2.ButtonConst +
+                        res.Item2.CatsConst.Item1 +
+                        res.Item2.CatsConst.Item2 +
+                        res.Item2.CatsConst.Item3 +
+                        res.Item2.TaskConst.Sum())/10;
                     outputFile.WriteLine(
                         $"{Math.Round(res.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                        $"{Math.Round(res.Item2.ButtonConst, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsConst.Item1, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsConst.Item2, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst.Item1, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst.Item2, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst.Item3, 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
+                        $"{Math.Round(res.Item2.ButtonConst / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.CatsConst.Item1 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.CatsConst.Item2 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.CatsConst.Item3 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.TaskConst[0] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.TaskConst[1] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.TaskConst[2] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.TaskConst[3] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.TaskConst[4] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.TaskConst[5] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
+                }
+            }
+            using (StreamWriter outputFile = new StreamWriter($"./Evol/progress_mixed.csv"))
+            {
+                outputFile.WriteLine("generation;avg;max");
+                for(int g = 0; g<generations;g++)
+                {
+
+                    outputFile.WriteLine(
+                        $"{g};" +
+                        $"{Math.Round(avg[g], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(max[g], 3, MidpointRounding.AwayFromZero).ToString("0.00000")}");
+
+                }
             }
         }
 
         private void EvolveAllSettings()
         {
-            List<Dictionary<(int, int, int), List<AverageGameStats>>> statsDict = new List<Dictionary<(int, int, int), List<AverageGameStats>>>();
+            //Dictionary<(int, int, int), List<AverageGameStats>> statsDict = new Dictionary<(int, int, int), List<AverageGameStats>>();
 
-            for (int b = 0; b < 4; b++)
-            {
-                //        statsDict.Add(new Dictionary<(int, int, int), List<AverageGameStats>>());
-                //        for (int i = 1; i <= 6; i++)
-                //        {
-                //            for (int j = i + 1; j <= 6; j++)
-                //            {
-                //                for (int k = j + 1; k <= 6; k++)
-                //                {
-                //                    statsDict[b][(i, j, k)] = new List<AverageGameStats>();
+            //int i = 1;
+            //int j = 2;
+            //int k = 3;
 
-                //                    Console.WriteLine($" {b} - {i},{j},{k}: ");
-                //                    EvolutionRun((i, j, k), b);
-                //                    Console.WriteLine();
 
-                //                    Console.WriteLine($" {b} - {i},{k},{j}: ");
-                //                    EvolutionRun((i, k, j), b);
-                //                    Console.WriteLine();
+            //statsDict[(i, j, k)] = new List<AverageGameStats>();
 
-                //                    Console.WriteLine($" {b} - {j},{i},{k}: ");
-                //                    EvolutionRun((j, i, k), b);
-                //                    Console.WriteLine();
+            //Console.WriteLine($" {i},{j},{k}: ");
+            //EvolutionRun((i, j, k));
+            //Console.WriteLine();
 
-                //                    Console.WriteLine($" {b} - {j},{k},{i}: ");
-                //                    EvolutionRun((j, k, i), b);
-                //                    Console.WriteLine();
+            //Console.WriteLine($" {i},{k},{j}: ");
+            //EvolutionRun((i, k, j));
+            //Console.WriteLine();
 
-                //                    Console.WriteLine($" {b} - {k},{i},{j}: ");
-                //                    EvolutionRun((k, i, j), b);
-                //                    Console.WriteLine();
+            //Console.WriteLine($" {j},{i},{k}: ");
+            //EvolutionRun((j, i, k));
+            //Console.WriteLine();
 
-                //                    Console.WriteLine($" {b} - {k},{j},{i}: ");
-                //                    EvolutionRun((k, j, i), b);
-                //                    Console.WriteLine();
-                //                }
-                //            }
-                //        }
+            //Console.WriteLine($" {j},{k},{i}: ");
+            //EvolutionRun((j, k, i));
+            //Console.WriteLine();
 
-                int i = 1;
-                int j = 2;
-                int k = 3;
+            //Console.WriteLine($"´{k},{i},{j}: ");
+            //EvolutionRun((k, i, j));
+            //Console.WriteLine();
 
-                statsDict.Add(new Dictionary<(int, int, int), List<AverageGameStats>>());
+            //Console.WriteLine($" {k},{j},{i}: ");
+            //EvolutionRun((k, j, i));
+            //Console.WriteLine();
 
-                statsDict[b][(i, j, k)] = new List<AverageGameStats>();
+            EvolutionRun();
 
-                Console.WriteLine($" {b} - {i},{j},{k}: ");
-                EvolutionRun((i, j, k), b);
-                Console.WriteLine();
-
-                Console.WriteLine($" {b} - {i},{k},{j}: ");
-                EvolutionRun((i, k, j), b);
-                Console.WriteLine();
-
-                Console.WriteLine($" {b} - {j},{i},{k}: ");
-                EvolutionRun((j, i, k), b);
-                Console.WriteLine();
-
-                Console.WriteLine($" {b} - {j},{k},{i}: ");
-                EvolutionRun((j, k, i), b);
-                Console.WriteLine();
-
-                Console.WriteLine($" {b} - {k},{i},{j}: ");
-                EvolutionRun((k, i, j), b);
-                Console.WriteLine();
-
-                Console.WriteLine($" {b} - {k},{j},{i}: ");
-                EvolutionRun((k, j, i), b);
-                Console.WriteLine();
-            }
-
-            
         }
 
 
-        private EvolutionGameProps[] RandomPopulation()
+        private UtilityConsts[] RandomPopulation()
         {
-            EvolutionGameProps[] population = new EvolutionGameProps[population_size];
+            UtilityConsts[] population = new UtilityConsts[population_size];
 
-            for (int i = 0; i < population_size; i++)
+            for (int i = 0; i < population_size/2; i++)
             {
-                population[i] = new EvolutionGameProps(
+                population[i] = new UtilityConsts(
+                    1 + SampleGaussian(0,0.1),
+                    (1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1)), 
+                    new double[] { 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1) }
+                    );
+            }
+            for (int i = 0; i < population_size / 2; i++)
+            {
+                population[(population_size/2) + i] = new UtilityConsts(
                     random.NextDouble(),
-                    (random.NextDouble(), random.NextDouble(), random.NextDouble()), 
-                    (random.NextDouble(), random.NextDouble(), random.NextDouble())
+                    (random.NextDouble(), random.NextDouble(), random.NextDouble()),
+                    new double[] { random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble() }
                     );
             }
 
             return population;
         }
 
-        private EvolutionGameProps[] Selection(EvolutionGameProps[] population, double[] fitness)
+        private UtilityConsts[] Selection(UtilityConsts[] population, double[] fitness)
         {
-            EvolutionGameProps[] newPopulation = new EvolutionGameProps[population_size];
+            UtilityConsts[] newPopulation = new UtilityConsts[population_size];
 
             for (int i = 0; i < population_size; i++)
             {
@@ -205,12 +209,12 @@ namespace Calico
             return newPopulation;
         }
 
-        private EvolutionGameProps[] Mutation(EvolutionGameProps[] population)
+        private UtilityConsts[] Mutation(UtilityConsts[] population)
         {
             for (int i = 0; i < population_size; i++)
             {
                 //Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst}");
-                EvolutionGameProps e = new EvolutionGameProps(population[i].ButtonConst, population[i].CatsConst, population[i].TaskConst);
+                UtilityConsts e = new UtilityConsts(population[i].ButtonConst, population[i].CatsConst, population[i].TaskConst);
 
                 if (random.NextDouble() < mutation_prob)
                 {
@@ -219,9 +223,12 @@ namespace Calico
                     e.CatsConst.Item1 += SampleGaussian(0, 0.01);
                     e.CatsConst.Item2 += SampleGaussian(0, 0.01);
                     e.CatsConst.Item3 += SampleGaussian(0, 0.01);
-                    e.TaskConst.Item1 += SampleGaussian(0, 0.01);
-                    e.TaskConst.Item2 += SampleGaussian(0, 0.01);
-                    e.TaskConst.Item3 += SampleGaussian(0, 0.01);
+                    e.TaskConst[0] += SampleGaussian(0, 0.01);
+                    e.TaskConst[1] += SampleGaussian(0, 0.01);
+                    e.TaskConst[2] += SampleGaussian(0, 0.01);
+                    e.TaskConst[3] += SampleGaussian(0, 0.01);
+                    e.TaskConst[4] += SampleGaussian(0, 0.01);
+                    e.TaskConst[5] += SampleGaussian(0, 0.01);
                 }
 
                 population[i] = e; 
@@ -231,26 +238,26 @@ namespace Calico
             return population;
         }
 
-        private double[] EvolutionGames (EvolutionGameProps[] population, (int,int,int) tasks, int boardId)
+        private double[] EvolutionGames (UtilityConsts[] population)
         {
             double[] fitness = new double[population_size];
 
             Parallel.For(0, population_size, i =>
             {
-                AverageGameStats gs = Game(population[i], 200, tasks, boardId);
+                AverageGameStats gs = Game(population[i], 1000 );
                 fitness[i] = gs.AvgScore;
             });
             return fitness;
         }
 
-        private AverageGameStats Game (EvolutionGameProps e, int iterations, (int,int,int) tasks, int boardId)
+        private AverageGameStats Game (UtilityConsts e, int iterations)
         {
             List<GameStats> stats = new List<GameStats>(new GameStats[iterations]);
 
             for ( int j = 0; j < iterations; j++)
             {
                 Game g = new Game();
-                g.EvolutionGame(false, e, tasks, boardId);
+                g.EvolutionGame(false, e);
                 stats[j] = g.Stats;
             }
 
@@ -269,17 +276,31 @@ namespace Calico
         }
     }
 
-    public class EvolutionGameProps
+    //public class UtilityConsts
+    //{
+    //    public double ButtonConst;
+    //    public (double, double, double) CatsConst;
+    //    public (double, double, double) TaskConst;
+
+    //    public UtilityConsts(double b, (double, double, double) c, (double, double, double) t)
+    //    {
+    //        ButtonConst = b;
+    //        CatsConst = c;
+    //        TaskConst = t;
+    //    }
+    //}
+
+    public class UtilityConsts
     {
         public double ButtonConst;
-        public (double,double,double) CatsConst;
-        public (double,double,double) TaskConst;
+        public (double, double, double) CatsConst;
+        public double[] TaskConst;
 
-        public EvolutionGameProps(double b, (double,double,double) c, (double,double,double) t) 
+        public UtilityConsts(double b, (double, double, double) c, double[] t)
         {
             ButtonConst = b;
             CatsConst = c;
-            TaskConst = t;
+            TaskConst = new double[] { t[0], t[1], t[2], t[3], t[4], t[5] };
         }
     }
 }
