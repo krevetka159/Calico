@@ -647,11 +647,8 @@ namespace Calico
 
         }
 
-        #endregion
 
-        #region Evolution Evaluation
-
-        public double EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, EvolutionGameProps e)
+        public double EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, UtilityConsts uc)
         {
             int count = 0;
             //List<(int, int)> n = GetNeighbors(row, col);
@@ -691,58 +688,145 @@ namespace Calico
             double evol_konst = 0;
             switch (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Id)
             {
+                case 0:
+                    evol_konst = uc.CatsConst.Item1;
+                    break;
                 case 1:
-                    evol_konst = e.CatsConst.Item1;
+                    evol_konst = uc.CatsConst.Item2;
                     break;
                 case 2:
-                    evol_konst = e.CatsConst.Item2;
-                    break;
-                case 3:
-                    evol_konst = e.CatsConst.Item3;
+                    evol_konst = uc.CatsConst.Item3;
                     break;
             }
 
             if (count + 1 >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize)
             {
-                return (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1)*evol_konst;
+                return (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1) * evol_konst;
             }
-            else return count*evol_konst;
+            else return count * evol_konst;
         }
 
-        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col, EvolutionGameProps e)
+        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col, UtilityConsts uc)
         {
             double score = 0;
             //List<(int, int)> n = GetNeighbors(row, col);
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
 
-            double evol_const = 0;
             foreach ((int r, int c) in n)
             {
                 if (IsTask(r, c))
                 {
-                    switch (TaskPieceSpots.IndexOf((r, c)))
-                    {
-                        case 0:
-                            evol_const = e.TaskConst.Item1;
-                            break;
-                        case 1:
-                            evol_const = e.TaskConst.Item2;
-                            break;
-                        case 2:
-                            evol_const = e.TaskConst.Item3;
-                            break;
-
-                    }
-                    score += (TaskPieces[(r, c)].CheckNeighboursUtility(gp))*evol_const;
+                    var evol_const = uc.TaskConst[TaskPieces[(r,c)].Id - 1];
+                    
+                    score += (TaskPieces[(r, c)].CheckNeighboursUtility(gp)) * evol_const;
                 }
             }
 
             return score;
         }
 
-        public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, EvolutionGameProps e)
+        public double EvaluateNeighborsUtilityBetter(GamePiece gp, int row, int col, UtilityConsts uc)
         {
-            return e.ButtonConst*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,e) + EvaluateNeighboringTaskUtility(gp, row, col,e);
+            return EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)*uc.ButtonConst + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,uc) + EvaluateNeighboringTaskUtility(gp, row, col,uc);
+
+        }
+
+        #endregion
+
+        #region Evolution Evaluation
+
+        //public double EvaluateNeighborsPatternUtilityEv(GamePiece gp, int row, int col, ScoreCounter sc, UtilityConsts e)
+        //{
+        //    int count = 0;
+        //    //List<(int, int)> n = GetNeighbors(row, col);
+
+        //    IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+
+        //    List<int> clusters = new List<int>(new int[6]);
+
+        //    int i = 0;
+
+        //    foreach ((int row_i, int col_i) in n)
+        //    {
+        //        if (board[row_i][col_i].Pattern == gp.Pattern)
+        //        {
+        //            //clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
+        //            //i++;
+        //            if (!clusters.Contains(ScoreCounter.GetPatternClusterId(board[row_i][col_i])))
+        //            {
+        //                if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return 0;
+        //                count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
+
+        //                clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
+        //                i++;
+        //            }
+        //        }
+
+        //    }
+
+        //    //foreach (int c in clusters.Distinct())
+        //    //{
+        //    //    if (sc.GetPatternCount(c) >= sc.Scoring.PatternScoring.PatternScoringDict[gp.Pattern].ClusterSize) return 0;
+        //    //    count += sc.GetPatternCount(c);
+        //    //}
+
+
+
+        //    double evol_konst = 0;
+        //    switch (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Id)
+        //    {
+        //        case 0:
+        //            evol_konst = e.CatsConst.Item1;
+        //            break;
+        //        case 1:
+        //            evol_konst = e.CatsConst.Item2;
+        //            break;
+        //        case 2:
+        //            evol_konst = e.CatsConst.Item3;
+        //            break;
+        //    }
+
+        //    if (count + 1 >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize)
+        //    {
+        //        return (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1)*evol_konst;
+        //    }
+        //    else return count*evol_konst;
+        //}
+
+        //public double EvaluateNeighboringTaskUtilityEv(GamePiece gp, int row, int col, UtilityConsts e)
+        //{
+        //    double score = 0;
+        //    //List<(int, int)> n = GetNeighbors(row, col);
+        //    IEnumerable<(int, int)> n = IterateNeighbors(row, col);
+
+        //    double evol_const = 0;
+        //    foreach ((int r, int c) in n)
+        //    {
+        //        if (IsTask(r, c))
+        //        {
+        //            switch (TaskPieceSpots.IndexOf((r, c)))
+        //            {
+        //                case 0:
+        //                    evol_const = e.TaskConst.Item1;
+        //                    break;
+        //                case 1:
+        //                    evol_const = e.TaskConst.Item2;
+        //                    break;
+        //                case 2:
+        //                    evol_const = e.TaskConst.Item3;
+        //                    break;
+
+        //            }
+        //            score += (TaskPieces[(r, c)].CheckNeighboursUtility(gp))*evol_const;
+        //        }
+        //    }
+
+        //    return score;
+        //}
+
+        public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, UtilityConsts e)
+        {
+            return (e.ButtonConst*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,e) + EvaluateNeighboringTaskUtility(gp, row, col, e);
 
         }
 
@@ -871,13 +955,13 @@ namespace Calico
 
         #endregion
 
-        public Dictionary<int, int> TasksCompleted()
+        public int[] TasksCompleted()
         {
-            Dictionary<int, int> tc = new Dictionary<int, int>() { { 1, -1 }, { 2, -1 },{ 3, -1 },{ 4, -1 },{ 5, -1 },{ 6, -1 } };
+            int[] tc = new int[6] {-1,-1,-1,-1,-1,-1};
 
             foreach(TaskPiece t in TaskPieces.Values)
             {
-                tc[t.Id] = t.Completed();
+                tc[t.Id-1] = t.Completed();
             }
             return tc;
         }
