@@ -8,9 +8,9 @@ namespace Calico
 {
     public class SimulationGame : Game
     {
-        public SimulationGame(GameBoard gb, GamePiece[] o, Scoring s)
+        public SimulationGame(GameBoard gb, GamePiece[] o, Scoring s, Bag b)
         {
-            bag = new Bag();
+            bag = new Bag(b);
             for (int i = 0; i < o.Length; i++)
             {
                 Opts[i] = o[i];
