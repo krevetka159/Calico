@@ -32,7 +32,8 @@ namespace Calico
             (6, " Nejlepší umístění náhodného dílku "),
             (7, " Utility fce"),
             (8, " Minimax"),
-            (9, " MC")
+            (9, " MC"),
+            (10, "EvolParams")
         };
 
         public Game()
@@ -161,7 +162,11 @@ namespace Calico
                     }
                 case 9:
                     {
-                        return new MonteCarloAgent(scoring);
+                        return new MonteCarloAgent(scoring, bag);
+                    }
+                case 10:
+                    {
+                        return new AgentCompleteWithUtilityParams(scoring);
                     }
                 default:
                     {
@@ -223,6 +228,7 @@ namespace Calico
         {
             agent = UseAgent(agentType);
             agent.ChooseTaskPieces();
+            //agent.AddTaskPieces(1, 4, 6);
 
             if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
@@ -241,7 +247,7 @@ namespace Calico
             var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
             (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
 
-            Stats = new GameStats(score,buttons,cats);
+            Stats = new GameStats(score,buttons,cats,agent.Board.TasksCompleted());
         }
 
         #endregion
@@ -523,10 +529,10 @@ namespace Calico
 
         #region Evolution
 
-        public void EvolutionGame(bool withPrint, EvolutionGameProps e, (int,int,int) tasks, int boardId)
+        public void EvolutionGame(bool withPrint, UtilityConsts e)
         {
-            agent = new EvolutionAgent(scoring,e,boardId);
-            agent.AddTaskPieces(tasks.Item1, tasks.Item2, tasks.Item3);
+            agent = new EvolutionAgent(scoring,e);
+            agent.ChooseTaskPieces();
 
             if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
