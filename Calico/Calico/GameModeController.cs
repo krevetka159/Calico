@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,16 +12,16 @@ namespace Calico
     {
         private List<(int, string)> AgentDescription = new List<(int, string)>()
         {
-            (1, " Kompletně náhodný agent "),
-            (2, " Nejlepší umístění vzhledek k barvám "),
-            (3, " Nejlepší umístění vzhledem ke vzorům "),
-            (4, " Nejlepší umístění "),
-            (5, " Nejlepší umístění s malou náhodou "),
-            (6, " Nejlepší umístění náhodného dílku "),
-            (7, " Utility fce"),
-            (8, " Minimax"),
-            (9, " MC"),
-            (10, "EvolParams")
+            (1, " Kompletně náhodný agent "), //NA
+            (2, " Nejlepší umístění vzhledek k barvám "), //UB
+            (3, " Nejlepší umístění vzhledem ke vzorům "), //UV
+            (4, " Nejlepší umístění "), //U
+            (5, " Nejlepší umístění s malou náhodou "), // UN
+            (6, " Nejlepší umístění náhodného dílku "), //
+            (7, " Utility fce"), // Albert
+            (8, " Minimax"), // Max
+            (9, " MC"), // MC agent (Karel)
+            (10, "EvolParams"), // Eva
         };
 
         private AverageGameStats avgStats;
@@ -59,15 +60,24 @@ namespace Calico
                     }
                 case 6:
                     {
-                        TestTasks();
+                        //TestTasks();
                         //TestBoards();
-                        //TestAllSettings();
+                        TestAllSettings();
                         break;
                     }
                 case 7:
                     {
                         Evolution();
                         break;
+                    }
+                case 8:
+                    {
+                        EvolParamsTesting();
+                        break;
+                    }
+                case 9:
+                    {
+                        VarianceTesting(); break;
                     }
                 default:
                     {
@@ -151,7 +161,7 @@ namespace Calico
                     //});
 
 
-                    using (StreamWriter outputFile = new StreamWriter($"./testAgent{agentType}_146.csv"))
+                    using (StreamWriter outputFile = new StreamWriter($"./testAgent{agentType}_146_evol1.csv"))
                     {
                         outputFile.WriteLine(stats.Max(item => item.Score));
                         outputFile.WriteLine(stats.Min(item => item.Score));
@@ -162,13 +172,15 @@ namespace Calico
                             $"{Math.Round(stats.Average(item => item.Cats.Item1), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
                             $"{Math.Round(stats.Average(item => item.Cats.Item2), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
                             $"{Math.Round(stats.Average(item => item.Cats.Item3), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Where(item => item.Tasks[0] >= 0).Average(item => item.Tasks[0]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Where(item => item.Tasks[1] >= 0).Average(item => item.Tasks[1]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Where(item => item.Tasks[2] >= 0).Average(item => item.Tasks[2]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Where(item => item.Tasks[3] >= 0).Average(item => item.Tasks[3]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Where(item => item.Tasks[4] >= 0).Average(item => item.Tasks[4]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Where(item => item.Tasks[5] >= 0).Average(item => item.Tasks[5]), 3, MidpointRounding.AwayFromZero).ToString("0.000")}"
-                            );
+                            $"{GetTaskAverageScore(1,stats)};" +
+                            $"{GetTaskAverageScore(2, stats)};" +
+                            $"{GetTaskAverageScore(3, stats)};" +
+                            $"{GetTaskAverageScore(4, stats)};" +
+                            $"{GetTaskAverageScore(5, stats)};" +
+                            $"{GetTaskAverageScore(6, stats)};"
+
+
+                            ) ;
                         outputFile.WriteLine("");
 
                         outputFile.WriteLine("score;Buttons;C1;C2;C3;T1;T2;T3;T4;T5;T6");
@@ -189,8 +201,6 @@ namespace Calico
                                 $"{gs.Tasks[5]}"
                                 );
                         }
-
-
                     }
                     break;
                 }
@@ -325,7 +335,14 @@ namespace Calico
             Parallel.For(0, iterations, j =>
             {
                 Game g = new Game();
-                g.AgentGameSettings(7, false, tasks, boardId);
+                if(boardId == -1)
+                {
+                    g.AgentGameTaskSettings(7, false, tasks);
+                }
+                else
+                {
+                    g.AgentGameSettings(7, false, tasks, boardId);
+                }
                 stats[j] = g.Stats;
             });
 
@@ -345,75 +362,56 @@ namespace Calico
 
         private void TestAllSettings()
         {
-            List<Dictionary<(int, int, int), List<AverageGameStats>>> statsDict = new List<Dictionary<(int, int, int), List<AverageGameStats>>>();
+            List<string>results = new List<string>();
 
-            for (int b =  0; b < 4; b++)
+                
+            for (int i = 1; i <= 6; i++)
             {
-                statsDict.Add(new Dictionary<(int, int, int), List<AverageGameStats>>());
-                for (int i = 1; i <= 6; i++)
+                for (int j = i + 1; j <= 6; j++)
                 {
-                    for (int j = i + 1; j <= 6; j++)
+                    for (int k = j + 1; k <= 6; k++)
                     {
-                        for (int k = j + 1; k <= 6; k++)
-                        {
-                            
-                            statsDict[b][(i, j, k)] = new List<AverageGameStats>();
 
-                            Console.WriteLine($" {b} - {i},{j},{k}: ");
-                            statsDict[b][(i, j, k)].Add(TestSetting(7, 5000, (i, j, k), b));
-                            Console.WriteLine();
+                        Console.WriteLine($" {i},{j},{k}: ");
+                        var res = TestSetting(7, 5000, (i, j, k), -1);
+                        results.Add($"{i},{j},{k};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                        Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {i},{k},{j}: ");
-                            statsDict[b][(i, j, k)].Add(TestSetting(7, 5000, (i, k, j), b));
-                            Console.WriteLine();
+                        Console.WriteLine($" {i},{k},{j}: ");
+                        res = TestSetting(7, 5000, (i, k, j), -1);
+                        results.Add($"{i},{k},{j};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                        Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {j},{i},{k}: ");
-                            statsDict[b][(i, j, k)].Add(TestSetting(7, 5000, (j, i, k), b));
-                            Console.WriteLine();
+                        Console.WriteLine($" {j},{i},{k}: ");
+                        res = TestSetting(7, 5000, (j, i, k), -1);
+                        results.Add($"{j},{i},{k};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                        Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {j},{k},{i}: ");
-                            statsDict[b][(i, j, k)].Add(TestSetting(7, 5000, (j, k, i), b));
-                            Console.WriteLine();
+                        Console.WriteLine($" {j},{k},{i}: ");
+                        res = TestSetting(7, 5000, (j, k, i), -1);
+                        results.Add($"{j},{k},{i};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                        Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {k},{i},{j}: ");
-                            statsDict[b][(i, j, k)].Add(TestSetting(7, 5000, (k, i, j), b));
-                            Console.WriteLine();
+                        Console.WriteLine($" {k},{i},{j}: ");
+                        res = TestSetting(7, 5000, (k, i, j), -1);
+                        results.Add($"{k},{i},{j};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                        Console.WriteLine();
 
-                            Console.WriteLine($" {b} - {k},{j},{i}: ");
-                            statsDict[b][(i, j, k)].Add(TestSetting(7, 5000, (k, j, i), b));
-                            Console.WriteLine();
-                        }
+                        Console.WriteLine($" {k},{j},{i}: ");
+                        res = TestSetting(7, 5000, (k, j, i), -1);
+                        results.Add($"{k},{j},{i};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                        Console.WriteLine();
                     }
                 }
             }
 
-            for (int i = 0; i < 4; i++)
-            {
-                List<(string, List<double>)> avgScores = new List<(string, List<double>)>();
-                foreach ((int, int, int) tasks in statsDict[0].Keys)
-                {
-                    avgScores.Add(($"{tasks.Item1},{tasks.Item2},{tasks.Item3}",
-                        new List<double>() { 
-                            statsDict[0][tasks].Average(item => item.AvgScore),
-                            statsDict[1][tasks].Average(item => item.AvgScore),
-                            statsDict[2][tasks].Average(item => item.AvgScore),
-                            statsDict[3][tasks].Average(item => item.AvgScore),
-                        }));
-                }
-                avgScores.Sort((x, y) => x.Item2.Average().CompareTo(y.Item2.Average()));
 
-                using (StreamWriter outputFile = new StreamWriter($"./testSettings.csv"))
+            using (StreamWriter outputFile = new StreamWriter($"./resultsBeforeEvol.csv"))
+            {
+                outputFile.WriteLine("tasks;score");
+                foreach (string res in results)
                 {
-                    outputFile.WriteLine("tasks;avg1;avg2;avg3;avg4;avg");
-                    foreach ((string, List<double>) ds in avgScores)
-                    {
-                        outputFile.WriteLine($"{ds.Item1};" +
-                            $"{Math.Round(ds.Item2[0], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(ds.Item2[1], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(ds.Item2[2], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(ds.Item2[3], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(ds.Item2.Average(), 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-                    }
+                outputFile.WriteLine(res);
                 }
             }
             
@@ -646,9 +644,192 @@ namespace Calico
 
         private void Evolution()
         {
-            new Evolution();
+            //new Evolution((1, 2, 3), true);
+            //new Evolution((1, 2, 4), true);
+            //new Evolution((1, 2, 5), true);
+            //new Evolution((1, 2, 6), true);
+            //new Evolution((1, 3, 4), true);
+            //new Evolution((1, 3, 5), true);
+            //new Evolution((1, 3, 6), true);
+            //new Evolution((1, 4, 5), true);
+            //new Evolution((1, 4, 6), true);
+            //new Evolution((1, 5, 6), true);
+            //new Evolution((2, 3, 4), true);
+            //new Evolution((2, 3, 5), true);
+            //new Evolution((2, 3, 6), true);
+            //new Evolution((2, 4, 5), true);
+            //new Evolution((2, 4, 6), true);
+            //new Evolution((2, 5, 6), true);
+            //new Evolution((3, 4, 5), true);
+            //new Evolution((3, 4, 6), true);
+            //new Evolution((3, 5, 6), true);
+            //new Evolution((4, 5, 6), true);
+        }
+
+        private void EvolParamsTesting()
+        {
+
+            string[] lines = new string[120];
+            int lineIndex = 0;
+
+
+            for (int i = 1; i <= 6; i++)
+            {
+                for (int j = i + 1; j <= 6; j++)
+                {
+                    for (int k = j + 1; k <= 6; k++)
+                    {
+                        foreach ((int, int, int) tasks in new[]{ (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
+                        {
+                            using (var reader = new StreamReader($"Evol/finalGen_{i}{j}{k}(mixed)new.csv"))
+                            {
+                                var line = reader.ReadLine();
+                                var values = line.Split(';'); // columns
+
+                                int iterations = 5000;
+
+                                double maxScoreAverage = 0;
+
+                                double maxConstB = 1;
+                                (double,double,double) maxConstC = (1, 1, 1);
+                                double[] maxConstT = new double[6] {1,1,1,1,1,1};
+
+
+                                for (int gen = 0;gen < 200;gen++) 
+                                {
+                                    if (!reader.EndOfStream)
+                                    {
+                                       
+                                        line = reader.ReadLine();
+                                        values = line.Split(';');
+
+                                        double constB = Convert.ToDouble(values[1]);
+                                        (double, double, double) constC = (Convert.ToDouble(values[2]), Convert.ToDouble(values[3]), Convert.ToDouble(values[4]));
+                                        double[] constT = new double[]
+                                                {
+                                                    Convert.ToDouble(values[5]),
+                                                    Convert.ToDouble(values[6]),
+                                                    Convert.ToDouble(values[7]),
+                                                    Convert.ToDouble(values[8]),
+                                                    Convert.ToDouble(values[9]),
+                                                    Convert.ToDouble(values[10]),
+                                                };
+
+                                        GameStats[] stats = new GameStats[iterations];
+                                        for (int s = 0; s < iterations; s++)
+                                        {
+                                            Game g = new Game();
+                                            g.EvolParamsTestAgent(
+                                                constB, 
+                                                constC, 
+                                                constT,
+                                                tasks);
+                                            stats[s] = g.Stats;
+                                        }
+                                        Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3} : {gen} : {stats.Average(item => item.Score)}");
+                                        if (stats.Average(item => item.Score) > maxScoreAverage)
+                                        {
+                                            maxScoreAverage = stats.Average(item => item.Score);
+                                            maxConstB = constB;
+                                            maxConstC = (constC.Item1, constC.Item2, constC.Item3);
+
+                                            for(int t=0; t<6; t++) 
+                                            {
+                                                maxConstT[t] = constT[t];
+                                            }
+                                        }
+                                    }
+                                }
+
+                                lines[lineIndex] =
+                                    $"{tasks.Item1},{tasks.Item2},{tasks.Item3};" +
+                                    $"{Math.Round(maxScoreAverage, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstB, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstC.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstC.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstC.Item3, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstT[0], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstT[1], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstT[2], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstT[3], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstT[4], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                                    $"{Math.Round(maxConstT[5], 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
+
+                                Console.WriteLine(lines[lineIndex]);
+                                lineIndex++;
+                            }
+
+                        }
+
+
+                    }
+                }
+            }
+
+            using (StreamWriter outputFile = new StreamWriter("./Evol/allResultsFinal.csv"))
+            {
+                outputFile.WriteLine("tasks;score;b;c1;c2;c3;t1;t2;t3;t4;t5;t6");
+                foreach (var line in lines)
+                {
+                    outputFile.WriteLine(line);
+                }
+            }
         }
         #endregion
+
+
+        #region Rozptyl
+
+
+        private void VarianceTesting()
+        {
+            foreach (int numOfGames in new int[] { 100,250,500,750,1000,2500,5000 })
+            {
+                double[] averageScores = new double[500];
+                Console.WriteLine(numOfGames);
+
+                for (int i = 0;i < 500;i++)
+                {
+                    int[] scores = new int[numOfGames];
+
+                    for (int j = 0; j<numOfGames; j++)
+                    {
+                        Game g = new Game();
+                        g.AgentGame(7, false);
+                        scores[j] = g.Stats.Score;
+                    }
+
+                    averageScores[i] = scores.Average();
+                    Console.WriteLine(i);
+                }
+
+                using (StreamWriter outputFile = new StreamWriter($"./variance_{numOfGames}.csv"))
+                {
+                    for (int i = 0; i < averageScores.Length; i++)
+                    {
+                        outputFile.WriteLine(averageScores[i]);
+                    }
+                    
+                }
+
+            }
+        }
+
+        #endregion
+
+
+
+        private string GetTaskAverageScore(int taskId, GameStats[] stats)
+        {
+            try
+            {
+                return $"{Math.Round(stats.Where(item => item.Tasks[taskId-1] >= 0).Average(item => item.Tasks[taskId-1]), 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
+            }
+            catch
+            {
+                return "0,000";
+            }
+        }
 
     }
 }
