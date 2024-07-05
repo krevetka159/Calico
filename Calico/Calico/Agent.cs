@@ -554,16 +554,20 @@ namespace Calico
     public class AgentCompleteWithUtilityParams : Agent
     {
         //public UtilityConsts ep = new UtilityConsts(1.137, (1.180, 1.084, 0.985), new[]{ 1.117, 1.039, 1.062, 0.634, 1.019, 0.744 });
-        public UtilityConsts ep = new UtilityConsts(1.14298, (1.21723, 1.13056, 1.06412), new[] { 1.09177, 0.91472, 1.02152, 0.51955, 1.05668, 0.84085 });
+        //public UtilityConsts ep = new UtilityConsts(1.14298, (1.21723, 1.13056, 1.06412), new[] { 1.09177, 0.91472, 1.02152, 0.51955, 1.05668, 0.84085 });
+        public Weights ep = new Weights(1.45259, (1.23961, 1.10339, 0.83142), new[] { 1.23273, 0, 0, 0.57713, 0, 0.56313 });
+
         /// <summary>
         /// picks patchtile and position that increases score the most
         /// </summary>
         /// <param name="scoring"></param>
-        public AgentCompleteWithUtilityParams(Scoring scoring) : base(scoring)
+        public AgentCompleteWithUtilityParams(Scoring scoring, double b, (double,double,double) c, double[] t) : base(scoring)
         {
+            ep = new Weights(b, c, t);
         }
-        public AgentCompleteWithUtilityParams(Scoring scoring, int boardId) : base(scoring, boardId)
+        public AgentCompleteWithUtilityParams(Scoring scoring, int boardId, double b, (double, double, double) c, double[] t) : base(scoring, boardId)
         {
+            ep = new Weights(b, c, t);
         }
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
@@ -669,7 +673,6 @@ namespace Calico
 
     public class MinimaxAgent : Agent
     {
-        public UtilityConsts uc = new UtilityConsts(1.08074, (1.18975, 0.99833, 0.96349), new[] { 1.27325, 0.98524, 0.96371, 0.69187, 1.00705, 0.84656 });
         public MinimaxAgent(Scoring scoring) : base(scoring) 
         {
         }
@@ -688,7 +691,7 @@ namespace Calico
                 {
                     if (Board.IsEmpty(i, j))
                     {
-                        positions[index] = ((i,j), board.EvaluateNeighborsUtilityBetter(gp, i, j, uc));
+                        positions[index] = ((i,j), board.EvaluateNeighborsUtility(gp, i, j));
                         index++;
                     }
                 }
@@ -726,7 +729,7 @@ namespace Calico
                             if (Board.IsEmpty(i1, j1))
                             {
                                 GameBoard gb_new = new GameBoard(Board);
-                                double eval = gb_new.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item1], i1, j1, uc);
+                                double eval = gb_new.EvaluateNeighborsUtility(Opts[optPermutation.Item1], i1, j1);
                                 gb_new.AddPiece(Opts[optPermutation.Item1], i1, j1);
 
                                 for (int i2 = 1; i2 < Board.Size - 1; i2++)
@@ -745,7 +748,7 @@ namespace Calico
 
 
                                             GameBoard gb_new2 = new GameBoard(gb_new);
-                                            double eval2 = eval + (gb_new2.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item2], i2, j2, uc) / 4);
+                                            double eval2 = eval + (gb_new2.EvaluateNeighborsUtility(Opts[optPermutation.Item2], i2, j2) / 4);
 
                                             //if (eval2 > max)
                                             //{
@@ -763,7 +766,7 @@ namespace Calico
                                                     {
 
                                                         GameBoard gb_new3 = new GameBoard(gb_new2);
-                                                        double eval3 = eval2 + (gb_new3.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item3], i3, j3,uc) / 16);
+                                                        double eval3 = eval2 + (gb_new3.EvaluateNeighborsUtility(Opts[optPermutation.Item3], i3, j3) / 16);
 
                                                         if (eval3 > max)
                                                         {
@@ -995,12 +998,12 @@ namespace Calico
 
     public class EvolutionAgent : Agent
     {
-        UtilityConsts gameProps;
-        public EvolutionAgent(Scoring scoring, UtilityConsts e) : base(scoring)
+        Weights gameProps;
+        public EvolutionAgent(Scoring scoring, Weights e) : base(scoring)
         {
             gameProps = e;
         }
-        public EvolutionAgent(Scoring scoring, UtilityConsts e, int boardId) : base(scoring, boardId)
+        public EvolutionAgent(Scoring scoring, Weights e, int boardId) : base(scoring, boardId)
         {
             gameProps = e;
         }
