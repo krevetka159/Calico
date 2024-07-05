@@ -1,6 +1,8 @@
 ﻿using Calico;
 using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace Calico
 {
@@ -101,6 +103,14 @@ namespace Calico
                             {
                                 return 7;
                             }
+                        case 8:
+                            {
+                                return 8;
+                            }
+                        case 9:
+                            {
+                                return 9;
+                            }
                         default:
                             {
                                 Console.WriteLine(" " + gameMode + " is not a mode option");
@@ -120,6 +130,10 @@ namespace Calico
         }
         static void Main(string[] args)
         {
+            //var cultureInfo = new CultureInfo("en-GB");
+            //CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            //CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            //CultureInfo.CurrentCulture = cultureInfo;
             NewGame(); 
         }
     }
