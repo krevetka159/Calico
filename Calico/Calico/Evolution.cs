@@ -383,4 +383,48 @@ namespace Calico
             TaskW = new double[] { t[0], t[1], t[2], t[3], t[4], t[5] };
         }
     }
+
+    public class WeightsDict
+    {
+        private Dictionary<(int, int, int), Weights> WDict;
+
+        public WeightsDict()
+        {
+            WDict = new Dictionary<(int, int, int), Weights>();
+
+            using (var reader = new StreamReader($"Evol/allResultsFinal.csv"))
+            {
+                var line = reader.ReadLine();
+                var values = line.Split(';'); // columns
+
+                if (!reader.EndOfStream)
+                {
+
+                    line = reader.ReadLine();
+                    values = line.Split(';');
+
+                    var tasks = values[0].Split(",");
+
+                    double weightB = Convert.ToDouble(values[1]);
+                    (double, double, double) weightC = (Convert.ToDouble(values[2]), Convert.ToDouble(values[3]), Convert.ToDouble(values[4]));
+                    double[] weightT = new double[]
+                            {
+                                                Convert.ToDouble(values[5]),
+                                                Convert.ToDouble(values[6]),
+                                                Convert.ToDouble(values[7]),
+                                                Convert.ToDouble(values[8]),
+                                                Convert.ToDouble(values[9]),
+                                                Convert.ToDouble(values[10]),
+                            };
+
+                    WDict[(Convert.ToInt32(tasks[0]), Convert.ToInt32(tasks[1]), Convert.ToInt32(tasks[2]))] = new Weights(weightB, weightC, weightT);
+                }
+            }
+        }
+
+        public Weights GetWeights((int, int, int) tasks)
+        {
+            return WDict[tasks];
+        }
+    }
 }
