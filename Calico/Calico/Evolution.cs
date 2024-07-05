@@ -13,22 +13,31 @@ namespace Calico
         private double mutation_prob = 1;
         private double tournament_prob = 0.8;
 
+
+        private (int, int, int) tasks;
+        private bool mixed;
+
         private Random random;
 
-        public Evolution()
+        public Evolution((int,int,int) tasks, bool mixed)
         {
             random = new Random();
+
+            this.tasks = tasks;
+            this.mixed = mixed;
 
             EvolveAllSettings();
         }
 
         private void EvolutionRun()
         {
-            UtilityConsts[] population = RandomPopulation();
+            Weights[] population = RandomPopulation();
             double[] fitness = new double[population_size];
 
             double[] avg = new double[generations];
             double[] max = new double[generations];
+
+            Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3}");
 
             for (int g = 0; g < generations - 1; g++)
             {
@@ -61,7 +70,7 @@ namespace Calico
             Console.WriteLine(fitness.Max());
             max[generations - 1] = fitness.Max();
 
-            List<(double, UtilityConsts)> results = new List<(double, UtilityConsts)>();
+            List<(double, Weights)> results = new List<(double, Weights)>();
             for (int i = 0; i < population_size; i++)
             {
                 results.Add((fitness[i], population[i]));
@@ -69,32 +78,41 @@ namespace Calico
             results.Sort((x, y) => y.Item1.CompareTo(x.Item1));
 
             Directory.CreateDirectory("./Evol");
-            using (StreamWriter outputFile = new StreamWriter($"./Evol/finalGen_mixed.csv"))
+            using (StreamWriter outputFile = new StreamWriter($"./Evol/finalGen_{tasks.Item1}{tasks.Item2}{tasks.Item3}(mixed)new.csv"))
             {
                 outputFile.WriteLine("fitness;buttons;catsA;catsB;catsC;taskA;taskB;taskC");
-                foreach ((double, UtilityConsts) res in results)
+                foreach ((double, Weights) res in results)
                 {
                     double normSum =
-                        (res.Item2.ButtonConst +
-                        res.Item2.CatsConst.Item1 +
-                        res.Item2.CatsConst.Item2 +
-                        res.Item2.CatsConst.Item3 +
-                        res.Item2.TaskConst.Sum())/10;
+                        (res.Item2.ButtonW +
+                        res.Item2.CatsW.Item1 +
+                        res.Item2.CatsW.Item2 +
+                        res.Item2.CatsW.Item3 +
+                        res.Item2.TaskW[tasks.Item1 - 1] +
+                        res.Item2.TaskW[tasks.Item2 - 1] +
+                        res.Item2.TaskW[tasks.Item3 - 1]
+                        )/7;
+
+                    double[] temp = new double[6] {1,1,1,1,1,1};
+                    temp[tasks.Item1 - 1] = res.Item2.TaskW[tasks.Item1 - 1] / normSum;
+                    temp[tasks.Item2 - 1] = res.Item2.TaskW[tasks.Item2 - 1] / normSum;
+                    temp[tasks.Item3 - 1] = res.Item2.TaskW[tasks.Item3 - 1] / normSum;   
+                    
                     outputFile.WriteLine(
                         $"{Math.Round(res.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                        $"{Math.Round(res.Item2.ButtonConst / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsConst.Item1 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsConst.Item2 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsConst.Item3 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst[0] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst[1] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst[2] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst[3] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst[4] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.TaskConst[5] / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
+                        $"{Math.Round(res.Item2.ButtonW / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.CatsW.Item1 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.CatsW.Item2 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(res.Item2.CatsW.Item3 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(temp[0], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(temp[1], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(temp[2], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(temp[3], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(temp[4], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                        $"{Math.Round(temp[5], 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
                 }
             }
-            using (StreamWriter outputFile = new StreamWriter($"./Evol/progress_mixed.csv"))
+            using (StreamWriter outputFile = new StreamWriter($"./Evol/progress_{tasks.Item1}{tasks.Item2}{tasks.Item3}(mixed).csv"))
             {
                 outputFile.WriteLine("generation;avg;max");
                 for(int g = 0; g<generations;g++)
@@ -149,33 +167,63 @@ namespace Calico
         }
 
 
-        private UtilityConsts[] RandomPopulation()
+        private Weights[] RandomPopulation()
         {
-            UtilityConsts[] population = new UtilityConsts[population_size];
+            Weights[] population = new Weights[population_size];
 
-            for (int i = 0; i < population_size/2; i++)
+            for (int i = 0; i < population_size / 2; i++)
             {
-                population[i] = new UtilityConsts(
-                    1 + SampleGaussian(0,0.1),
-                    (1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1)), 
-                    new double[] { 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1) }
-                    );
+                var tasksConst = new double[]
+                {
+                    1,1,1,1,1,1
+                };
+                tasksConst[tasks.Item1 - 1] += SampleGaussian(0, 0.1);
+                tasksConst[tasks.Item2 - 1] += SampleGaussian(0, 0.1);
+                tasksConst[tasks.Item3 - 1] += SampleGaussian(0, 0.1);
+
+                population[i] = new Weights(
+                    1 + SampleGaussian(0, 0.1),
+                    (1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1)),
+                     //new double[] { 
+                     //    1 + SampleGaussian(0, 0.1), 
+                     //    1 + SampleGaussian(0, 0.1), 
+                     //    1 + SampleGaussian(0, 0.1), 
+                     //    1 + SampleGaussian(0, 0.1), 
+                     //    1 + SampleGaussian(0, 0.1), 
+                     //    1 + SampleGaussian(0, 0.1) }
+                     tasksConst);
             }
             for (int i = 0; i < population_size / 2; i++)
             {
-                population[(population_size/2) + i] = new UtilityConsts(
+                var tasksConst = new double[]
+                {
+                    1,1,1,1,1,1
+                };
+                tasksConst[tasks.Item1 - 1] = random.NextDouble();
+                tasksConst[tasks.Item2 - 1] = random.NextDouble();
+                tasksConst[tasks.Item3 - 1] = random.NextDouble();
+
+                population[(population_size / 2) + i] = new Weights(
                     random.NextDouble(),
                     (random.NextDouble(), random.NextDouble(), random.NextDouble()),
-                    new double[] { random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble() }
+                    //new double[] { 
+                    //    random.NextDouble(), 
+                    //    random.NextDouble(), 
+                    //    random.NextDouble(), 
+                    //    random.NextDouble(), 
+                    //    random.NextDouble(), 
+                    //    random.NextDouble() }
+                    tasksConst
                     );
             }
+
 
             return population;
         }
 
-        private UtilityConsts[] Selection(UtilityConsts[] population, double[] fitness)
+        private Weights[] Selection(Weights[] population, double[] fitness)
         {
-            UtilityConsts[] newPopulation = new UtilityConsts[population_size];
+            Weights[] newPopulation = new Weights[population_size];
 
             for (int i = 0; i < population_size; i++)
             {
@@ -209,26 +257,29 @@ namespace Calico
             return newPopulation;
         }
 
-        private UtilityConsts[] Mutation(UtilityConsts[] population)
+        private Weights[] Mutation(Weights[] population)
         {
             for (int i = 0; i < population_size; i++)
             {
                 //Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst}");
-                UtilityConsts e = new UtilityConsts(population[i].ButtonConst, population[i].CatsConst, population[i].TaskConst);
+                Weights e = new Weights(population[i].ButtonW, population[i].CatsW, population[i].TaskW);
 
                 if (random.NextDouble() < mutation_prob)
                 {
                     // pro každou proměnnou přidat číslo z normálního rozdělelní
-                    e.ButtonConst += SampleGaussian(0, 0.01);
-                    e.CatsConst.Item1 += SampleGaussian(0, 0.01);
-                    e.CatsConst.Item2 += SampleGaussian(0, 0.01);
-                    e.CatsConst.Item3 += SampleGaussian(0, 0.01);
-                    e.TaskConst[0] += SampleGaussian(0, 0.01);
-                    e.TaskConst[1] += SampleGaussian(0, 0.01);
-                    e.TaskConst[2] += SampleGaussian(0, 0.01);
-                    e.TaskConst[3] += SampleGaussian(0, 0.01);
-                    e.TaskConst[4] += SampleGaussian(0, 0.01);
-                    e.TaskConst[5] += SampleGaussian(0, 0.01);
+                    e.ButtonW += SampleGaussian(0, 0.01);
+                    e.CatsW.Item1 += SampleGaussian(0, 0.01);
+                    e.CatsW.Item2 += SampleGaussian(0, 0.01);
+                    e.CatsW.Item3 += SampleGaussian(0, 0.01);
+                    //e.TaskConst[0] += SampleGaussian(0, 0.01);
+                    //e.TaskConst[1] += SampleGaussian(0, 0.01);
+                    //e.TaskConst[2] += SampleGaussian(0, 0.01);
+                    //e.TaskConst[3] += SampleGaussian(0, 0.01);
+                    //e.TaskConst[4] += SampleGaussian(0, 0.01);
+                    //e.TaskConst[5] += SampleGaussian(0, 0.01);
+                    e.TaskW[tasks.Item1 - 1] += SampleGaussian(0, 0.01);
+                    e.TaskW[tasks.Item2 - 1] += SampleGaussian(0, 0.01);
+                    e.TaskW[tasks.Item3 - 1] += SampleGaussian(0, 0.01);
                 }
 
                 population[i] = e; 
@@ -238,27 +289,70 @@ namespace Calico
             return population;
         }
 
-        private double[] EvolutionGames (UtilityConsts[] population)
+        private double[] EvolutionGames (Weights[] population)
         {
             double[] fitness = new double[population_size];
 
             Parallel.For(0, population_size, i =>
             {
-                AverageGameStats gs = Game(population[i], 1000 );
+                AverageGameStats gs = Game(population[i], 1200 );
                 fitness[i] = gs.AvgScore;
             });
             return fitness;
         }
 
-        private AverageGameStats Game (UtilityConsts e, int iterations)
+        private AverageGameStats Game (Weights e, int iterations)
         {
             List<GameStats> stats = new List<GameStats>(new GameStats[iterations]);
 
-            for ( int j = 0; j < iterations; j++)
+            if (mixed)
             {
-                Game g = new Game();
-                g.EvolutionGame(false, e);
-                stats[j] = g.Stats;
+                int part = iterations / 6;
+                for (int j = 0; j < part; j++)
+                {
+                    Game g = new Game();
+                    g.EvolutionGame(false, e, (tasks.Item1, tasks.Item2, tasks.Item3));
+                    stats[j] = g.Stats;
+                }
+                for (int j = 0; j < part; j++)
+                {
+                    Game g = new Game();
+                    g.EvolutionGame(false, e, (tasks.Item1, tasks.Item3, tasks.Item2));
+                    stats[part + j] = g.Stats;
+                }
+                for (int j = 0; j < part; j++)
+                {
+                    Game g = new Game();
+                    g.EvolutionGame(false, e, (tasks.Item2, tasks.Item1, tasks.Item3));
+                    stats[2*part + j] = g.Stats;
+                }
+                for (int j = 0; j < part; j++)
+                {
+                    Game g = new Game();
+                    g.EvolutionGame(false, e, (tasks.Item2, tasks.Item3, tasks.Item1));
+                    stats[3*part + j] = g.Stats;
+                }
+                for (int j = 0; j < part; j++)
+                {
+                    Game g = new Game();
+                    g.EvolutionGame(false, e, (tasks.Item3, tasks.Item1, tasks.Item2));
+                    stats[4*part + j] = g.Stats;
+                }
+                for (int j = 0; j < part; j++)
+                {
+                    Game g = new Game();
+                    g.EvolutionGame(false, e, (tasks.Item3, tasks.Item2, tasks.Item1));
+                    stats[5*part + j] = g.Stats;
+                }
+            }
+            else
+            {
+                for (int j = 0; j < iterations; j++)
+                {
+                    Game g = new Game();
+                    g.EvolutionGame(false, e);
+                    stats[j] = g.Stats;
+                }
             }
 
             return new AverageGameStats(0, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
@@ -276,31 +370,17 @@ namespace Calico
         }
     }
 
-    //public class UtilityConsts
-    //{
-    //    public double ButtonConst;
-    //    public (double, double, double) CatsConst;
-    //    public (double, double, double) TaskConst;
-
-    //    public UtilityConsts(double b, (double, double, double) c, (double, double, double) t)
-    //    {
-    //        ButtonConst = b;
-    //        CatsConst = c;
-    //        TaskConst = t;
-    //    }
-    //}
-
-    public class UtilityConsts
+    public class Weights
     {
-        public double ButtonConst;
-        public (double, double, double) CatsConst;
-        public double[] TaskConst;
+        public double ButtonW;
+        public (double, double, double) CatsW;
+        public double[] TaskW;
 
-        public UtilityConsts(double b, (double, double, double) c, double[] t)
+        public Weights(double b, (double, double, double) c, double[] t)
         {
-            ButtonConst = b;
-            CatsConst = c;
-            TaskConst = new double[] { t[0], t[1], t[2], t[3], t[4], t[5] };
+            ButtonW = b;
+            CatsW = c;
+            TaskW = new double[] { t[0], t[1], t[2], t[3], t[4], t[5] };
         }
     }
 }
