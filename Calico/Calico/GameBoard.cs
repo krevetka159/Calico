@@ -648,7 +648,7 @@ namespace Calico
         }
 
 
-        public double EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, UtilityConsts uc)
+        public double EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, Weights uc)
         {
             int count = 0;
             //List<(int, int)> n = GetNeighbors(row, col);
@@ -689,13 +689,13 @@ namespace Calico
             switch (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Id)
             {
                 case 0:
-                    evol_konst = uc.CatsConst.Item1;
+                    evol_konst = uc.CatsW.Item1;
                     break;
                 case 1:
-                    evol_konst = uc.CatsConst.Item2;
+                    evol_konst = uc.CatsW.Item2;
                     break;
                 case 2:
-                    evol_konst = uc.CatsConst.Item3;
+                    evol_konst = uc.CatsW.Item3;
                     break;
             }
 
@@ -706,7 +706,7 @@ namespace Calico
             else return count * evol_konst;
         }
 
-        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col, UtilityConsts uc)
+        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col, Weights uc)
         {
             double score = 0;
             //List<(int, int)> n = GetNeighbors(row, col);
@@ -716,7 +716,7 @@ namespace Calico
             {
                 if (IsTask(r, c))
                 {
-                    var evol_const = uc.TaskConst[TaskPieces[(r,c)].Id - 1];
+                    var evol_const = uc.TaskW[TaskPieces[(r,c)].Id - 1];
                     
                     score += (TaskPieces[(r, c)].CheckNeighboursUtility(gp)) * evol_const;
                 }
@@ -725,9 +725,9 @@ namespace Calico
             return score;
         }
 
-        public double EvaluateNeighborsUtilityBetter(GamePiece gp, int row, int col, UtilityConsts uc)
+        public double EvaluateNeighborsUtilityBetter(GamePiece gp, int row, int col, Weights uc)
         {
-            return EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)*uc.ButtonConst + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,uc) + EvaluateNeighboringTaskUtility(gp, row, col,uc);
+            return EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)*uc.ButtonW + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,uc) + EvaluateNeighboringTaskUtility(gp, row, col,uc);
 
         }
 
@@ -824,9 +824,9 @@ namespace Calico
         //    return score;
         //}
 
-        public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, UtilityConsts e)
+        public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, Weights e)
         {
-            return (e.ButtonConst*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,e) + EvaluateNeighboringTaskUtility(gp, row, col, e);
+            return (e.ButtonW*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,e) + EvaluateNeighboringTaskUtility(gp, row, col, e);
 
         }
 
