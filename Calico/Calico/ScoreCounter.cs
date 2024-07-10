@@ -15,10 +15,9 @@ namespace Calico
         private UnionFind<GamePiece> colorUF;
         private UnionFind<GamePiece> patternUF;
 
-        //public Dictionary<Color, int> buttons;
         public int[] butts;
         public int rainbowButtons { get; private set; }
-        //public Dictionary<PatternScoringPanel, int> cats;
+        
         public int[] catts;
 
         public Scoring Scoring { get; private set; }
@@ -31,19 +30,9 @@ namespace Calico
             colorUF = new UnionFind<GamePiece>();
             patternUF = new UnionFind<GamePiece>();
 
-            //buttons = new Dictionary<Color, int>(){ 
-            //    { Color.Yellow, 0 },
-            //    { Color.Green, 0 },
-            //    { Color.Cyan, 0 },
-            //    { Color.Blue, 0 },
-            //    { Color.Purple, 0 },
-            //    { Color.Pink, 0 },
-            //};
-
             butts = new int[6] {0,0,0,0,0,0};
             rainbowButtons = 0;
 
-            //cats = new Dictionary<PatternScoringPanel, int>();
             catts = new int[3];
             foreach (PatternScoringPanel panel in Scoring.PatternScoring.ps)
             {
@@ -67,41 +56,6 @@ namespace Calico
 
         }
 
-        public void SetProps(int[] b, int rb, Dictionary<PatternScoringPanel,int> c)
-        {
-            //foreach(KeyValuePair<Color,int>button in b)
-            //{
-            //    //buttons[button.Key] = button.Value;
-            //    butts[(int)button.Key-1] = button.Value;
-            //}
-            butts = b;
-            rainbowButtons = rb;
-            foreach (KeyValuePair<PatternScoringPanel,int> cat in c)
-            {
-                catts[cat.Key.Id] = cat.Value;
-            }
-        }
-
-        public bool PatternUFContains(GamePiece gp)
-        {
-            return patternUF.Contains(gp);
-        }
-
-        public bool ColorUFContains(GamePiece gp)
-        {
-            return colorUF.Contains(gp);
-        }
-
-        public List<GamePiece> GetPatternCluster(GamePiece gp)
-        {
-            return patternUF.GetCluster(gp);
-        }
-
-        public List<GamePiece> GetColorCluster(GamePiece gp)
-        {
-            return colorUF.GetCluster(gp);
-        }
-
         public int GetPatternClusterId(GamePiece gp)
         {
             return patternUF.GetClusterId(gp);
@@ -122,62 +76,7 @@ namespace Calico
             colorUF.Add(piece);
         }
 
-        public void AddToPatternUF(List<GamePiece> pieces)
-        {
-            patternUF.Add(pieces[0]);
-            for (int i = 1; i < pieces.Count; i++)
-            {
-                patternUF.Add(pieces[i]);
-                patternUF.Union(pieces[i], pieces[i - 1]);
-            }
-        }
-
-        public void AddToColorUF(List<GamePiece> pieces)
-        {
-            colorUF.Add(pieces[0]);
-            for (int i = 1; i < pieces.Count; i++)
-            {
-                colorUF.Add(pieces[i]);
-                colorUF.Union(pieces[i], pieces[i - 1]);
-            }
-        }
-
-        /// <summary>
-        /// Checks if 2 patchtiles have the same color/pattern and unites them in UnionFind if needed
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="n"></param>
-        public void EvaluateNew(GamePiece p, GamePiece n)
-        {
-            if (p.Color == n.Color)
-            {
-
-                if (!colorUF.Find(p, n))
-                {
-                    Score -= GetColorScore(n);
-                    Score -= GetColorScore(p);
-
-                    colorUF.Union(n, p);
-
-                    Score += GetColorScore(n);
-                }
-
-            }
-            if (p.Pattern == n.Pattern)
-            {
-                if (!patternUF.Find(p, n))
-                {
-                    Score -= GetPatternScore(n);
-                    Score -= GetPatternScore(p);
-
-                    patternUF.Union(n, p);
-
-                    Score += GetPatternScore(n);
-                }
-
-            }
-
-        }
+       
         /// <summary>
         /// Checks the sizes of neighbours clusters for both color and pattern
         /// </summary>
@@ -264,21 +163,6 @@ namespace Calico
             return colorUF.Count(p);
         }
 
-        public int GetColorCount(int p)
-        {
-            return colorUF.Count(p);
-        }
-
-        /// <summary>
-        /// Returns scoring of color cluster that the patchtile is a part of
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public int GetColorScore(GamePiece p)
-        {
-            return (colorUF.Count(p) /Scoring.ColorClusterSize) * Scoring.ColorClusterScore;
-        }
-
         /// <summary>
         /// Returns size of pattern cluster that the patchtile is a part of
         /// </summary>
@@ -293,37 +177,6 @@ namespace Calico
         {
             return patternUF.Count(p);
         }
-
-        /// <summary>
-        /// Returns scoring of pattern cluster that the patchtile is a part of
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public int GetPatternScore(GamePiece p)
-        {
-            return (patternUF.Count(p) / Scoring.pcSizes[(int)p.Pattern-1]) * Scoring.pcScores[(int)p.Pattern-1];
-        }
-
-        /// <summary>
-        /// Count color score from the number of tiles in a cluster
-        /// </summary>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        public int CountColorScore(int count)
-        {
-            return (count / Scoring.ColorClusterSize) * Scoring.ColorClusterScore;
-        }
-
-        /// <summary>
-        /// Count pattern score from the number of tiles in a cluster
-        /// </summary>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        public int CountPatternScore(int count, Pattern p) 
-        {
-            return (count / Scoring.pcSizes[(int)p-1]) * Scoring.pcScores[(int)p-1];
-        }
-
 
         /// <summary>
         /// Returns the score value

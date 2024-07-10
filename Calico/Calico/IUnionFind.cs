@@ -46,11 +46,6 @@ namespace Calico
                 clusters[x] == clusters[y];
         }
 
-        public bool Contains(T x)
-        {
-            return clusters.ContainsKey(x);
-        }
-
         public int Count(T x)
         {
             //int xCluster = clusters[x];
@@ -80,20 +75,6 @@ namespace Calico
 
             //return cnt;
             return clusterSizes[x];
-        }
-
-        public List<T> GetCluster(T x)
-        {
-            int xCluster = clusters[x];
-            List<T> cluster = new List<T>();
-            foreach ((T z, int zCluster) in clusters)
-            {
-                if (zCluster == xCluster)
-                {
-                    cluster.Add(z);
-                }
-            }
-            return cluster;
         }
 
         public int GetClusterId(T x)

@@ -26,7 +26,7 @@ namespace Calico
             this.tasks = tasks;
             this.mixed = mixed;
 
-            EvolveAllSettings();
+            EvolutionRun();
         }
 
         private void EvolutionRun()
@@ -44,15 +44,6 @@ namespace Calico
                 Console.WriteLine($" Generation {g + 1}");
 
                 fitness = EvolutionGames(population);
-
-                //for (int i = 0; i < population_size; i++)
-                //{
-                //    Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst} : {fitness[i]}");
-                //}
-                //for (int i = 0; i < population_size; i++)
-                //{
-                //    Console.WriteLine($" {population[i].TaskConst[0]}, {population[i].TaskConst[1]}, {population[i].TaskConst[2]} : {fitness[i]}");
-                //}
 
                 population = Mutation(Selection(population, fitness));
 
@@ -78,7 +69,7 @@ namespace Calico
             results.Sort((x, y) => y.Item1.CompareTo(x.Item1));
 
             Directory.CreateDirectory("./Evol");
-            using (StreamWriter outputFile = new StreamWriter($"./Evol/finalGen_{tasks.Item1}{tasks.Item2}{tasks.Item3}(mixed)new.csv"))
+            using (StreamWriter outputFile = new StreamWriter($"./Evol/finalGen_{tasks.Item1}{tasks.Item2}{tasks.Item3}(detail)new.csv"))
             {
                 outputFile.WriteLine("fitness;buttons;catsA;catsB;catsC;taskA;taskB;taskC");
                 foreach ((double, Weights) res in results)
@@ -127,45 +118,6 @@ namespace Calico
             }
         }
 
-        private void EvolveAllSettings()
-        {
-            //Dictionary<(int, int, int), List<AverageGameStats>> statsDict = new Dictionary<(int, int, int), List<AverageGameStats>>();
-
-            //int i = 1;
-            //int j = 2;
-            //int k = 3;
-
-
-            //statsDict[(i, j, k)] = new List<AverageGameStats>();
-
-            //Console.WriteLine($" {i},{j},{k}: ");
-            //EvolutionRun((i, j, k));
-            //Console.WriteLine();
-
-            //Console.WriteLine($" {i},{k},{j}: ");
-            //EvolutionRun((i, k, j));
-            //Console.WriteLine();
-
-            //Console.WriteLine($" {j},{i},{k}: ");
-            //EvolutionRun((j, i, k));
-            //Console.WriteLine();
-
-            //Console.WriteLine($" {j},{k},{i}: ");
-            //EvolutionRun((j, k, i));
-            //Console.WriteLine();
-
-            //Console.WriteLine($"´{k},{i},{j}: ");
-            //EvolutionRun((k, i, j));
-            //Console.WriteLine();
-
-            //Console.WriteLine($" {k},{j},{i}: ");
-            //EvolutionRun((k, j, i));
-            //Console.WriteLine();
-
-            EvolutionRun();
-
-        }
-
 
         private Weights[] RandomPopulation()
         {
@@ -183,14 +135,9 @@ namespace Calico
 
                 population[i] = new Weights(
                     1 + SampleGaussian(0, 0.1),
+
                     (1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1), 1 + SampleGaussian(0, 0.1)),
-                     //new double[] { 
-                     //    1 + SampleGaussian(0, 0.1), 
-                     //    1 + SampleGaussian(0, 0.1), 
-                     //    1 + SampleGaussian(0, 0.1), 
-                     //    1 + SampleGaussian(0, 0.1), 
-                     //    1 + SampleGaussian(0, 0.1), 
-                     //    1 + SampleGaussian(0, 0.1) }
+
                      tasksConst);
             }
             for (int i = 0; i < population_size / 2; i++)
@@ -205,14 +152,9 @@ namespace Calico
 
                 population[(population_size / 2) + i] = new Weights(
                     random.NextDouble(),
+
                     (random.NextDouble(), random.NextDouble(), random.NextDouble()),
-                    //new double[] { 
-                    //    random.NextDouble(), 
-                    //    random.NextDouble(), 
-                    //    random.NextDouble(), 
-                    //    random.NextDouble(), 
-                    //    random.NextDouble(), 
-                    //    random.NextDouble() }
+
                     tasksConst
                     );
             }
@@ -261,22 +203,17 @@ namespace Calico
         {
             for (int i = 0; i < population_size; i++)
             {
-                //Console.WriteLine($" {population[i].ButtonConst}, {population[i].CatsConst}, {population[i].TaskConst}");
                 Weights e = new Weights(population[i].ButtonW, population[i].CatsW, population[i].TaskW);
 
                 if (random.NextDouble() < mutation_prob)
                 {
                     // pro každou proměnnou přidat číslo z normálního rozdělelní
                     e.ButtonW += SampleGaussian(0, 0.01);
+
                     e.CatsW.Item1 += SampleGaussian(0, 0.01);
                     e.CatsW.Item2 += SampleGaussian(0, 0.01);
                     e.CatsW.Item3 += SampleGaussian(0, 0.01);
-                    //e.TaskConst[0] += SampleGaussian(0, 0.01);
-                    //e.TaskConst[1] += SampleGaussian(0, 0.01);
-                    //e.TaskConst[2] += SampleGaussian(0, 0.01);
-                    //e.TaskConst[3] += SampleGaussian(0, 0.01);
-                    //e.TaskConst[4] += SampleGaussian(0, 0.01);
-                    //e.TaskConst[5] += SampleGaussian(0, 0.01);
+
                     e.TaskW[tasks.Item1 - 1] += SampleGaussian(0, 0.01);
                     e.TaskW[tasks.Item2 - 1] += SampleGaussian(0, 0.01);
                     e.TaskW[tasks.Item3 - 1] += SampleGaussian(0, 0.01);
@@ -295,7 +232,7 @@ namespace Calico
 
             Parallel.For(0, population_size, i =>
             {
-                AverageGameStats gs = Game(population[i], 1200 );
+                AverageGameStats gs = Game(population[i], 1000 );
                 fitness[i] = gs.AvgScore;
             });
             return fitness;
@@ -350,7 +287,7 @@ namespace Calico
                 for (int j = 0; j < iterations; j++)
                 {
                     Game g = new Game();
-                    g.EvolutionGame(false, e);
+                    g.EvolutionGame(false, e, (tasks.Item1, tasks.Item2, tasks.Item3));
                     stats[j] = g.Stats;
                 }
             }
@@ -397,7 +334,7 @@ namespace Calico
                 var line = reader.ReadLine();
                 var values = line.Split(';'); // columns
 
-                if (!reader.EndOfStream)
+                while (!reader.EndOfStream)
                 {
 
                     line = reader.ReadLine();
@@ -405,16 +342,17 @@ namespace Calico
 
                     var tasks = values[0].Split(",");
 
-                    double weightB = Convert.ToDouble(values[1]);
-                    (double, double, double) weightC = (Convert.ToDouble(values[2]), Convert.ToDouble(values[3]), Convert.ToDouble(values[4]));
+                    double weightB = Convert.ToDouble(values[2]);
+                    (double, double, double) weightC = (Convert.ToDouble(values[3]), Convert.ToDouble(values[4]), Convert.ToDouble(values[5]));
                     double[] weightT = new double[]
                             {
-                                                Convert.ToDouble(values[5]),
+                                                
                                                 Convert.ToDouble(values[6]),
                                                 Convert.ToDouble(values[7]),
                                                 Convert.ToDouble(values[8]),
                                                 Convert.ToDouble(values[9]),
                                                 Convert.ToDouble(values[10]),
+                                                Convert.ToDouble(values[11]),
                             };
 
                     WDict[(Convert.ToInt32(tasks[0]), Convert.ToInt32(tasks[1]), Convert.ToInt32(tasks[2]))] = new Weights(weightB, weightC, weightT);

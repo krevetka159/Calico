@@ -24,10 +24,6 @@ namespace Calico
 
                 GameModeController game = new GameModeController(mode);
 
-                // pro publikaci na testování lidmi
-                //Game g = new Game();
-                //g.SinglePlayer();
-
                 while (true)
                 {
                     Console.WriteLine();
@@ -130,10 +126,6 @@ namespace Calico
         }
         static void Main(string[] args)
         {
-            //var cultureInfo = new CultureInfo("en-GB");
-            //CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            //CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-            //CultureInfo.CurrentCulture = cultureInfo;
             NewGame(); 
         }
     }
