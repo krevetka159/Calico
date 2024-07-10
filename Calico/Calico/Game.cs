@@ -22,6 +22,7 @@ namespace Calico
         public GameStatePrinter gameStatePrinter;
         public GameStats Stats;
 
+
         private List<(int,string)> AgentDescription = new List<(int, string)>()
         {
             (1, " Kompletně náhodný agent "),
@@ -156,14 +157,6 @@ namespace Calico
                     {
                         return new AgentCompleteWithUtility(scoring);
                     }
-                case 8:
-                    {
-                        return new MinimaxAgent(scoring);
-                    }
-                case 9:
-                    {
-                        return new MonteCarloAgent(scoring, bag);
-                    }
                 default:
                     {
                         return new Agent(scoring);
@@ -208,10 +201,6 @@ namespace Calico
                     {
                         return new AgentCompleteWithUtility(scoring, boardId);
                     }
-                case 8:
-                    {
-                        return new MinimaxAgent(scoring,boardId);
-                    }
                 default:
                     {
                         return new Agent(scoring, boardId);
@@ -229,7 +218,6 @@ namespace Calico
         {
             agent = UseAgent(agentType);
             agent.ChooseTaskPieces();
-            //agent.AddTaskPieces(1, 4, 6);
 
             if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
 
@@ -249,6 +237,80 @@ namespace Calico
             (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
 
             Stats = new GameStats(score,buttons,cats,agent.Board.TasksCompleted());
+        }
+
+        public void WeightedAgentGame(WeightsDict wd, bool withPrint)
+        {
+            agent = new EvolutionAgent(scoring,wd);
+            
+
+            if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
+
+            for (int i = 0; i < 22; i++)
+            {
+                MakeMove(agent);
+
+                if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
+            }
+
+            if (withPrint) gameStatePrinter.PrintStats(agent);
+
+            int score = agent.Board.ScoreCounter.GetScore();
+
+            int buttons = agent.Board.ScoreCounter.GetButtonsCount();
+            var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
+            (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
+
+            Stats = new GameStats(score, buttons, cats, agent.Board.TasksCompleted());
+        }
+
+        public void TreeSearchAgentGame(WeightsDict wd, bool withPrint,int depth, double discount)
+        {
+            agent = new MinimaxAgent(scoring, wd, depth,discount);
+
+
+            if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
+
+            for (int i = 0; i < 22; i++)
+            {
+                MakeMove(agent);
+
+                if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
+            }
+
+            if (withPrint) gameStatePrinter.PrintStats(agent);
+
+            int score = agent.Board.ScoreCounter.GetScore();
+
+            int buttons = agent.Board.ScoreCounter.GetButtonsCount();
+            var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
+            (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
+
+            Stats = new GameStats(score, buttons, cats, agent.Board.TasksCompleted());
+        }
+        public void SimulationTSAgentGame(WeightsDict wd, bool withPrint, int s)
+        {
+            agent = new MonteCarloAgent(scoring, wd, bag, s);
+
+
+            if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
+
+            for (int i = 0; i < 22; i++)
+            {
+                MakeMove(agent);
+
+                if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
+            }
+
+            if (withPrint) gameStatePrinter.PrintStats(agent);
+
+            int score = agent.Board.ScoreCounter.GetScore();
+
+            int buttons = agent.Board.ScoreCounter.GetButtonsCount();
+            var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
+            (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
+
+            Stats = new GameStats(score, buttons, cats, agent.Board.TasksCompleted());
         }
 
         #endregion
@@ -529,32 +591,6 @@ namespace Calico
         #endregion
 
         #region Evolution
-
-        public void EvolutionGame(bool withPrint, Weights e)
-        {
-            agent = new EvolutionAgent(scoring,e);
-            //agent.ChooseTaskPieces();
-            agent.AddTaskPieces(1, 4, 6);
-
-            if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
-
-            for (int i = 0; i < 22; i++)
-            {
-                MakeMove(agent);
-
-                if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
-            }
-
-            if (withPrint) gameStatePrinter.PrintStats(agent);
-
-            int score = agent.Board.ScoreCounter.GetScore();
-
-            int buttons = agent.Board.ScoreCounter.GetButtonsCount();
-            var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
-            (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
-
-            Stats = new GameStats(score, buttons, cats);
-        }
 
         public void EvolutionGame(bool withPrint, Weights e, (int,int,int) tasks)
         {
