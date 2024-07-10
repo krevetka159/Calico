@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Calico
+﻿namespace Calico
 {
-// ----------------------------------------------- RANDOM AGENT ------------------------------------------------------------
+    // ----------------------------------------------- RANDOM AGENT ------------------------------------------------------------
 
     public class Agent : Player
     {
@@ -469,7 +463,7 @@ namespace Calico
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
         {
             int maxPieceIndex = RandomGamePiece(Opts);
-            int max = 0;
+            double max = 0;
             (int, int) maxPosition = RandomPosition();
 
             for (int o = 0; o < Opts.Length; o++)
@@ -481,10 +475,10 @@ namespace Calico
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighbors(gp, i, j) > max)
+                            if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighbors(gp, i, j);
+                                max = Board.EvaluateNeighborsUtility(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
@@ -492,7 +486,7 @@ namespace Calico
                     }
                 }
             }
-            if (random.NextDouble() > 0.05)
+            if (random.NextDouble() > 0.01)
             {
                 return (maxPieceIndex, maxPosition);
             }
@@ -671,13 +665,26 @@ namespace Calico
 
     #region Few Steps Ahead
 
-    public class MinimaxAgent : Agent
+    public class MinimaxAgent : EvolutionAgent
     {
-        public MinimaxAgent(Scoring scoring) : base(scoring) 
+
+        private int depth;
+        private double discount;
+        public MinimaxAgent(Scoring scoring, Weights w) : base(scoring, w) 
         {
         }
-        public MinimaxAgent(Scoring scoring, int boardId) : base(scoring,boardId)
+        public MinimaxAgent(Scoring scoring, Weights w, int boardId) : base(scoring,w,boardId)
         {
+        }
+
+        public MinimaxAgent(Scoring scoring, WeightsDict wd) : base(scoring,wd)
+        { 
+        }
+
+        public MinimaxAgent(Scoring scoring, WeightsDict wd, int dpth, double dsc) : base(scoring, wd)
+        {
+            depth = dpth;
+            discount = dsc;
         }
 
         public List<(int,int)> TopPositions(GamePiece gp, int num, GameBoard board)
@@ -689,9 +696,9 @@ namespace Calico
             {
                 for (int j = 1; j < Board.Size - 1; j++)
                 {
-                    if (Board.IsEmpty(i, j))
+                    if (board.IsEmpty(i, j))
                     {
-                        positions[index] = ((i,j), board.EvaluateNeighborsUtility(gp, i, j));
+                        positions[index] = ((i,j), board.EvaluateNeighborsUtilityBetter(gp, i, j, weights));
                         index++;
                     }
                 }
@@ -718,73 +725,75 @@ namespace Calico
 
                 foreach ((int, int, int) optPermutation in perms)
                 {
-                    //Parallel.For(1, Board.Size - 1, i1 =>
-                    //{
-                    //    Parallel.For(1, Board.Size - 1, j1 =>
-                    //    {
+
                         Parallel.ForEach(TopPositions(Opts[optPermutation.Item1], 10, Board), pos =>
                         {
                             (int i1, int j1) = pos;
 
                             if (Board.IsEmpty(i1, j1))
                             {
+                                
+                                double eval = Board.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item1], i1, j1, weights);
                                 GameBoard gb_new = new GameBoard(Board);
-                                double eval = gb_new.EvaluateNeighborsUtility(Opts[optPermutation.Item1], i1, j1);
                                 gb_new.AddPiece(Opts[optPermutation.Item1], i1, j1);
 
-                                for (int i2 = 1; i2 < Board.Size - 1; i2++)
+                                if (Board.EmptySpotsCount > 2 && depth == 3)
                                 {
-                                    for (int j2 = 1; j2 < Board.Size - 1; j2++)
+                                    foreach ((int, int) pos2 in TopPositions(Opts[optPermutation.Item2], 10, gb_new))
                                     {
-                                        if (Board.IsEmpty(i2, j2) && ((i1, j1) != (i2, j2)))
+                                        (int i2, int j2) = pos2;
+
+                                        
+                                        double eval2 = eval + (gb_new.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item2], i2, j2, weights) * discount);
+
+                                        GameBoard gb_new2 = new GameBoard(gb_new);
+                                        gb_new2.AddPiece(Opts[optPermutation.Item2], i2, j2);
+
+                                        for (int i3 = 1; i3 < Board.Size - 1; i3++)
                                         {
-
-                                            //Parallel.For(1, Board.Size - 1, i3 =>
-                                            //{
-                                            //    Parallel.For(1, Board.Size - 1, j3 =>
-                                            //    {
-                                            //        if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
-                                            //        {
-
-
-                                            GameBoard gb_new2 = new GameBoard(gb_new);
-                                            double eval2 = eval + (gb_new2.EvaluateNeighborsUtility(Opts[optPermutation.Item2], i2, j2) / 4);
-
-                                            //if (eval2 > max)
-                                            //{
-                                            //    max = eval2;
-                                            //    maxPosition = (i1, j1);
-                                            //    pieceIndex = optPermutation.Item1;
-                                            //}
-                                            gb_new2.AddPiece(Opts[optPermutation.Item2], i2, j2);
-
-                                            for (int i3 = 1; i3 < Board.Size - 1; i3++)
+                                            for (int j3 = 1; j3 < Board.Size - 1; j3++)
                                             {
-                                                for (int j3 = 1; j3 < Board.Size - 1; j3++)
+                                                if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
                                                 {
-                                                    if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
+                                                    double eval3 = eval2 + (gb_new2.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item3], i3, j3, weights) * discount * discount);
+
+                                                    if (eval3 > max)
                                                     {
-
-                                                        GameBoard gb_new3 = new GameBoard(gb_new2);
-                                                        double eval3 = eval2 + (gb_new3.EvaluateNeighborsUtility(Opts[optPermutation.Item3], i3, j3) / 16);
-
-                                                        if (eval3 > max)
-                                                        {
-                                                            max = eval3;
-                                                            maxPosition = (i1, j1);
-                                                            pieceIndex = optPermutation.Item1;
-                                                        }
+                                                        max = eval3;
+                                                        maxPosition = (i1, j1);
+                                                        pieceIndex = optPermutation.Item1;
                                                     }
                                                 }
                                             }
                                         }
+                                        
                                     }
                                 }
+                                else
+                                {
+                                    for (int i2 = 1; i2 < Board.Size - 1; i2++)
+                                    {
+                                        for (int j2 = 1; j2 < Board.Size - 1; j2++)
+                                        {
+                                            if (gb_new.IsEmpty(i2, j2))
+                                            {
+                                                double eval2 = eval + (gb_new.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item2], i2, j2, weights) * discount);
+                                                if (eval2 > max)
+                                                {
+                                                    max = eval2;
+                                                    maxPosition = (i1, j1);
+                                                    pieceIndex = optPermutation.Item1;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+
 
                             }
                         });
-                    //    });
-                    //});
+
                 }
 
             }
@@ -800,10 +809,11 @@ namespace Calico
                         {
                             if (Board.IsEmpty(i, j))
                             {
-                                if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
+                                var temp = Board.EvaluateNeighborsUtilityBetter(gp, i, j, weights);
+                                if (temp > max)
                                 {
                                     pieceIndex = o;
-                                    max = Board.EvaluateNeighborsUtility(gp, i, j);
+                                    max = temp;
                                     maxPosition = (i, j);
                                 }
                             }
@@ -818,13 +828,18 @@ namespace Calico
 
     #endregion
 
-    public class MonteCarloAgent : Agent
+    public class MonteCarloAgent : MinimaxAgent
     {
-        public MonteCarloAgent(Scoring scoring, Bag b) : base(scoring, b)
+        int simulationsCount;
+        public MonteCarloAgent(Scoring scoring, Weights w, Bag b, int s) : base(scoring, w)
         {
+            bag = b;
+            simulationsCount = s;
         }
-        public MonteCarloAgent(Scoring scoring, int boardId, Bag b) : base(scoring, boardId, b)
+        public MonteCarloAgent(Scoring scoring, WeightsDict wd, Bag b, int s) : base(scoring, wd)
         {
+            bag = b;
+            simulationsCount = s;
         }
 
         public List<(int, int)> TopPositions(GamePiece gp, GameBoard board)
@@ -851,8 +866,8 @@ namespace Calico
 
         public double Simulation(GameBoard gb, GamePiece[] Opts)
         {
-            int[] scores = new int[100];
-            Parallel.For(0, 100, i =>
+            int[] scores = new int[simulationsCount];
+            Parallel.For(0, simulationsCount, i =>
             {
                 SimulationGame sg = new SimulationGame(new GameBoard(gb), Opts, gb.ScoreCounter.Scoring, bag);
                 scores[i] = sg.Game();
@@ -879,8 +894,6 @@ namespace Calico
                     {
                         (int i1, int j1) = pos;
 
-                        if (Board.IsEmpty(i1, j1))
-                        {
                             GameBoard gb_new = new GameBoard(Board);
                             gb_new.AddPiece(Opts[optPermutation.Item1], i1, j1);
 
@@ -888,8 +901,7 @@ namespace Calico
                             Parallel.ForEach(TopPositions(Opts[optPermutation.Item2], gb_new), pos1 =>
                             {
                                 (int i2, int j2) = pos1;
-                                if (Board.IsEmpty(i2, j2) && ((i1, j1) != (i2, j2)))
-                                {
+
                                     if (Board.EmptySpotsCount > 2)
                                     {
                                         GameBoard gb_new2 = new GameBoard(gb_new);
@@ -898,8 +910,6 @@ namespace Calico
                                         Parallel.ForEach(TopPositions(Opts[optPermutation.Item3], gb_new2), pos2 =>
                                         {
                                             (int i3, int j3) = pos2;
-                                            if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
-                                            {
                                                 if (Board.EmptySpotsCount > 3)
                                                 {
                                                     GameBoard gb_new3 = new GameBoard(gb_new2);
@@ -927,7 +937,7 @@ namespace Calico
                                                     }
                                                 }
 
-                                            }
+                                            
                                         });
 
                                         double eval = Simulation(gb_new2, new GamePiece[1] { Opts[optPermutation.Item3] });
@@ -951,7 +961,7 @@ namespace Calico
                                         }
                                     }
                                     
-                                }
+                                
                             });
 
                             double eval = Simulation(gb_new, new GamePiece[2] { Opts[optPermutation.Item2], Opts[optPermutation.Item3] });
@@ -962,7 +972,7 @@ namespace Calico
                                 maxPosition = (i1, j1);
                                 pieceIndex = optPermutation.Item1;
                             }
-                        }
+                        
                     });
                 }
             }
@@ -998,14 +1008,20 @@ namespace Calico
 
     public class EvolutionAgent : Agent
     {
-        Weights gameProps;
+        protected Weights weights;
         public EvolutionAgent(Scoring scoring, Weights e) : base(scoring)
         {
-            gameProps = e;
+            weights = e;
         }
         public EvolutionAgent(Scoring scoring, Weights e, int boardId) : base(scoring, boardId)
         {
-            gameProps = e;
+            weights = e;
+        }
+
+        public EvolutionAgent(Scoring scoring, WeightsDict wd) : base(scoring)
+        {
+            ChooseTaskPieces();
+            weights = wd.GetWeights((TaskIds[0], TaskIds[1], TaskIds[2]));
         }
 
         public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
@@ -1023,7 +1039,7 @@ namespace Calico
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            double eval = Board.EvaluateNeighborsEvolution(gp, i, j, gameProps);
+                            double eval = Board.EvaluateNeighborsEvolution(gp, i, j, weights);
                             if (eval > max)
                             {
                                 maxPieceIndex = o;
