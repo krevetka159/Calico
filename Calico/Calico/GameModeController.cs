@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,19 +13,20 @@ namespace Calico
     {
         private List<(int, string)> AgentDescription = new List<(int, string)>()
         {
-            (1, " Kompletně náhodný agent "), //NA
-            (2, " Nejlepší umístění vzhledek k barvám "), //UB
-            (3, " Nejlepší umístění vzhledem ke vzorům "), //UV
-            (4, " Nejlepší umístění "), //U
-            (5, " Nejlepší umístění s malou náhodou "), // UN
-            (6, " Nejlepší umístění náhodného dílku "), //
-            (7, " Utility fce"), // Albert
-            (8, " Minimax"), // Max
-            (9, " MC"), // MC agent (Karel)
-            (10, "EvolParams"), // Eva
+            (1, " Náhodný agent "), //RAND
+            (2, " Základní ohodnocení barev "), //U1B
+            (3, " Základní ohodnocení vzorů "), //U1V
+            (4, " Základní ohodnocení"), //U1
+            (5, " Rozšířená funkce"), // Albert U2
+            (6, " Rozšířená funkce s náhodou "), // U2RAND
+            (7, " Vážená rozšířená funkce"), // Adalbert
+            (8, " Stromové prohledávání"), // Max
+            (9, " Stromové prohledávání se simulacemi"), // Karel
         };
 
         private AverageGameStats avgStats;
+
+        public WeightsDict WeightsDict;
 
         public GameModeController(int mode)
         {
@@ -46,16 +48,6 @@ namespace Calico
                 case 3:
                     {
                         Testing();
-                        break;
-                    }
-                case 4:
-                    {
-                        TestAll();
-                        break;
-                    }
-                case 5:
-                    {
-                       //TestMultiPlayer();
                         break;
                     }
                 case 6:
@@ -94,13 +86,13 @@ namespace Calico
             {
                 try
                 {
-                    Console.WriteLine(" Agent options: ");
+                    Console.WriteLine(" Nabídka agentů: ");
 
                     foreach ((int, string) ad in AgentDescription)
                     {
                         Console.WriteLine($"    {ad.Item1}. {ad.Item2}");
                     }
-                    Console.Write(" Pick agent: ");
+                    Console.Write(" Vyberte číslo agenta: ");
 
                     agentOption = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine();
@@ -111,13 +103,128 @@ namespace Calico
                     }
                     else
                     {
-                        Console.WriteLine(" " + agentOption + " is not a mode option");
+                        Console.WriteLine(" " + agentOption + " není číslo agenta");
                     }
 
                 }
                 catch
                 {
-                    Console.WriteLine(" Must be an integer.");
+                    Console.WriteLine(" Zadejte celé číslo.");
+                }
+            }
+        }
+
+        private (bool, string) GetOutputFileName()
+        {
+            string outputIntoFile;
+
+            while (true)
+            {
+
+                Console.Write(" Přejete si vytisknout výsledky do souboru? (y/n) ");
+
+                outputIntoFile = Console.ReadLine();
+
+                try
+                {
+                    if (outputIntoFile.Replace(" ", "") == "n")
+                    {
+                        return (false, "");
+                    }
+                    else if (outputIntoFile.Replace(" ", "") == "y")
+                    {
+                        break ;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Neznámý příkaz");
+                    }
+
+                }
+                catch
+                {
+                    
+                }
+
+            }
+
+            while (true)
+            {
+                Console.Write(" Zadejte jméno výstupního souboru: ");
+
+                string output = Console.ReadLine();
+                if (output != null)
+                {
+                    return(true, output);
+                }       
+                
+            }
+        }
+
+        private int getTreeDepth()
+        {
+            int depth;
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write(" Vyberte hloubku stromu (2/3): ");
+                    depth = Convert.ToInt32(Console.ReadLine());
+
+                    if (2 <= depth && depth <= 3)
+                    {
+                        return depth;
+                    }
+                    else
+                    {
+                        Console.WriteLine(" Zadejte číslo 2 nebo 3");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine(" Zadejte číslo 2 nebo 3");
+                }
+            }
+        }
+
+        private int getSimulationSize()
+        {
+            int simulationSize;
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write(" Zadejte velikost simulace: ");
+
+                    simulationSize = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine();
+                    return simulationSize;
+                }
+                catch
+                {
+                    Console.WriteLine(" Zadejte celé číslo.");
+                }
+            }
+        }
+        private double getDiscountFactor()
+        {
+            double discountFactor;
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write(" Zadejte velikost simulace: ");
+
+                    discountFactor = Convert.ToDouble(Console.ReadLine());
+                    Console.WriteLine();
+                    return discountFactor;
+                }
+                catch
+                {
+                    Console.WriteLine(" Zadejte celé číslo.");
                 }
             }
         }
@@ -126,45 +233,78 @@ namespace Calico
 
         private void Testing()
         {
+            int agentType = PickAgent(false);
 
-            while (true)
+            (bool outputToFile, string fileName) = GetOutputFileName();
+
+            int iterations;
+            GameStats[] stats = null;
+
+
+            if(agentType < 7)
             {
+                iterations = 5000;
+                stats = new GameStats[iterations];
 
-                Console.Write(" Print progress (y/n): ");
-                string newGame = Console.ReadLine();
-
-                int agentType = PickAgent(false);
-
-                if (newGame == "n")
+                for (int i = 0; i < iterations; i++)
                 {
-                    //List<double> avg = new List<double>();
-                    //for (int j = 0; j < 20; j++)
-                    //{
-                    //    avg.Add(0);
-                    //}
+                    Game g = new Game();
+                    g.AgentGame(agentType, false);
+                    stats[i] = g.Stats;
+                    Console.WriteLine($" {i} : {g.Stats.Score}");
+                }
+            }
+            else if(agentType == 7)
+            {
+                iterations = 5000;
+                stats = new GameStats[iterations];
 
-                    //Parallel.For(0, 20, j =>
-                    //{
-                        int iterations = 5000;
-                        GameStats[] stats = new GameStats[iterations];
+                for (int i = 0; i < iterations; i++)
+                {
+                    Game g = new Game();
+                    g.WeightedAgentGame(WeightsDict, false);
+                    stats[i] = g.Stats;
+                    Console.WriteLine($" {i} : {g.Stats.Score}");
+                }
+            }
+            else if(agentType == 8)
+            {
+                iterations = 5000;
+                stats = new GameStats[iterations];
 
+                int depth = getTreeDepth();
+                double discountFactor = getDiscountFactor();
 
-                        for (int i = 0;i < iterations; i++)
-                        {
-                            Game g = new Game();
-                            g.AgentGame(agentType, false);
-                            stats[i] = g.Stats;
-                            Console.WriteLine($" {i} : {g.Stats.Score}");
-                        }
+                for (int i = 0; i < iterations; i++)
+                {
+                    Game g = new Game();
+                    g.TreeSearchAgentGame(WeightsDict, false, depth, discountFactor);
+                    stats[i] = g.Stats;
+                    Console.WriteLine($" {i} : {g.Stats.Score}");
+                }
+            }
+            else if (agentType == 9)
+            {
+                iterations = 250;
+                stats = new GameStats[iterations];
 
+                int simulationSize = getSimulationSize();
 
-                    //});
+                for (int i = 0;i < iterations; i++)
+                {
+                    Game g = new Game();
+                    g.SimulationTSAgentGame(WeightsDict, false, simulationSize);
+                    stats[i] = g.Stats;
+                    Console.WriteLine($" {i} : {g.Stats.Score}");
+                }
+            }
 
-
-                    using (StreamWriter outputFile = new StreamWriter($"./testAgent{agentType}_146_evol1.csv"))
+            if (outputToFile)
+            {
+                try
+                {
+                    using (StreamWriter outputFile = new StreamWriter(fileName))
                     {
-                        outputFile.WriteLine(stats.Max(item => item.Score));
-                        outputFile.WriteLine(stats.Min(item => item.Score));
 
                         outputFile.WriteLine(
                             $"{Math.Round(stats.Average(item => item.Score), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
@@ -178,8 +318,6 @@ namespace Calico
                             $"{GetTaskAverageScore(4, stats)};" +
                             $"{GetTaskAverageScore(5, stats)};" +
                             $"{GetTaskAverageScore(6, stats)};"
-
-
                             ) ;
                         outputFile.WriteLine("");
 
@@ -200,124 +338,33 @@ namespace Calico
                                 $"{gs.Tasks[4]};" +
                                 $"{gs.Tasks[5]}"
                                 );
-                        }
+                        } 
                     }
-                    break;
                 }
-                else if (newGame == "y")
+                catch
                 {
-                    Game g = new Game();
-                    g.AgentGame(agentType, true);
+                    Console.WriteLine(" Zápis do souboru selhal");
                 }
-                else
-                {
-                    Console.WriteLine(" Invalid expression");
-                }
+
             }
+            else
+            {
+                Console.WriteLine(
+                            $"{Math.Round(stats.Average(item => item.Score), 3, MidpointRounding.AwayFromZero).ToString("0.000")}, " +
+                            $"{Math.Round(stats.Average(item => item.Buttons), 3, MidpointRounding.AwayFromZero).ToString("0.000")} " +
+                            $"{Math.Round(stats.Average(item => item.Cats.Item1), 3, MidpointRounding.AwayFromZero).ToString("0.000")}, " +
+                            $"{Math.Round(stats.Average(item => item.Cats.Item2), 3, MidpointRounding.AwayFromZero).ToString("0.000")}, " +
+                            $"{Math.Round(stats.Average(item => item.Cats.Item3), 3, MidpointRounding.AwayFromZero).ToString("0.000")}, " +
+                            $"{GetTaskAverageScore(1, stats)}, " +
+                            $"{GetTaskAverageScore(2, stats)}, " +
+                            $"{GetTaskAverageScore(3, stats)}, " +
+                            $"{GetTaskAverageScore(4, stats)}, " +
+                            $"{GetTaskAverageScore(5, stats)}, " +
+                            $"{GetTaskAverageScore(6, stats)} "
+                );
+            }
+                
         }
-
-        private void TestAll()
-        {
-            int iterations = 5000;
-            GameStats[][] stats = new GameStats[7][];
-
-            Console.WriteLine(" Agent options: ");
-
-            foreach ((int, string) ad in AgentDescription)
-            {
-                Console.WriteLine($"    {ad.Item1}. {ad.Item2}");
-            }
-
-            for (int i = 1; i <= 7; i++)
-            {
-                stats[i - 1] = new GameStats[iterations];
-                Console.WriteLine(" " + i + ": ");
-
-                Parallel.For(0, iterations, j =>
-                {
-                    Game g = new Game();
-                    g.AgentGame(i, false);
-                    stats[i-1][j] = g.Stats;
-                });
-
-                Console.WriteLine(stats[i-1].Average(item => item.Score));
-                Console.WriteLine();
-            }
-
-            // Write the string array to a new file named "WriteLines.txt".
-            using (StreamWriter outputFile = new StreamWriter("./testAll.csv"))
-            {
-                outputFile.WriteLine("agent;averageScore;buttons;c1;c2;c3;t1;t2;t3;t4;t5;t6;best;lowest");
-                for (int i = 0; i < 7; i++)
-                    outputFile.WriteLine(
-                            $"{i+1};"+
-                            $"{Math.Round(stats[i].Average(item => item.Score), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Average(item => item.Buttons), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Average(item => item.Cats.Item1), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Average(item => item.Cats.Item2), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Average(item => item.Cats.Item3), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Where(item => item.Tasks[0] >= 0).Average(item => item.Tasks[0]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Where(item => item.Tasks[1] >= 0).Average(item => item.Tasks[1]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Where(item => item.Tasks[2] >= 0).Average(item => item.Tasks[2]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Where(item => item.Tasks[3] >= 0).Average(item => item.Tasks[3]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Where(item => item.Tasks[4] >= 0).Average(item => item.Tasks[4]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats[i].Where(item => item.Tasks[5] >= 0).Average(item => item.Tasks[5]), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{stats[i].Max(item => item.Score)};" +
-                            $"{stats[i].Min(item => item.Score)}"
-                            );
-            }
-
-        }
-
-        //private void TestMultiPlayer()
-        //{
-        //    while (true)
-        //    {
-        //        Console.Write("Number of players (2-4): ");
-        //        try
-        //        {
-        //            int numOfPlayers = Convert.ToInt32(Console.ReadLine());
-
-        //            if (numOfPlayers == 2)
-        //            {
-        //                while (true)
-        //                {
-        //                    Console.Write(" Print progress (y/n): ");
-        //                    string newGame = Console.ReadLine();
-
-        //                    if (newGame == "n")
-        //                    {
-        //                        TestMultiPlayerGame(numOfPlayers, false, false, 500);
-        //                        break;
-        //                    }
-        //                    else if (newGame == "y")
-        //                    {
-        //                        TestMultiPlayerGame(numOfPlayers, true, true, 1);
-        //                        break;
-        //                    }
-        //                    else
-        //                    {
-        //                        Console.WriteLine(" Invalid expression");
-        //                    }
-        //                }
-        //            }
-        //            else if (numOfPlayers == 3 || numOfPlayers == 4)
-        //            {
-        //                TestMultiPlayerGame(numOfPlayers, false, false, 1000);
-        //                break;
-        //            }
-        //            else
-        //            {
-        //                Console.WriteLine(" Invalid number of players");
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            Console.WriteLine(" Invalid expression");
-        //        }
-
-        //    }
-        //}
 
         #endregion
 
@@ -510,90 +557,6 @@ namespace Calico
 
                 }
             }
-
-            //avgScores = new List<(string, double)>();
-
-            //avgScores.Add(($"1,2,3", statsDict[(1, 2, 3)][0].AvgScore));
-            //avgScores.Add(($"1,3,2", statsDict[(1, 2, 3)][1].AvgScore));
-            //avgScores.Add(($"2,1,3", statsDict[(1, 2, 3)][2].AvgScore));
-            //avgScores.Add(($"2,3,1", statsDict[(1, 2, 3)][3].AvgScore));
-            //avgScores.Add(($"3,1,2", statsDict[(1, 2, 3)][4].AvgScore));
-            //avgScores.Add(($"3,2,1", statsDict[(1, 2, 3)][5].AvgScore));
-
-            //avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-
-            //using (StreamWriter outputFile = new StreamWriter("./testTasks123.csv"))
-            //{
-            //    outputFile.WriteLine("tasks;score");
-
-            //    foreach ((string, double) ds in avgScores)
-            //    {
-            //        outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-
-            //    }
-            //}
-
-            //avgScores = new List<(string, double)>();
-
-            //avgScores.Add(($"2,3,5", statsDict[(2, 3, 5)][0].AvgScore));
-            //avgScores.Add(($"2,5,3", statsDict[(2, 3, 5)][1].AvgScore));
-            //avgScores.Add(($"3,2,5", statsDict[(2, 3, 5)][2].AvgScore));
-            //avgScores.Add(($"3,5,2", statsDict[(2, 3, 5)][3].AvgScore));
-            //avgScores.Add(($"5,2,3", statsDict[(2, 3, 5)][4].AvgScore));
-            //avgScores.Add(($"5,3,2", statsDict[(2, 3, 5)][5].AvgScore));
-
-            //avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-
-            //using (StreamWriter outputFile = new StreamWriter("./testTasks235.csv"))
-            //{
-            //    outputFile.WriteLine("tasks;score");
-
-            //    foreach ((string, double) ds in avgScores)
-            //    {
-            //        outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-
-            //    }
-            //}
-            //avgScores = new List<(string, double)>();
-
-            //avgScores.Add(($"1,4,6", statsDict[(1, 4, 6)][0].AvgScore));
-            //avgScores.Add(($"1,6,4", statsDict[(1, 4, 6)][1].AvgScore));
-            //avgScores.Add(($"4,1,6", statsDict[(1, 4, 6)][2].AvgScore));
-            //avgScores.Add(($"4,6,1", statsDict[(1, 4, 6)][3].AvgScore));
-            //avgScores.Add(($"6,1,4", statsDict[(1, 4, 6)][4].AvgScore));
-            //avgScores.Add(($"6,4,1", statsDict[(1, 4, 6)][5].AvgScore));
-
-            //avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-            //using (StreamWriter outputFile = new StreamWriter("./testTasks146.csv"))
-            //{
-            //    outputFile.WriteLine("tasks;score");
-
-            //    foreach ((string, double) ds in avgScores)
-            //    {
-            //        outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-
-            //    }
-            //}
-            //avgScores = new List<(string, double)>();
-
-            //avgScores.Add(($"4,5,6", statsDict[(4, 5, 6)][0].AvgScore));
-            //avgScores.Add(($"4,6,5", statsDict[(4, 5, 6)][1].AvgScore));
-            //avgScores.Add(($"5,4,6", statsDict[(4, 5, 6)][2].AvgScore));
-            //avgScores.Add(($"5,6,4", statsDict[(4, 5, 6)][3].AvgScore));
-            //avgScores.Add(($"6,4,5", statsDict[(4, 5, 6)][4].AvgScore));
-            //avgScores.Add(($"6,5,4", statsDict[(4, 5, 6)][5].AvgScore));
-
-            //avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-            //using (StreamWriter outputFile = new StreamWriter("./testTasks456.csv"))
-            //{
-            //    outputFile.WriteLine("tasks;score");
-
-            //    foreach ((string, double) ds in avgScores)
-            //    {
-            //        outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-
-            //    }
-            //}
         }
 
         #endregion
@@ -613,11 +576,6 @@ namespace Calico
             if (iterations > 1)
             {
                 Console.WriteLine(" Mean: " + stats.Average(item => item.Score));
-                //Console.WriteLine(" Average number of buttons: " + (Convert.ToDouble(buttons) / Convert.ToDouble(iterations)));
-                //Console.WriteLine(" Average number of cats: " + (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)));
-                //Console.WriteLine(" Best score: " + max + "; buttons: " + Convert.ToDouble(maxButtons) +
-                //    "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3));
-                //Console.WriteLine(" Lowest score: " + min);
             }
 
             return new AverageGameStats(7, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
@@ -664,12 +622,19 @@ namespace Calico
             //new Evolution((3, 4, 6), true);
             //new Evolution((3, 5, 6), true);
             //new Evolution((4, 5, 6), true);
+
+            new Evolution((1, 5, 6), false);
+            new Evolution((1, 6, 5), false);
+            new Evolution((5, 1, 6), false);
+            new Evolution((5, 6, 1), false);
+            new Evolution((6, 1, 5), false);
+            new Evolution((6, 5, 1), false);
         }
 
         private void EvolParamsTesting()
         {
 
-            string[] lines = new string[120];
+            string[] lines = new string[6];
             int lineIndex = 0;
 
 
@@ -681,7 +646,7 @@ namespace Calico
                     {
                         foreach ((int, int, int) tasks in new[]{ (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
                         {
-                            using (var reader = new StreamReader($"Evol/finalGen_{i}{j}{k}(mixed)new.csv"))
+                            using (var reader = new StreamReader($"finalGen_{tasks.Item1}{tasks.Item2}{tasks.Item3}(detail)new.csv"))
                             {
                                 var line = reader.ReadLine();
                                 var values = line.Split(';'); // columns
@@ -766,7 +731,7 @@ namespace Calico
                 }
             }
 
-            using (StreamWriter outputFile = new StreamWriter("./Evol/allResultsFinal.csv"))
+            using (StreamWriter outputFile = new StreamWriter("156DetailFinal.csv"))
             {
                 outputFile.WriteLine("tasks;score;b;c1;c2;c3;t1;t2;t3;t4;t5;t6");
                 foreach (var line in lines)
