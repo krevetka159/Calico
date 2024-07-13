@@ -25,16 +25,15 @@ namespace Calico
 
         private List<(int,string)> AgentDescription = new List<(int, string)>()
         {
-            (1, " Kompletně náhodný agent "),
-            (2, " Nejlepší umístění vzhledek k barvám "),
-            (3, " Nejlepší umístění vzhledem ke vzorům "),
-            (4, " Nejlepší umístění "),
-            (5, " Nejlepší umístění s malou náhodou "),
-            (6, " Nejlepší umístění náhodného dílku "),
-            (7, " Utility fce"),
-            (8, " Minimax"),
-            (9, " MC"),
-            (10, "EvolParams")
+            (1, " Náhodný agent "), //RAND
+            (2, " Základní ohodnocení barev "), //U1B
+            (3, " Základní ohodnocení vzorů "), //U1V
+            (4, " Základní ohodnocení"), //U1
+            (5, " Rozšířená funkce"), // Albert U2
+            (6, " Rozšířená funkce s náhodou "), // U2RAND
+            (7, " Vážená rozšířená funkce"), // Adalbert
+            (8, " Stromové prohledávání"), // Max
+            (9, " Stromové prohledávání se simulacemi"), // Karel
         };
 
         public Game()
@@ -147,15 +146,11 @@ namespace Calico
                     }
                 case 5:
                     {
-                        return new AgentCompleteWithProb(scoring);
+                        return new AgentCompleteWithUtility(scoring);
                     }
                 case 6:
                     {
-                        return new RandomPatchTileAgent(scoring);
-                    }
-                case 7:
-                    {
-                        return new AgentCompleteWithUtility(scoring);
+                        return new AgentCompleteWithProb(scoring);
                     }
                 default:
                     {
@@ -191,15 +186,11 @@ namespace Calico
                     }
                 case 5:
                     {
-                        return new AgentCompleteWithProb(scoring, boardId);
+                        return new AgentCompleteWithUtility(scoring, boardId);
                     }
                 case 6:
                     {
-                        return new RandomPatchTileAgent(scoring, boardId);
-                    }
-                case 7:
-                    {
-                        return new AgentCompleteWithUtility(scoring, boardId);
+                        return new AgentCompleteWithProb(scoring, boardId);
                     }
                 default:
                     {

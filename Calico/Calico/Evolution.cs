@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -329,7 +330,11 @@ namespace Calico
         {
             WDict = new Dictionary<(int, int, int), Weights>();
 
-            using (var reader = new StreamReader($"Evol/allResultsFinal.csv"))
+            //string path = Path.Combine(Environment.CurrentDirectory, @"Data\", "weights.csv");
+            string path = @"..\..\..\weights.csv";
+            //string path= "C:\\Users\\ditac\\Documents\\Mff\\bakalarka\\Calico\\Calico\\Calico\\weights.csv"
+
+            using (var reader = new StreamReader(path))
             {
                 var line = reader.ReadLine();
                 var values = line.Split(';'); // columns

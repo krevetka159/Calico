@@ -30,6 +30,7 @@ namespace Calico
 
         public GameModeController(int mode)
         {
+            WeightsDict = new WeightsDict();
 
             switch (mode)
             {
@@ -241,7 +242,7 @@ namespace Calico
             GameStats[] stats = null;
 
 
-            if(agentType < 7)
+            if(agentType < 7) // rand, základní a rozšířené ohodnocení
             {
                 iterations = 5000;
                 stats = new GameStats[iterations];
@@ -254,7 +255,7 @@ namespace Calico
                     Console.WriteLine($" {i} : {g.Stats.Score}");
                 }
             }
-            else if(agentType == 7)
+            else if(agentType == 7) // vážená rozšířená funkce
             {
                 iterations = 5000;
                 stats = new GameStats[iterations];
@@ -267,7 +268,7 @@ namespace Calico
                     Console.WriteLine($" {i} : {g.Stats.Score}");
                 }
             }
-            else if(agentType == 8)
+            else if(agentType == 8) // stromové prohledávání
             {
                 iterations = 5000;
                 stats = new GameStats[iterations];
@@ -283,7 +284,7 @@ namespace Calico
                     Console.WriteLine($" {i} : {g.Stats.Score}");
                 }
             }
-            else if (agentType == 9)
+            else if (agentType == 9) // MCTS inspired prohledávání
             {
                 iterations = 250;
                 stats = new GameStats[iterations];
@@ -305,7 +306,8 @@ namespace Calico
                 {
                     using (StreamWriter outputFile = new StreamWriter(fileName))
                     {
-
+                        outputFile.WriteLine(stats.Max(item => item.Score));
+                        outputFile.WriteLine(stats.Min(item => item.Score));
                         outputFile.WriteLine(
                             $"{Math.Round(stats.Average(item => item.Score), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
                             $"{Math.Round(stats.Average(item => item.Buttons), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
@@ -497,43 +499,40 @@ namespace Calico
         {
             List<AverageGameStats> statsDict = new List<AverageGameStats>();
 
-            //for (int i = 1; i <= 6; i++)
-            //{
-            //    for (int j = i + 1; j <= 6; j++)
-            //    {
-            //        for (int k = j + 1; k <= 6; k++)
-            //        {
-            int i = 2;
-            int j = 3;
-            int k = 5;
+            for (int i = 1; i <= 6; i++)
+            {
+                for (int j = i + 1; j <= 6; j++)
+                {
+                    for (int k = j + 1; k <= 6; k++)
+                    {
                         statsDict = new List<AverageGameStats>();
 
                         Console.WriteLine($" {i},{j},{k}: ");
-                        statsDict.Add(TestTask(7, 5000, (i, j, k)));
+                        statsDict.Add(TestTask(5, 5000, (i, j, k)));
                         Console.WriteLine();
 
                         Console.WriteLine($" {i},{k},{j}: ");
-                        statsDict.Add(TestTask(7, 5000, (i, k, j)));
+                        statsDict.Add(TestTask(5, 5000, (i, k, j)));
                         Console.WriteLine();
 
                         Console.WriteLine($" {j},{i},{k}: ");
-                        statsDict.Add(TestTask(7, 5000, (j, i, k)));
+                        statsDict.Add(TestTask(5, 5000, (j, i, k)));
                         Console.WriteLine();
 
                         Console.WriteLine($" {j},{k},{i}: ");
-                        statsDict.Add(TestTask(7, 5000, (j, k, i)));
+                        statsDict.Add(TestTask(5, 5000, (j, k, i)));
                         Console.WriteLine();
 
                         Console.WriteLine($" {k},{i},{j}: ");
-                        statsDict.Add(TestTask(7, 5000, (k, i, j)));
+                        statsDict.Add(TestTask(5, 5000, (k, i, j)));
                         Console.WriteLine();
 
                         Console.WriteLine($" {k},{j},{i}: ");
-                        statsDict.Add(TestTask(7, 5000, (k, j, i)));
+                        statsDict.Add(TestTask(5, 5000, (k, j, i)));
                         Console.WriteLine();
-                //    }
-                //}
-            //}
+                    }
+                }
+            }
 
             // objListOrder.Sort((x, y) => x.OrderDate.CompareTo(y.OrderDate));
 
@@ -578,7 +577,7 @@ namespace Calico
                 Console.WriteLine(" Mean: " + stats.Average(item => item.Score));
             }
 
-            return new AverageGameStats(7, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
+            return new AverageGameStats(5, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
 
         }
 

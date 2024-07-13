@@ -369,11 +369,11 @@ namespace Calico
             {
                 if (ScoreCounter.GetsRainbowButton(gp.Color))
                 {
-                    return ScoreCounter.Scoring.ColorScoring.Points + 1 + 3;
+                    return 2*ScoreCounter.Scoring.ColorScoring.Points;
                 }
                 else
                 {
-                    return ScoreCounter.Scoring.ColorScoring.Points + 1;
+                    return ScoreCounter.Scoring.ColorScoring.Points;
                 }
             }
             else return 1;
@@ -413,7 +413,7 @@ namespace Calico
 
 
             if (count == 0) return 0;
-            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1;
+            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points;
             else return 1;
         }
 

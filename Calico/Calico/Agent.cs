@@ -6,7 +6,7 @@
     {
         // basic random agent
         public List<Agent> Opponents;
-        public void SetOpponent(ref List<Agent> opponents)
+        public void SetOpponent(ref List<Agent> opponents) // for multiplayer 
         {
             Opponents = opponents;
         }
@@ -22,13 +22,6 @@
         }
 
         public Agent(Scoring scoring, int boardId) : base(scoring,boardId)
-        {
-        }
-        public Agent(Scoring scoring, Bag b) : base(scoring, b)
-        {
-        }
-
-        public Agent(Scoring scoring, int boardId, Bag b) : base(scoring, boardId, b)
         {
         }
 
@@ -830,16 +823,17 @@
 
     public class MonteCarloAgent : MinimaxAgent
     {
-        int simulationsCount;
+        protected Bag Bag { get; set; }
+        protected int SimulationsCount;
         public MonteCarloAgent(Scoring scoring, Weights w, Bag b, int s) : base(scoring, w)
         {
-            bag = b;
-            simulationsCount = s;
+            Bag = b;
+            SimulationsCount = s;
         }
         public MonteCarloAgent(Scoring scoring, WeightsDict wd, Bag b, int s) : base(scoring, wd)
         {
-            bag = b;
-            simulationsCount = s;
+            Bag = b;
+            SimulationsCount = s;
         }
 
         public List<(int, int)> TopPositions(GamePiece gp, GameBoard board)
@@ -866,10 +860,10 @@
 
         public double Simulation(GameBoard gb, GamePiece[] Opts)
         {
-            int[] scores = new int[simulationsCount];
-            Parallel.For(0, simulationsCount, i =>
+            int[] scores = new int[SimulationsCount];
+            Parallel.For(0, SimulationsCount, i =>
             {
-                SimulationGame sg = new SimulationGame(new GameBoard(gb), Opts, gb.ScoreCounter.Scoring, bag);
+                SimulationGame sg = new SimulationGame(new GameBoard(gb), Opts, gb.ScoreCounter.Scoring, Bag);
                 scores[i] = sg.Game();
             });
             return scores.Average();
