@@ -10,8 +10,6 @@ namespace Calico
     {
         public GameBoard Board { get; set; }
 
-        public Bag bag { get; set; }
-
         public int[] TaskIds;
 
         public Player(Scoring scoring)
@@ -24,19 +22,6 @@ namespace Calico
         {
             Board = new GameBoard(scoring, boardId);
             TaskIds = new int[] { 0, 0, 0 };
-        }
-        public Player(Scoring scoring, Bag b)
-        {
-            Board = new GameBoard(scoring);
-            TaskIds = new int[] { 0, 0, 0 };
-            bag = b;
-        }
-
-        public Player(Scoring scoring, int boardId, Bag b)
-        {
-            Board = new GameBoard(scoring, boardId);
-            TaskIds = new int[] { 0, 0, 0 };
-            bag = b;
         }
 
         /// <summary>
