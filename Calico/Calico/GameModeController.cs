@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Calico
+﻿namespace Calico
 {
     public class GameModeController
     {
@@ -48,7 +39,7 @@ namespace Calico
                     }
                 case 3:
                     {
-                        Testing();
+                        TestingAgent();
                         break;
                     }
                 case 6:
@@ -79,7 +70,9 @@ namespace Calico
             }
         }
 
-        private int PickAgent(bool multiPlayer)
+        #region GetConsoleInput
+
+        private int PickAgent()
         {
             int agentOption;
 
@@ -115,26 +108,23 @@ namespace Calico
             }
         }
 
-        private (bool, string) GetOutputFileName()
+        private bool GetYesNo(string message)
         {
-            string outputIntoFile;
-
+            string val;
             while (true)
             {
-
-                Console.Write(" Přejete si vytisknout výsledky do souboru? (y/n) ");
-
-                outputIntoFile = Console.ReadLine();
+                Console.Write(message);
 
                 try
                 {
-                    if (outputIntoFile.Replace(" ", "") == "n")
+                    val = Console.ReadLine().Replace(" ", "");
+                    if (val == "n")
                     {
-                        return (false, "");
+                        return false;
                     }
-                    else if (outputIntoFile.Replace(" ", "") == "y")
+                    else if (val == "y")
                     {
-                        break ;
+                        return true;
                     }
                     else
                     {
@@ -144,19 +134,22 @@ namespace Calico
                 }
                 catch
                 {
-                    
+
                 }
-
             }
+        }
 
+        private string GetOutputFileName()
+        {
+            string output;
             while (true)
             {
                 Console.Write(" Zadejte jméno výstupního souboru: ");
 
-                string output = Console.ReadLine();
+                output = Console.ReadLine();
                 if (output != null)
                 {
-                    return(true, output);
+                    return output;
                 }       
                 
             }
@@ -215,28 +208,111 @@ namespace Calico
 
             while (true)
             {
+                Console.Write(" Zadejte velikost simulace: ");
                 try
                 {
-                    Console.Write(" Zadejte velikost simulace: ");
-
                     discountFactor = Convert.ToDouble(Console.ReadLine());
                     Console.WriteLine();
                     return discountFactor;
                 }
                 catch
                 {
-                    Console.WriteLine(" Zadejte celé číslo.");
+                    Console.WriteLine(" Zadejte číslo ");
                 }
             }
         }
 
-        #region TestingAgents
-
-        private void Testing()
+        private (int, int, int) GetTasksInput()
         {
-            int agentType = PickAgent(false);
+            int task1, task2, task3;
 
-            (bool outputToFile, string fileName) = GetOutputFileName();
+            while (true)
+            {
+                try
+                {
+                    Console.Write(" Zadejte čísla úkolů ve formátu i,j,k: ");
+
+                    string[] tasks = Console.ReadLine().Split(",");
+
+                    task1 = Convert.ToInt32(tasks[0]);
+                    task2 = Convert.ToInt32(tasks[1]);
+                    task3 = Convert.ToInt32(tasks[2]);
+
+                    if (tasks.Length != 3)
+                    {
+                        Console.WriteLine(" Zadejte právě tři čísla v danm formátu");
+                    }
+                    else
+                    {
+                        if (1 <= task1 && task1 <= 6 && 1 <= task2 && task2 <= 6 && 1 <= task3 && task3 <= 6)
+                        {
+                            if (task1 == task2 || task1 == task3 || task2 == task3)
+                            {
+                                Console.WriteLine(" Každý úkol lze vybrat nejvýše jednou");
+                            }
+                            else
+                            {
+                                return (task1, task2, task3);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine(" Zadejte čísla od 1 do 6");
+                        }
+                    }
+
+                    
+                }
+                catch
+                {
+                    Console.WriteLine(" Zadejte čísla od 1 do 6");
+                }
+            }
+        }
+
+        private int GetBoardId()
+        {
+            int boardId;
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write(" Zadejte číslo desky (1-4): ");
+
+                    boardId = Convert.ToInt32(Console.ReadLine());
+
+                    if (1 <= boardId && boardId <= 4)
+                    {
+                        return boardId;
+                    }
+                    else
+                    {
+                        Console.WriteLine(" Zadejte číslo od 1 do 4");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine(" Zadejte číslo od 1 do 4");
+                }
+            }
+        }
+
+        #endregion
+
+        #region TestingAgents - fixed
+
+        private void TestingAgent()
+        {
+            int agentType = PickAgent();
+
+            bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
+            string fileName = "";
+
+            if (outputToFile)
+            {
+                fileName = GetOutputFileName();
+            }
 
             int iterations;
             GameStats[] stats = null;
@@ -306,23 +382,6 @@ namespace Calico
                 {
                     using (StreamWriter outputFile = new StreamWriter(fileName))
                     {
-                        outputFile.WriteLine(stats.Max(item => item.Score));
-                        outputFile.WriteLine(stats.Min(item => item.Score));
-                        outputFile.WriteLine(
-                            $"{Math.Round(stats.Average(item => item.Score), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Average(item => item.Buttons), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Average(item => item.Cats.Item1), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Average(item => item.Cats.Item2), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{Math.Round(stats.Average(item => item.Cats.Item3), 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                            $"{GetTaskAverageScore(1,stats)};" +
-                            $"{GetTaskAverageScore(2, stats)};" +
-                            $"{GetTaskAverageScore(3, stats)};" +
-                            $"{GetTaskAverageScore(4, stats)};" +
-                            $"{GetTaskAverageScore(5, stats)};" +
-                            $"{GetTaskAverageScore(6, stats)};"
-                            ) ;
-                        outputFile.WriteLine("");
-
                         outputFile.WriteLine("score;Buttons;C1;C2;C3;T1;T2;T3;T4;T5;T6");
 
                         foreach (GameStats gs in stats)
@@ -347,10 +406,11 @@ namespace Calico
                 {
                     Console.WriteLine(" Zápis do souboru selhal");
                 }
-
             }
             else
             {
+                Console.WriteLine(stats.Max(item => item.Score));
+                Console.WriteLine(stats.Min(item => item.Score));
                 Console.WriteLine(
                             $"{Math.Round(stats.Average(item => item.Score), 3, MidpointRounding.AwayFromZero).ToString("0.000")}, " +
                             $"{Math.Round(stats.Average(item => item.Buttons), 3, MidpointRounding.AwayFromZero).ToString("0.000")} " +
@@ -367,7 +427,6 @@ namespace Calico
             }
                 
         }
-
         #endregion
 
         #region Settings analysis
@@ -465,8 +524,6 @@ namespace Calico
             }
             
         }
-
-
             #region Task Analysis
 
             private AverageGameStats TestTask(int agentType, int iterations, (int, int, int) tasks)
@@ -593,9 +650,6 @@ namespace Calico
         #endregion
 
         #endregion
-
-
-
 
         #region Evolution
 
@@ -741,7 +795,6 @@ namespace Calico
         }
         #endregion
 
-
         #region Rozptyl
 
 
@@ -781,7 +834,7 @@ namespace Calico
 
         #endregion
 
-
+        #region Helpers
 
         private string GetTaskAverageScore(int taskId, GameStats[] stats)
         {
@@ -794,6 +847,8 @@ namespace Calico
                 return "0,000";
             }
         }
+
+        #endregion
 
     }
 }
