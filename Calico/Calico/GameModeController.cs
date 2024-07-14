@@ -55,7 +55,6 @@ namespace Calico
                         Console.WriteLine(" Invalid expression");
                     }
                 }
-
             }
         }
 
@@ -99,7 +98,7 @@ namespace Calico
                             }
                         case 3:
                             {
-                                Evolution();
+                                ChooseEvolutionMode();
                                 return;
                             }
                         default:
@@ -114,7 +113,6 @@ namespace Calico
                     Console.WriteLine(" Game mode must be an integer.");
                 }
             }
-
         }
 
         #region GetConsoleInput
@@ -847,138 +845,161 @@ namespace Calico
 
         #region Evolution
 
+        private int GetEvolMode()
+        {
+            int mode;
+
+            Console.WriteLine(" Vyberte jeden z následujících: ");
+            Console.WriteLine("   1. Spustit evoluci");
+            Console.WriteLine("   2. Získat váhy pro konkrétní umístění");
+
+            while (true)
+            {
+                Console.Write(" Zadejte vybrané: ");
+
+                try
+                {
+                    mode = Convert.ToInt32(Console.ReadLine());
+
+                    if (mode == 1 || mode == 2)
+                    {
+                        return mode;
+                    }
+                    else
+                    {
+                        Console.WriteLine(" Zadejte 1 nebo 2");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine(" Zadejte 1 nebo 2");
+                }
+            }
+        }
+
+        private void ChooseEvolutionMode()
+        {
+            // jestli spustím evoluci nebo získání vah z poslední generace
+            int mode = GetEvolMode();
+
+            if (mode == 1)
+            {
+                Evolution();
+            }
+            else // mode == 2
+            {
+                EvolParamsTesting();
+            }
+        }
+
         private void Evolution()
         {
-            //new Evolution((1, 2, 3), true);
-            //new Evolution((1, 2, 4), true);
-            //new Evolution((1, 2, 5), true);
-            //new Evolution((1, 2, 6), true);
-            //new Evolution((1, 3, 4), true);
-            //new Evolution((1, 3, 5), true);
-            //new Evolution((1, 3, 6), true);
-            //new Evolution((1, 4, 5), true);
-            //new Evolution((1, 4, 6), true);
-            //new Evolution((1, 5, 6), true);
-            //new Evolution((2, 3, 4), true);
-            //new Evolution((2, 3, 5), true);
-            //new Evolution((2, 3, 6), true);
-            //new Evolution((2, 4, 5), true);
-            //new Evolution((2, 4, 6), true);
-            //new Evolution((2, 5, 6), true);
-            //new Evolution((3, 4, 5), true);
-            //new Evolution((3, 4, 6), true);
-            //new Evolution((3, 5, 6), true);
-            //new Evolution((4, 5, 6), true);
+            // vybrat tasky
+            (int,int, int) tasks = GetTasksInput();
+            // vybrat jestli mixed placement
+            bool mixedPlacement = GetYesNo(" Chcete testovat kombinace bez konkrétního umístění? (y/n): ");
 
-            new Evolution((1, 5, 6), false);
-            new Evolution((1, 6, 5), false);
-            new Evolution((5, 1, 6), false);
-            new Evolution((5, 6, 1), false);
-            new Evolution((6, 1, 5), false);
-            new Evolution((6, 5, 1), false);
+            // název souboru
+            string outputFileName = GetOutputFileName();
+
+            new Evolution(tasks, true, outputFileName);
+
         }
 
         private void EvolParamsTesting()
         {
+            // název souboru ze kterého beru
+            string inputFileName = GetOutputFileName();
+            // název souboru kam ukládám
+            string outputFileName = GetOutputFileName();
+            // kombinace kterou čtu
+            (int i, int j, int k) = GetTasksInput();
 
-            string[] lines = new string[6];
+            string[] lines = new string[6]; // 6 možností umístění kombinace úkolů
             int lineIndex = 0;
 
-
-            for (int i = 1; i <= 6; i++)
+            foreach ((int, int, int) tasks in new[]{ (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
             {
-                for (int j = i + 1; j <= 6; j++)
+                using (var reader = new StreamReader(inputFileName))
                 {
-                    for (int k = j + 1; k <= 6; k++)
+                    var line = reader.ReadLine();
+                    var values = line.Split(';'); // columns
+
+                    int iterations = 5000;
+
+                    double maxScoreAverage = 0;
+
+                    double maxConstB = 1;
+                    (double,double,double) maxConstC = (1, 1, 1);
+                    double[] maxConstT = new double[6] {1,1,1,1,1,1};
+
+
+                    for (int gen = 0;gen < 200;gen++) 
                     {
-                        foreach ((int, int, int) tasks in new[]{ (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
+                        if (!reader.EndOfStream)
                         {
-                            using (var reader = new StreamReader($"finalGen_{tasks.Item1}{tasks.Item2}{tasks.Item3}(detail)new.csv"))
-                            {
-                                var line = reader.ReadLine();
-                                var values = line.Split(';'); // columns
-
-                                int iterations = 5000;
-
-                                double maxScoreAverage = 0;
-
-                                double maxConstB = 1;
-                                (double,double,double) maxConstC = (1, 1, 1);
-                                double[] maxConstT = new double[6] {1,1,1,1,1,1};
-
-
-                                for (int gen = 0;gen < 200;gen++) 
-                                {
-                                    if (!reader.EndOfStream)
-                                    {
                                        
-                                        line = reader.ReadLine();
-                                        values = line.Split(';');
+                            line = reader.ReadLine();
+                            values = line.Split(';');
 
-                                        double constB = Convert.ToDouble(values[1]);
-                                        (double, double, double) constC = (Convert.ToDouble(values[2]), Convert.ToDouble(values[3]), Convert.ToDouble(values[4]));
-                                        double[] constT = new double[]
-                                                {
-                                                    Convert.ToDouble(values[5]),
-                                                    Convert.ToDouble(values[6]),
-                                                    Convert.ToDouble(values[7]),
-                                                    Convert.ToDouble(values[8]),
-                                                    Convert.ToDouble(values[9]),
-                                                    Convert.ToDouble(values[10]),
-                                                };
+                            double constB = Convert.ToDouble(values[1]);
+                            (double, double, double) constC = (Convert.ToDouble(values[2]), Convert.ToDouble(values[3]), Convert.ToDouble(values[4]));
+                            double[] constT = new double[]
+                                    {
+                                        Convert.ToDouble(values[5]),
+                                        Convert.ToDouble(values[6]),
+                                        Convert.ToDouble(values[7]),
+                                        Convert.ToDouble(values[8]),
+                                        Convert.ToDouble(values[9]),
+                                        Convert.ToDouble(values[10]),
+                                    };
 
-                                        GameStats[] stats = new GameStats[iterations];
-                                        for (int s = 0; s < iterations; s++)
-                                        {
-                                            Game g = new Game();
-                                            g.EvolParamsTestAgent(
-                                                constB, 
-                                                constC, 
-                                                constT,
-                                                tasks);
-                                            stats[s] = g.Stats;
-                                        }
-                                        Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3} : {gen} : {stats.Average(item => item.Score)}");
-                                        if (stats.Average(item => item.Score) > maxScoreAverage)
-                                        {
-                                            maxScoreAverage = stats.Average(item => item.Score);
-                                            maxConstB = constB;
-                                            maxConstC = (constC.Item1, constC.Item2, constC.Item3);
-
-                                            for(int t=0; t<6; t++) 
-                                            {
-                                                maxConstT[t] = constT[t];
-                                            }
-                                        }
-                                    }
-                                }
-
-                                lines[lineIndex] =
-                                    $"{tasks.Item1},{tasks.Item2},{tasks.Item3};" +
-                                    $"{Math.Round(maxScoreAverage, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstB, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstC.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstC.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstC.Item3, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstT[0], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstT[1], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstT[2], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstT[3], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstT[4], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                                    $"{Math.Round(maxConstT[5], 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
-
-                                Console.WriteLine(lines[lineIndex]);
-                                lineIndex++;
+                            GameStats[] stats = new GameStats[iterations];
+                            for (int s = 0; s < iterations; s++)
+                            {
+                                Game g = new Game();
+                                g.EvolParamsTestAgent(
+                                    constB, 
+                                    constC, 
+                                    constT,
+                                    tasks);
+                                stats[s] = g.Stats;
                             }
+                            Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3} : {gen} : {stats.Average(item => item.Score)}");
+                            if (stats.Average(item => item.Score) > maxScoreAverage)
+                            {
+                                maxScoreAverage = stats.Average(item => item.Score);
+                                maxConstB = constB;
+                                maxConstC = (constC.Item1, constC.Item2, constC.Item3);
 
+                                for(int t=0; t<6; t++) 
+                                {
+                                    maxConstT[t] = constT[t];
+                                }
+                            }
                         }
-
-
                     }
+
+                    lines[lineIndex] =
+                        $"{tasks.Item1},{tasks.Item2},{tasks.Item3};" +
+                        $"{Math.Round(maxScoreAverage, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstB, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstC.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstC.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstC.Item3, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstT[0], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstT[1], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstT[2], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstT[3], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstT[4], 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                        $"{Math.Round(maxConstT[5], 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
+
+                    Console.WriteLine(lines[lineIndex]);
+                    lineIndex++;
                 }
             }
 
-            using (StreamWriter outputFile = new StreamWriter("156DetailFinal.csv"))
+            using (StreamWriter outputFile = new StreamWriter(outputFileName))
             {
                 outputFile.WriteLine("tasks;score;b;c1;c2;c3;t1;t2;t3;t4;t5;t6");
                 foreach (var line in lines)

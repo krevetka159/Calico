@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,14 +19,18 @@ namespace Calico
         private (int, int, int) tasks;
         private bool mixed;
 
+        private string outputFileName;
+
         private Random random;
 
-        public Evolution((int,int,int) tasks, bool mixed)
+        public Evolution((int,int,int) tasks, bool mixed, string outputFileName)
         {
             random = new Random();
 
             this.tasks = tasks;
             this.mixed = mixed;
+
+            this.outputFileName = outputFileName;
 
             EvolutionRun();
         }
@@ -69,10 +74,9 @@ namespace Calico
             }
             results.Sort((x, y) => y.Item1.CompareTo(x.Item1));
 
-            Directory.CreateDirectory("./Evol");
-            using (StreamWriter outputFile = new StreamWriter($"./Evol/finalGen_{tasks.Item1}{tasks.Item2}{tasks.Item3}(detail)new.csv"))
+            using (StreamWriter outputFile = new StreamWriter(outputFileName))
             {
-                outputFile.WriteLine("fitness;buttons;catsA;catsB;catsC;taskA;taskB;taskC");
+                outputFile.WriteLine("fitness;buttons;c1;c2;c3;t1;t2;t3;t4;t5;t6");
                 foreach ((double, Weights) res in results)
                 {
                     double normSum =
@@ -102,19 +106,6 @@ namespace Calico
                         $"{Math.Round(temp[3], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(temp[4], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
                         $"{Math.Round(temp[5], 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
-                }
-            }
-            using (StreamWriter outputFile = new StreamWriter($"./Evol/progress_{tasks.Item1}{tasks.Item2}{tasks.Item3}(mixed).csv"))
-            {
-                outputFile.WriteLine("generation;avg;max");
-                for(int g = 0; g<generations;g++)
-                {
-
-                    outputFile.WriteLine(
-                        $"{g};" +
-                        $"{Math.Round(avg[g], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(max[g], 3, MidpointRounding.AwayFromZero).ToString("0.00000")}");
-
                 }
             }
         }
