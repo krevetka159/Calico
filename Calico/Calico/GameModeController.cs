@@ -432,6 +432,9 @@ namespace Calico
 
         #region Settings analysis
 
+        /// <summary>
+        /// Choose settings to test
+        /// </summary>
         private void TestSettingsController()
         {
             bool testTasks = GetYesNo(" Testování konkrétní kombinace úkolů? (y/n): ");
@@ -454,24 +457,30 @@ namespace Calico
 
             if (testTasks && testBoards)
             {
-                TestSettingMock(tasks, mixedPlacement, boardId);
+                TestSetting(tasks, mixedPlacement, boardId);
             }
             else if (testTasks)
             {
-                TestTaskMock(tasks, mixedPlacement);
+                TestTask(tasks, mixedPlacement);
             }
             else if (testBoards)
             {
-                TestBoardMock(boardId);
+                TestBoard(boardId);
             }
             else
             {
                 mixedPlacement = GetYesNo(" Testovat kombinace úkolů bez konkrétního umístění? (y/n): ");
-                TestAllMock(mixedPlacement);
+                TestAllSettings(mixedPlacement);
             }
         }
 
-        private double TestSetting((int, int, int) tasks, int boardId)
+        /// <summary>
+        /// Průměrné skóre s daným umístěním úkolů na desce
+        /// </summary>
+        /// <param name="tasks"></param>
+        /// <param name="boardId"></param>
+        /// <returns></returns>
+        private double TestSettingScore((int, int, int) tasks, int boardId)
         {
             int iterations = 5000;
             GameStats[] stats = new GameStats[iterations];
@@ -485,8 +494,12 @@ namespace Calico
 
             return stats.Average(item => item.Score);
         }
-
-        private double TestTask((int, int, int) tasks)
+        /// <summary>
+        /// Průměrné skóre s daným umístěním úkolů
+        /// </summary>
+        /// <param name="tasks"></param>
+        /// <returns></returns>
+        private double TestTaskScore((int, int, int) tasks)
         {
             int iterations = 5000;
             GameStats[] stats = new GameStats[iterations];
@@ -500,8 +513,12 @@ namespace Calico
 
             return stats.Average(item => item.Score);
         }
-
-        private double TestBoard(int boardId)
+        /// <summary>
+        /// Průměrné skóre s danou deskou
+        /// </summary>
+        /// <param name="boardId"></param>
+        /// <returns></returns>
+        private double TestBoardScore(int boardId)
         {
             int iterations = 5000;
             GameStats[] stats = new GameStats[iterations];
@@ -516,7 +533,13 @@ namespace Calico
             return stats.Average(item => item.Score);
         }
 
-        private void TestSettingMock((int,int,int) tasks, bool mixedPlacement, int boardId)
+        /// <summary>
+        /// Otestování dané kombinace úkolů na desce
+        /// </summary>
+        /// <param name="tasks"></param>
+        /// <param name="mixedPlacement"></param>
+        /// <param name="boardId"></param>
+        private void TestSetting((int,int,int) tasks, bool mixedPlacement, int boardId)
         {
             bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
             string fileName = "";
@@ -535,17 +558,17 @@ namespace Calico
                 int k = tasks.Item3;
 
                 score =
-                    (TestSetting((i, j, k), boardId) +
-                    TestSetting((i, k, j), boardId) +
-                    TestSetting((j, i, k), boardId) +
-                    TestSetting((j, k, i), boardId) +
-                    TestSetting((k, i, j), boardId) +
-                    TestSetting((k, j, i), boardId))
+                    (TestSettingScore((i, j, k), boardId) +
+                    TestSettingScore((i, k, j), boardId) +
+                    TestSettingScore((j, i, k), boardId) +
+                    TestSettingScore((j, k, i), boardId) +
+                    TestSettingScore((k, i, j), boardId) +
+                    TestSettingScore((k, j, i), boardId))
                     / 6;
             }
             else
             {
-                score = TestSetting(tasks, boardId);
+                score = TestSettingScore(tasks, boardId);
             }
 
             if (outputToFile)
@@ -568,7 +591,12 @@ namespace Calico
             }
         }
 
-        private void TestTaskMock((int, int, int) tasks, bool mixedPlacement)
+        /// <summary>
+        /// Otestování dané kombinace úkolů
+        /// </summary>
+        /// <param name="tasks"></param>
+        /// <param name="mixedPlacement"></param>
+        private void TestTask((int, int, int) tasks, bool mixedPlacement)
         { 
             bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
             string fileName = "";
@@ -587,17 +615,17 @@ namespace Calico
                 int k = tasks.Item3;
 
                 score =
-                    (TestTask((i, j, k)) +
-                    TestTask((i, k, j)) +
-                    TestTask((j, i, k)) +
-                    TestTask((j, k, i)) +
-                    TestTask((k, i, j)) +
-                    TestTask((k, j, i))
+                    (TestTaskScore((i, j, k)) +
+                    TestTaskScore((i, k, j)) +
+                    TestTaskScore((j, i, k)) +
+                    TestTaskScore((j, k, i)) +
+                    TestTaskScore((k, i, j)) +
+                    TestTaskScore((k, j, i))
                     ) / 6;
             }
             else
             {
-                score = TestTask(tasks);
+                score = TestTaskScore(tasks);
             }
 
             if (outputToFile)
@@ -620,7 +648,11 @@ namespace Calico
             }
         }
 
-        private void TestBoardMock(int boardId)
+        /// <summary>
+        /// Otestování dané desky
+        /// </summary>
+        /// <param name="boardId"></param>
+        private void TestBoard(int boardId)
         {
             bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
             string fileName = "";
@@ -630,7 +662,7 @@ namespace Calico
                 fileName = GetOutputFileName();
             }
 
-            double score = TestBoard(boardId);
+            double score = TestBoardScore(boardId);
 
             if (outputToFile)
             {
@@ -652,7 +684,11 @@ namespace Calico
             }
         }
 
-        private void TestAllMock(bool mixedPlacement)
+        /// <summary>
+        /// Otestování všech kombinací úkolů na všech deskách
+        /// </summary>
+        /// <param name="mixedPlacement"></param>
+        private void TestAllSettings(bool mixedPlacement)
         {
             bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
             string fileName = "";
@@ -688,12 +724,12 @@ namespace Calico
                                 if (mixedPlacement)
                                 {
                                     score = 
-                                        (TestSetting((i, j, k), b) +
-                                        TestSetting((i, k, j), b) +
-                                        TestSetting((j, i, k), b) +
-                                        TestSetting((j, k, i), b) +
-                                        TestSetting((k, i, j), b) +
-                                        TestSetting((k, j, i), b))
+                                        (TestSettingScore((i, j, k), b) +
+                                        TestSettingScore((i, k, j), b) +
+                                        TestSettingScore((j, i, k), b) +
+                                        TestSettingScore((j, k, i), b) +
+                                        TestSettingScore((k, i, j), b) +
+                                        TestSettingScore((k, j, i), b))
                                         / 6;
                                     results[index] = $"{b};{i},{j},{k};{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
                                     index++;
@@ -703,7 +739,7 @@ namespace Calico
                                 {
                                     foreach((int,int,int) t in new[] { (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
                                     {
-                                        score = TestSetting(t, b);
+                                        score = TestSettingScore(t, b);
                                         results[index] = $"{b};{t.Item1},{t.Item2},{t.Item3};{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
                                         index++;
                                     }
@@ -737,12 +773,12 @@ namespace Calico
                                 if (mixedPlacement)
                                 {
                                     score =
-                                        (TestSetting((i, j, k), b) +
-                                        TestSetting((i, k, j), b) +
-                                        TestSetting((j, i, k), b) +
-                                        TestSetting((j, k, i), b) +
-                                        TestSetting((k, i, j), b) +
-                                        TestSetting((k, j, i), b))
+                                        (TestSettingScore((i, j, k), b) +
+                                        TestSettingScore((i, k, j), b) +
+                                        TestSettingScore((j, i, k), b) +
+                                        TestSettingScore((j, k, i), b) +
+                                        TestSettingScore((k, i, j), b) +
+                                        TestSettingScore((k, j, i), b))
                                         / 6;
                                     Console.WriteLine($" {b} | {i},{j},{k}: {Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
                                 }
@@ -750,7 +786,7 @@ namespace Calico
                                 { 
                                     foreach((int,int,int) t in new[] { (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
                                     {
-                                        score = TestSetting(t, b);
+                                        score = TestSettingScore(t, b);
                                         Console.WriteLine($"{b} | {t.Item1},{t.Item2},{t.Item3}: {Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
                                     }
                                 }
