@@ -1,4 +1,7 @@
-﻿namespace Calico
+﻿using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
+
+namespace Calico
 {
     public class GameModeController
     {
@@ -44,9 +47,7 @@
                     }
                 case 6:
                     {
-                        //TestTasks();
-                        //TestBoards();
-                        TestAllSettings();
+                        TestSettingsController();
                         break;
                     }
                 case 7:
@@ -431,223 +432,325 @@
 
         #region Settings analysis
 
-        private AverageGameStats TestSetting(int agentType, int iterations, (int, int, int) tasks, int boardId)
+        private void TestSettingsController()
         {
-            List<GameStats> stats = new List<GameStats>();
+            bool testTasks = GetYesNo(" Testování konkrétní kombinace úkolů? (y/n): ");
+            (int, int, int) tasks = (0, 0, 0);
+            bool mixedPlacement = false;
 
-            for (int j = 0; j < iterations; j++)
+            if(testTasks)
             {
-                stats.Add(null);
+                tasks = GetTasksInput();
+                mixedPlacement = GetYesNo(" Otestovat kombinaci bez konkrétního umístění? (y/n): ");
             }
 
-            Parallel.For(0, iterations, j =>
+            bool testBoards = GetYesNo(" Testování konkrétní desky? (y/n): ");
+            int boardId = -1;
+
+            if(testBoards)
+            {
+                boardId = GetBoardId();
+            }
+
+            if (testTasks && testBoards)
+            {
+                TestSettingMock(tasks, mixedPlacement, boardId);
+            }
+            else if (testTasks)
+            {
+                TestTaskMock(tasks, mixedPlacement);
+            }
+            else if (testBoards)
+            {
+                TestBoardMock(boardId);
+            }
+            else
+            {
+                mixedPlacement = GetYesNo(" Testovat kombinace úkolů bez konkrétního umístění? (y/n): ");
+                TestAllMock(mixedPlacement);
+            }
+        }
+
+        private double TestSetting((int, int, int) tasks, int boardId)
+        {
+            int iterations = 5000;
+            GameStats[] stats = new GameStats[iterations];
+
+            for (int i = 0; i < iterations; i++)
             {
                 Game g = new Game();
-                if(boardId == -1)
+                g.AgentGameSettings(5, false, tasks, boardId);
+                stats[i] = g.Stats;
+            }
+
+            return stats.Average(item => item.Score);
+        }
+
+        private double TestTask((int, int, int) tasks)
+        {
+            int iterations = 5000;
+            GameStats[] stats = new GameStats[iterations];
+
+            for (int i = 0; i < iterations; i++)
+            {
+                Game g = new Game();
+                g.AgentGameTaskSettings(5, false, tasks);
+                stats[i] = g.Stats;
+            }
+
+            return stats.Average(item => item.Score);
+        }
+
+        private double TestBoard(int boardId)
+        {
+            int iterations = 5000;
+            GameStats[] stats = new GameStats[iterations];
+
+            for (int i = 0; i < iterations; i++)
+            {
+                Game g = new Game();
+                g.AgentGameBoardSettings(5, false, boardId);
+                stats[i] = g.Stats;
+            }
+
+            return stats.Average(item => item.Score);
+        }
+
+        private void TestSettingMock((int,int,int) tasks, bool mixedPlacement, int boardId)
+        {
+            bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
+            string fileName = "";
+
+            if (outputToFile)
+            {
+                fileName = GetOutputFileName();
+            }
+
+            double score;
+
+            if (mixedPlacement)
+            {
+                int i = tasks.Item1;
+                int j = tasks.Item2;
+                int k = tasks.Item3;
+
+                score =
+                    (TestSetting((i, j, k), boardId) +
+                    TestSetting((i, k, j), boardId) +
+                    TestSetting((j, i, k), boardId) +
+                    TestSetting((j, k, i), boardId) +
+                    TestSetting((k, i, j), boardId) +
+                    TestSetting((k, j, i), boardId))
+                    / 6;
+            }
+            else
+            {
+                score = TestSetting(tasks, boardId);
+            }
+
+            if (outputToFile)
+            {
+                using (StreamWriter outputFile = new StreamWriter(fileName))
                 {
-                    g.AgentGameTaskSettings(7, false, tasks);
+                    outputFile.WriteLine("board;tasks;score");
+                    outputFile.WriteLine(
+                            $"{boardId};{tasks.Item1},{tasks.Item2},{tasks.Item3};" +
+                            $"{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}"
+                    );
+                }  
+            }
+            else
+            {
+                Console.WriteLine(
+                    $" {boardId} | {tasks.Item1},{tasks.Item2},{tasks.Item3}: " +
+                    $"{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}"
+                );
+            }
+        }
+
+        private void TestTaskMock((int, int, int) tasks, bool mixedPlacement)
+        { 
+            bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
+            string fileName = "";
+
+            if (outputToFile)
+            {
+                fileName = GetOutputFileName();
+            }
+
+            double score;
+
+            if (mixedPlacement)
+            {
+                int i = tasks.Item1;
+                int j = tasks.Item2;
+                int k = tasks.Item3;
+
+                score =
+                    (TestTask((i, j, k)) +
+                    TestTask((i, k, j)) +
+                    TestTask((j, i, k)) +
+                    TestTask((j, k, i)) +
+                    TestTask((k, i, j)) +
+                    TestTask((k, j, i))
+                    ) / 6;
+            }
+            else
+            {
+                score = TestTask(tasks);
+            }
+
+            if (outputToFile)
+            {
+                using (StreamWriter outputFile = new StreamWriter(fileName))
+                {
+                    outputFile.WriteLine("tasks;score");
+                    outputFile.WriteLine(
+                            $"{tasks.Item1},{tasks.Item2},{tasks.Item3};" +
+                            $"{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}"
+                    );
+                }
+            }
+            else
+            {
+                Console.WriteLine(
+                    $" {tasks.Item1},{tasks.Item2},{tasks.Item3}: " +
+                    $"{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}"
+                );
+            }
+        }
+
+        private void TestBoardMock(int boardId)
+        {
+            bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
+            string fileName = "";
+
+            if (outputToFile)
+            {
+                fileName = GetOutputFileName();
+            }
+
+            double score = TestBoard(boardId);
+
+            if (outputToFile)
+            {
+                using (StreamWriter outputFile = new StreamWriter(fileName))
+                {
+                    outputFile.WriteLine("board;score");
+                    outputFile.WriteLine(
+                    $"{boardId};" +
+                            $"{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}"
+                    );
+                }
+            }
+            else
+            {
+                Console.WriteLine(
+                $" {boardId}: " +
+                    $"{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}"
+                );
+            }
+        }
+
+        private void TestAllMock(bool mixedPlacement)
+        {
+            bool outputToFile = GetYesNo(" Chcete výsledky zapsat do souboru? (y/n): ");
+            string fileName = "";
+
+            if (outputToFile)
+            {
+                fileName = GetOutputFileName();
+            }
+
+            double score;
+
+            if (outputToFile)
+            {
+                string[] results;
+                if (mixedPlacement)
+                {
+                    results = new string[4 * 120];
                 }
                 else
                 {
-                    g.AgentGameSettings(7, false, tasks, boardId);
+                    results = new string[4 * 20];
                 }
-                stats[j] = g.Stats;
-            });
 
-            if (iterations > 1)
-            {
-                Console.WriteLine(" Mean: " + stats.Average(item => item.Score));
-                //Console.WriteLine(" Average number of buttons: " + (Convert.ToDouble(buttons) / Convert.ToDouble(iterations)));
-                //Console.WriteLine(" Average number of cats: " + (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)));
-                //Console.WriteLine(" Best score: " + max + "; buttons: " + Convert.ToDouble(maxButtons) +
-                //    "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3));
-                //Console.WriteLine(" Lowest score: " + min);
-            }
-
-            return new AverageGameStats(agentType, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
-
-        }
-
-        private void TestAllSettings()
-        {
-            List<string>results = new List<string>();
-
-                
-            for (int i = 1; i <= 6; i++)
-            {
-                for (int j = i + 1; j <= 6; j++)
+                int index = 0;
+                for (int b = 0; b < 4; b++)
                 {
-                    for (int k = j + 1; k <= 6; k++)
+                    for (int i = 1; i <= 6; i++)
                     {
+                        for (int j = i + 1; j <= 6; j++)
+                        {
+                            for (int k = j + 1; k <= 6; k++)
+                            {
+                                if (mixedPlacement)
+                                {
+                                    score = 
+                                        (TestSetting((i, j, k), b) +
+                                        TestSetting((i, k, j), b) +
+                                        TestSetting((j, i, k), b) +
+                                        TestSetting((j, k, i), b) +
+                                        TestSetting((k, i, j), b) +
+                                        TestSetting((k, j, i), b))
+                                        / 6;
+                                    results[index] = $"{b};{i},{j},{k};{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
+                                    index++;
 
-                        Console.WriteLine($" {i},{j},{k}: ");
-                        var res = TestSetting(7, 5000, (i, j, k), -1);
-                        results.Add($"{i},{j},{k};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-                        Console.WriteLine();
+                                }
+                                else
+                                {
+                                    foreach((int,int,int) t in new[] { (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
+                                    {
+                                        score = TestSetting(t, b);
+                                        results[index] = $"{b};{t.Item1},{t.Item2},{t.Item3};{Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}";
+                                        index++;
+                                    }
 
-                        Console.WriteLine($" {i},{k},{j}: ");
-                        res = TestSetting(7, 5000, (i, k, j), -1);
-                        results.Add($"{i},{k},{j};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-                        Console.WriteLine();
+                                }
+                            }
+                        }
+                    }
+                }
 
-                        Console.WriteLine($" {j},{i},{k}: ");
-                        res = TestSetting(7, 5000, (j, i, k), -1);
-                        results.Add($"{j},{i},{k};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {j},{k},{i}: ");
-                        res = TestSetting(7, 5000, (j, k, i), -1);
-                        results.Add($"{j},{k},{i};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {k},{i},{j}: ");
-                        res = TestSetting(7, 5000, (k, i, j), -1);
-                        results.Add($"{k},{i},{j};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {k},{j},{i}: ");
-                        res = TestSetting(7, 5000, (k, j, i), -1);
-                        results.Add($"{k},{j},{i};{Math.Round(res.AvgScore, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-                        Console.WriteLine();
+            }
+            else
+            {
+                for (int b = 0; b < 4; b++)
+                {
+                    for (int i = 1; i <= 6; i++)
+                    {
+                        for (int j = i + 1; j <= 6; j++)
+                        {
+                            for (int k = j + 1; k <= 6; k++)
+                            {
+                                if (mixedPlacement)
+                                {
+                                    score =
+                                        (TestSetting((i, j, k), b) +
+                                        TestSetting((i, k, j), b) +
+                                        TestSetting((j, i, k), b) +
+                                        TestSetting((j, k, i), b) +
+                                        TestSetting((k, i, j), b) +
+                                        TestSetting((k, j, i), b))
+                                        / 6;
+                                    Console.WriteLine($" {b} | {i},{j},{k}: {Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                                }
+                                else
+                                { 
+                                    foreach((int,int,int) t in new[] { (i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i) })
+                                    {
+                                        score = TestSetting(t, b);
+                                        Console.WriteLine($"{b} | {t.Item1},{t.Item2},{t.Item3}: {Math.Round(score, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-
-
-            using (StreamWriter outputFile = new StreamWriter($"./resultsBeforeEvol.csv"))
-            {
-                outputFile.WriteLine("tasks;score");
-                foreach (string res in results)
-                {
-                outputFile.WriteLine(res);
-                }
-            }
-            
         }
-            #region Task Analysis
-
-            private AverageGameStats TestTask(int agentType, int iterations, (int, int, int) tasks)
-        {
-            List<GameStats> stats = new List<GameStats>();
-
-            for (int j = 0; j < iterations; j++)
-            {
-
-                Game g = new Game();
-                g.AgentGameTaskSettings(7, false, tasks);
-                stats.Add( g.Stats);
-            }
-
-            if (iterations > 1)
-            {
-                //Console.WriteLine(" Mean: " + stats.Average(item => item.Score));
-                //Console.WriteLine(" Average number of buttons: " + (Convert.ToDouble(buttons) / Convert.ToDouble(iterations)));
-                //Console.WriteLine(" Average number of cats: " + (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)));
-                //Console.WriteLine(" Best score: " + max + "; buttons: " + Convert.ToDouble(maxButtons) +
-                //    "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3));
-                //Console.WriteLine(" Lowest score: " + min);
-            }
-
-            return new AverageGameStats(agentType, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
-
-        }
-
-        private void TestTasks()
-        {
-            List<AverageGameStats> statsDict = new List<AverageGameStats>();
-
-            for (int i = 1; i <= 6; i++)
-            {
-                for (int j = i + 1; j <= 6; j++)
-                {
-                    for (int k = j + 1; k <= 6; k++)
-                    {
-                        statsDict = new List<AverageGameStats>();
-
-                        Console.WriteLine($" {i},{j},{k}: ");
-                        statsDict.Add(TestTask(5, 5000, (i, j, k)));
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {i},{k},{j}: ");
-                        statsDict.Add(TestTask(5, 5000, (i, k, j)));
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {j},{i},{k}: ");
-                        statsDict.Add(TestTask(5, 5000, (j, i, k)));
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {j},{k},{i}: ");
-                        statsDict.Add(TestTask(5, 5000, (j, k, i)));
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {k},{i},{j}: ");
-                        statsDict.Add(TestTask(5, 5000, (k, i, j)));
-                        Console.WriteLine();
-
-                        Console.WriteLine($" {k},{j},{i}: ");
-                        statsDict.Add(TestTask(5, 5000, (k, j, i)));
-                        Console.WriteLine();
-                    }
-                }
-            }
-
-            // objListOrder.Sort((x, y) => x.OrderDate.CompareTo(y.OrderDate));
-
-            List<(string, double)> avgScores = new List<(string, double)>();
-
-            avgScores.Add(($"2,3,5", statsDict[0].AvgScore));
-            avgScores.Add(($"2,5,3", statsDict[1].AvgScore));
-            avgScores.Add(($"3,2,5", statsDict[2].AvgScore));
-            avgScores.Add(($"3,5,2", statsDict[3].AvgScore));
-            avgScores.Add(($"5,2,3", statsDict[4].AvgScore));
-            avgScores.Add(($"5,3,2", statsDict[5].AvgScore));
-
-            avgScores.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-
-            using (StreamWriter outputFile = new StreamWriter("./testTasks235.csv"))
-            {
-                outputFile.WriteLine("tasks;averageScore");
-                foreach ((string, double) ds in avgScores)
-                {
-                    outputFile.WriteLine($"{ds.Item1};{Math.Round(ds.Item2, 3, MidpointRounding.AwayFromZero).ToString("0.000")}");
-
-                }
-            }
-        }
-
-        #endregion
-        #region Board Analysis
-
-        private AverageGameStats TestBoard(int boardId, int iterations)
-        {
-            List<GameStats> stats = new List<GameStats>();
-            for (int j = 0; j < iterations; j++)
-            {
-
-                Game g = new Game();
-                g.AgentGameBoardSettings(7, false, boardId);
-                stats.Add(g.Stats);
-            }
-
-            if (iterations > 1)
-            {
-                Console.WriteLine(" Mean: " + stats.Average(item => item.Score));
-            }
-
-            return new AverageGameStats(5, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
-
-        }
-
-
-        private void TestBoards()
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                Console.WriteLine(i);
-                TestBoard(i, 5000);
-            }
-        }
-        #endregion
 
         #endregion
 
