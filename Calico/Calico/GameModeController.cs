@@ -22,53 +22,99 @@ namespace Calico
 
         public WeightsDict WeightsDict;
 
-        public GameModeController(int mode)
+        public GameModeController()
         {
             WeightsDict = new WeightsDict();
-
-            switch (mode)
+            bool inGame = true;
+            string newGame;
+            while (inGame)
             {
-                case 1:
+
+                Console.WriteLine();
+                Console.WriteLine(" CALICO ");
+                Console.WriteLine();
+
+
+                ChooseGameMode();
+
+
+                while (true)
+                {
+                    Console.WriteLine();
+                    Console.Write(" Start a new game (y/n): ");
+                    newGame = Console.ReadLine();
+
+                    if (newGame == "n")
                     {
-                        Game g = new Game();
-                        g.SinglePlayer();
+                        inGame = false;
                         break;
                     }
-                case 2:
+                    else if (newGame == "y") { break; }
+                    else
                     {
-                        Game g = new Game();
-                        g.MultiPlayer();
-                        break;
+                        Console.WriteLine(" Invalid expression");
                     }
-                case 3:
-                    {
-                        TestingAgent();
-                        break;
-                    }
-                case 6:
-                    {
-                        TestSettingsController();
-                        break;
-                    }
-                case 7:
-                    {
-                        Evolution();
-                        break;
-                    }
-                case 8:
-                    {
-                        EvolParamsTesting();
-                        break;
-                    }
-                case 9:
-                    {
-                        VarianceTesting(); break;
-                    }
-                default:
-                    {
-                        break;
-                    }
+                }
+
             }
+        }
+
+        private void ChooseGameMode()
+        {
+            int gameMode;
+
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine(" Mode options: ");
+                    Console.WriteLine("   1. Single agent testing");
+                    Console.WriteLine("   2. Task analysis");
+                    Console.WriteLine("   3. Evolution");
+                    Console.WriteLine("   4. Single player");
+
+                    Console.Write(" Choose game mode: ");
+
+                    gameMode = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine();
+
+
+                    switch (gameMode)
+                    {
+                        case 4:
+                            {
+                                Game g = new Game();
+                                g.SinglePlayer();
+                                return;
+                            }
+                        case 1:
+                            {
+                                TestingAgent();
+                                return;
+                            }
+                        case 2:
+                            {
+                                TestSettingsController();
+                                return;
+                            }
+                        case 3:
+                            {
+                                Evolution();
+                                return;
+                            }
+                        default:
+                            {
+                                Console.WriteLine(" " + gameMode + " is not a mode option");
+                                break;
+                            }
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine(" Game mode must be an integer.");
+                }
+            }
+
         }
 
         #region GetConsoleInput
