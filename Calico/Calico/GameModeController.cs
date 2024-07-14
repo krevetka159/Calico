@@ -714,6 +714,15 @@ namespace Calico
                     }
                 }
 
+                using (StreamWriter outputFile = new StreamWriter(fileName))
+                {
+                    outputFile.WriteLine("board;tasks;score");
+                    foreach (string line in results)
+                    {
+                        outputFile.WriteLine(line);
+                    }
+                }
+
             }
             else
             {
