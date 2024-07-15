@@ -95,32 +95,6 @@ namespace Calico
         }
         #endregion
 
-    #region MultiPlayer
-        public void MultiPlayer() 
-        {
-            player = new Player(scoring);
-            agent = new AgentComplete(scoring);
-
-            //print empty
-            gameStatePrinter.PrintStateMulti(player, agent, Opts);
-
-            for (int i = 0; i < 22; i++)
-            {
-                MakeMove(player);
-
-                gameStatePrinter.PrintStateMulti(player, agent, Opts);
-
-                MakeMove(agent);
-                gameStatePrinter.PrintStateMulti(player, agent, Opts);
-
-            }
-
-            gameStatePrinter.PrintStats(player);
-            gameStatePrinter.PrintStats(agent);
-        }
-
-        #endregion
-
     #region Testing
 
         #region AgentInit
