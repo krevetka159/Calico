@@ -97,7 +97,7 @@ namespace Calico
 
             ScoreCounter = new ScoreCounter(scoring);
 
-            // generování okrajů boardu podle id - 4 možnosti
+            // generate with borders based on id - 4 options
             switch (id)
             {
                 case 1:
@@ -167,10 +167,11 @@ namespace Calico
             }
             EmptySpotsCount = b.EmptySpotsCount;
         }
-
+        /// <summary>
+        /// Add border pieces from board to unionfind
+        /// </summary>
         private void BorderUF()
         {
-            //Add corners to unionfind
             for (int row = 0; row < Size; row++)
             {
                 if (row == 0 || row == Size - 1)
@@ -189,7 +190,11 @@ namespace Calico
                 }
             }
         }
-
+        /// <summary>
+        /// Put task on board
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <param name="position"></param>
         public void AddTaskPiece(int taskId,int position )
         {
             (int row, int col) = TaskPieceSpots[position];
@@ -219,6 +224,12 @@ namespace Calico
             EmptySpotsCount--;
         }
 
+        /// <summary>
+        /// Union new patchtile with neighboring pieces
+        /// </summary>
+        /// <param name="piece"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
         private void UnionWithNeighbors(GamePiece piece,int row, int col)
         {
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -233,6 +244,12 @@ namespace Calico
             ScoreCounter.EvaluateNew(piece, neighborsToEvaluate);
         }
 
+        /// <summary>
+        /// Add new patchtile to neighbors of task
+        /// </summary>
+        /// <param name="piece"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
         private void AddToTaskNeighbors(GamePiece piece, int row, int col)
         {
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -268,78 +285,16 @@ namespace Calico
 
         #endregion
 
-        #region Check For Similar Neighbors
-
-        /// <summary>
-        /// Checks whether a position on a gameboard has a neighbor with a certain color
-        /// </summary>
-        /// <param name="color"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public bool CheckNeighborsColor(Color color, int row, int col)
-        {
-            // List<(int, int)> neighbors = GetNeighbors(row, col);
-            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
-            foreach ((int r, int c) in n)
-            {
-                if (board[r][c].Color == color)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Checks whether a position on a gameboard has a neighbor with a certain pattern
-        /// </summary>
-        /// <param name="color"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public bool CheckNeighborsPattern(Pattern pattern, int row, int col)
-        {
-            //List<(int, int)> neighbors = GetNeighbors(row, col);
-            IEnumerable<(int, int)> n = IterateNeighbors(row, col);
-            foreach ((int r, int c) in n)
-            {
-                if (board[r][c].Pattern == pattern)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Checks whether a position on a gameboard has a neighbor with the same pattern or color as gamepiece
-        /// </summary>
-        /// <param name="gp"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public bool CheckNeighbors(GamePiece gp, int row, int col)
-        {
-
-            return (CheckNeighborsColor(gp.Color, row, col) || CheckNeighborsPattern(gp.Pattern, row, col));
-
-        }
-
-        #endregion
-
         #region Basic evaluation
 
         /// <summary>
-        /// Counts how much color score would change after adding gamepiece
+        /// Basic evaluation function - color
         /// </summary>
         /// <param name="gp"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsColorFixed(GamePiece gp, int row, int col)
+        public int EvaluateNeighborsBasicColor(GamePiece gp, int row, int col)
         {
             int count = 0;
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -380,13 +335,13 @@ namespace Calico
         }
 
         /// <summary>
-        /// Counts how much pattern score would change after adding gamepiece
+        /// Basic evaluation function - pattern
         /// </summary>
         /// <param name="gp"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsPatternFixed(GamePiece gp, int row, int col)
+        public int EvaluateNeighborsBasicPattern(GamePiece gp, int row, int col)
         {
             int count = 0;
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -417,6 +372,13 @@ namespace Calico
             else return 1;
         }
 
+        /// <summary>
+        /// Basuc evaluation function - tasks
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
         public int EvaluateNeighboringTask(GamePiece gp, int row, int col)
         {
             int score = 0;
@@ -433,15 +395,15 @@ namespace Calico
         }
 
         /// <summary>
-        /// Counts how much score would change after adding gamepiece
+        /// Basic evaluation function
         /// </summary>
         /// <param name="gp"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighbors(GamePiece gp, int row, int col)
+        public int EvaluateNeighborsBasic(GamePiece gp, int row, int col)
         {
-            return EvaluateNeighborsColorFixed(gp, row, col) + EvaluateNeighborsPatternFixed(gp, row, col) + EvaluateNeighboringTask(gp, row,col);
+            return EvaluateNeighborsBasicColor(gp, row, col) + EvaluateNeighborsBasicPattern(gp, row, col) + EvaluateNeighboringTask(gp, row,col);
             
         }
 
@@ -449,8 +411,14 @@ namespace Calico
 
         #region Utility evaluation
 
-
-        public int EvaluateNeighborsColorUtility(GamePiece gp, int row, int col, ScoreCounter sc)
+        /// <summary>
+        /// Part of advanced evaluation function - color
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public int EvaluateNeighborsAdvancedColor(GamePiece gp, int row, int col)
         {
             int count = 0;
 
@@ -464,33 +432,40 @@ namespace Calico
             {
                 if (board[row_i][col_i].Color == gp.Color)
                 {
-                    if (! clusters.Contains(sc.GetColorClusterId(board[row_i][col_i])))
+                    if (! clusters.Contains(ScoreCounter.GetColorClusterId(board[row_i][col_i])))
                     {
-                        if (sc.GetColorCount(board[row_i][col_i]) >= sc.Scoring.ColorScoring.ClusterSize) return 0;
-                        count += sc.GetColorCount(board[row_i][col_i]);
+                        if (ScoreCounter.GetColorCount(board[row_i][col_i]) >= ScoreCounter.Scoring.ColorScoring.ClusterSize) return 0;
+                        count += ScoreCounter.GetColorCount(board[row_i][col_i]);
 
-                        clusters.Add( sc.GetColorClusterId(board[row_i][col_i]));
+                        clusters.Add( ScoreCounter.GetColorClusterId(board[row_i][col_i]));
                         i++;
                     }
                 }
 
             }
 
-            if (count + 1 >= sc.Scoring.ColorClusterSize)
+            if (count + 1 >= ScoreCounter.Scoring.ColorClusterSize)
             {
-                if (sc.GetsRainbowButton(gp.Color))
+                if (ScoreCounter.GetsRainbowButton(gp.Color))
                 {
-                    return sc.Scoring.ColorScoring.Points + 1 + 3;
+                    return ScoreCounter.Scoring.ColorScoring.Points + 1 + 3;
                 }
                 else
                 {
-                    return sc.Scoring.ColorScoring.Points + 1;
+                    return ScoreCounter.Scoring.ColorScoring.Points + 1;
                 }
             }
             else return count;
         }
 
-        public int EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc)
+        /// <summary>
+        /// Part of advanced evaluation function - pattern
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public int EvaluateNeighborsAdvancedPattern(GamePiece gp, int row, int col)
         {
             int count = 0;
 
@@ -504,22 +479,29 @@ namespace Calico
             {
                 if (board[row_i][col_i].Pattern == gp.Pattern)
                 {
-                    clusters[i] = sc.GetPatternClusterId(board[row_i][col_i]);
+                    clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
                     i++;
                 }
             }
 
             foreach (int c in clusters.Distinct())
             {
-                if (sc.GetPatternCount(c) >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return 0;
-                count += sc.GetPatternCount(c);
+                if (ScoreCounter.GetPatternCount(c) >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return 0;
+                count += ScoreCounter.GetPatternCount(c);
             }
 
-            if (count + 1 >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1;
+            if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1;
             else return count;
         }
 
-        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col)
+        /// <summary>
+        /// Part of advanced evaluation function - tasks
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public double EvaluateNeighboringTaskAdvanced(GamePiece gp, int row, int col)
         {
             double score = 0;
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -535,20 +517,28 @@ namespace Calico
         }
 
         /// <summary>
-        /// Counts how much score would change after adding gamepiece
+        /// Advanced evaluation function
         /// </summary>
         /// <param name="gp"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public double EvaluateNeighborsUtility(GamePiece gp, int row, int col)
+        public double EvaluateNeighborsAdvanced(GamePiece gp, int row, int col)
         {
-            return EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter) + EvaluateNeighboringTaskUtility(gp, row, col);
+            return EvaluateNeighborsAdvancedColor(gp, row, col) + EvaluateNeighborsAdvancedPattern(gp, row, col) + EvaluateNeighboringTaskAdvanced(gp, row, col);
 
         }
 
-
-        public double EvaluateNeighborsPatternUtility(GamePiece gp, int row, int col, ScoreCounter sc, Weights uc)
+        /// <summary>
+        /// Part od weighted evaluation function - pattern
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="sc"></param>
+        /// <param name="weights"></param>
+        /// <returns></returns>
+        public double EvaluateNeighborsWeightedAdvancedPattern(GamePiece gp, int row, int col, Weights weights)
         {
             int count = 0;
 
@@ -575,27 +565,34 @@ namespace Calico
             }
 
             double evol_konst = 0;
-            switch (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Id)
+            switch (ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Id)
             {
                 case 0:
-                    evol_konst = uc.CatsW.Item1;
+                    evol_konst = weights.CatsW.Item1;
                     break;
                 case 1:
-                    evol_konst = uc.CatsW.Item2;
+                    evol_konst = weights.CatsW.Item2;
                     break;
                 case 2:
-                    evol_konst = uc.CatsW.Item3;
+                    evol_konst = weights.CatsW.Item3;
                     break;
             }
 
-            if (count + 1 >= sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize)
+            if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize)
             {
-                return (sc.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1) * evol_konst;
+                return (ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1) * evol_konst;
             }
             else return count * evol_konst;
         }
-
-        public double EvaluateNeighboringTaskUtility(GamePiece gp, int row, int col, Weights uc)
+        /// <summary>
+        /// Part of weighted advanced evaluation function - tasks
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="weights"></param>
+        /// <returns></returns>
+        public double EvaluateNeighboringWeightedAdvancedTask(GamePiece gp, int row, int col, Weights weights)
         {
             double score = 0;
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -604,7 +601,7 @@ namespace Calico
             {
                 if (IsTask(r, c))
                 {
-                    var evol_const = uc.TaskW[TaskPieces[(r,c)].Id - 1];
+                    var evol_const = weights.TaskW[TaskPieces[(r,c)].Id - 1];
                     
                     score += (TaskPieces[(r, c)].CheckNeighboursUtility(gp)) * evol_const;
                 }
@@ -613,19 +610,17 @@ namespace Calico
             return score;
         }
 
-        public double EvaluateNeighborsUtilityBetter(GamePiece gp, int row, int col, Weights uc)
+        /// <summary>
+        /// Weighted advanced evaluation function
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="weights"></param>
+        /// <returns></returns>
+        public double EvaluateNeighborsWeightedAdvanced(GamePiece gp, int row, int col, Weights weights)
         {
-            return EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)*uc.ButtonW + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,uc) + EvaluateNeighboringTaskUtility(gp, row, col,uc);
-        }
-
-        #endregion
-
-        #region Evolution Evaluation
-
-        public double EvaluateNeighborsEvolution(GamePiece gp, int row, int col, Weights e)
-        {
-            return (e.ButtonW*EvaluateNeighborsColorUtility(gp, row, col, ScoreCounter)) + EvaluateNeighborsPatternUtility(gp, row, col, ScoreCounter,e) + EvaluateNeighboringTaskUtility(gp, row, col, e);
-
+            return EvaluateNeighborsAdvancedColor(gp, row, col)*weights.ButtonW + EvaluateNeighborsWeightedAdvancedPattern(gp, row, col,weights) + EvaluateNeighboringWeightedAdvancedTask(gp, row, col,weights);
         }
 
         #endregion
@@ -666,6 +661,14 @@ namespace Calico
 
         #endregion
 
+        /// <summary>
+        /// Overview, which tasks were completed
+        /// -1 = not chosen 
+        /// 0 = not completed
+        /// 1 = completed partially
+        /// 2 = completed
+        /// </summary>
+        /// <returns></returns>
         public int[] TasksCompleted()
         {
             int[] tc = new int[6] {-1,-1,-1,-1,-1,-1};
