@@ -140,6 +140,12 @@ namespace Calico
             return (ChooseGamePiece(Opts), ChoosePosition());
         }
 
+
+        /// <summary>
+        /// Choose one task to add on exact position on gameboard (gets instructions from console)
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private int ChooseTaskPiece(int index)
         {
             bool taskAvailable;
@@ -182,13 +188,14 @@ namespace Calico
             }
         }
 
+        /// <summary>
+        /// Choose all tasks for a game
+        /// </summary>
         public virtual void ChooseTaskPieces()
         {
             Board.AddTaskPiece(ChooseTaskPiece(0), 0);
             Board.AddTaskPiece(ChooseTaskPiece(1), 1);
             Board.AddTaskPiece(ChooseTaskPiece(2), 2);
         }
-
-
     }
 }
