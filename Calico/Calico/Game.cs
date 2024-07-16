@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using static Calico.AgentComplete;
+using static Calico.AgentBasic;
 using System.Collections;
 
 namespace Calico
@@ -108,23 +108,23 @@ namespace Calico
                     }
                 case 2:
                     {
-                        return new AgentColor(scoring);
+                        return new AgentBasicColor(scoring);
                     }
                 case 3:
                     {
-                        return new AgentPattern(scoring);
+                        return new AgentBasicPattern(scoring);
                     }
                 case 4:
                     {
-                        return new AgentComplete(scoring);
+                        return new AgentBasic(scoring);
                     }
                 case 5:
                     {
-                        return new AgentCompleteWithUtility(scoring);
+                        return new AgentAdvanced(scoring);
                     }
                 case 6:
                     {
-                        return new AgentCompleteWithProb(scoring);
+                        return new AgentAdvancedRandomness(scoring);
                     }
                 default:
                     {
@@ -148,23 +148,23 @@ namespace Calico
                     }
                 case 2:
                     {
-                        return new AgentColor(scoring, boardId);
+                        return new AgentBasicColor(scoring, boardId);
                     }
                 case 3:
                     {
-                        return new AgentPattern(scoring, boardId);
+                        return new AgentBasicPattern(scoring, boardId);
                     }
                 case 4:
                     {
-                        return new AgentComplete(scoring, boardId);
+                        return new AgentBasic(scoring, boardId);
                     }
                 case 5:
                     {
-                        return new AgentCompleteWithUtility(scoring, boardId);
+                        return new AgentAdvanced(scoring, boardId);
                     }
                 case 6:
                     {
-                        return new AgentCompleteWithProb(scoring, boardId);
+                        return new AgentAdvancedRandomness(scoring, boardId);
                     }
                 default:
                     {
@@ -206,7 +206,7 @@ namespace Calico
 
         public void WeightedAgentGame(WeightsDict wd, bool withPrint)
         {
-            agent = new EvolutionAgent(scoring,wd);
+            agent = new AgentWeightedAdvanced(scoring,wd);
             
 
             if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
@@ -231,7 +231,7 @@ namespace Calico
 
         public void TreeSearchAgentGame(WeightsDict wd, bool withPrint,int depth, double discount)
         {
-            agent = new MinimaxAgent(scoring, wd, depth,discount);
+            agent = new AgentTreeSearch(scoring, wd, depth,discount);
 
 
             if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
@@ -255,7 +255,7 @@ namespace Calico
         }
         public void SimulationTSAgentGame(WeightsDict wd, bool withPrint, int s)
         {
-            agent = new MonteCarloAgent(scoring, wd, bag, s);
+            agent = new AgentMCTS(scoring, wd, bag, s);
 
 
             if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
@@ -356,201 +356,7 @@ namespace Calico
 
             Stats = new GameStats(score, buttons, cats);
         }
-
         #endregion
-
-
-        //private GameStats TestGame(bool withPrint, bool allResults, int agentType, int iterations)
-        //{
-        //    int sum = 0;
-        //    int max = 0;
-        //    int min = -1;
-        //    int score;
-        //    int buttons = 0;
-        //    (int, int, int) cats = (0,0,0);
-        //    int maxButtons = 0;
-        //    (int, int, int) maxCats = (0, 0, 0);
-
-        //    for (int j = 0; j < iterations; j++)
-        //    {
-
-
-        //        bag = new Bag();
-
-        //        scoring = new Scoring();
-
-        //        gameStatePrinter = new GameStatePrinter(scoring);
-
-        //        for (int i = 0; i < 3; i++)
-        //        {
-        //            Opts[i] = bag.Next();
-        //        }
-
-        //        agent = UseAgent(agentType);
-
-        //        //agent.AddTaskPieces(1,6,4); //best option
-
-        //        agent.ChooseTaskPieces();
-
-        //        if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
-
-
-
-        //        for (int i = 0; i < 22; i++)
-        //        {
-        //            MakeMove(agent);
-
-        //            if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
-
-        //        }
-
-        //        if (allResults)
-        //        {
-        //            if (j % 1000 == 0) Console.WriteLine(j);
-        //            //gameStatePrinter.PrintStats(agent);
-        //        }
-
-        //        score = agent.Board.ScoreCounter.GetScore();
-        //        sum += score;
-        //        if (score > max)
-        //        {
-        //            max = score;
-        //            maxButtons = agent.Board.ScoreCounter.GetButtonsCount();
-        //            var maxCatsTemp = agent.Board.ScoreCounter.GetCatsCount();
-        //            maxCats.Item1 = maxCatsTemp.Item1;
-        //            maxCats.Item2 = maxCatsTemp.Item2;
-        //            maxCats.Item3 = maxCatsTemp.Item3;
-        //        }
-        //        if (score < min || min == -1) min = score;
-
-        //        buttons += agent.Board.ScoreCounter.GetButtonsCount();
-        //        var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
-        //        cats.Item1 += catsTemp.Item1;
-        //        cats.Item2 += catsTemp.Item2;
-        //        cats.Item3 += catsTemp.Item3;
-        //    }
-        //    Console.WriteLine();
-        //    if (iterations > 1)
-        //    {
-        //        Console.WriteLine(" Mean: " + (Convert.ToDouble(sum) / Convert.ToDouble(iterations)));
-        //        Console.WriteLine(" Average number of buttons: " + (Convert.ToDouble(buttons) / Convert.ToDouble(iterations)));
-        //        Console.WriteLine(" Average number of cats: " + (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations)) + "; "+ (Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations)) + "; " + (Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)));
-        //        Console.WriteLine(" Best score: " + max + "; buttons: " + Convert.ToDouble(maxButtons)+
-        //            "; cats: " + Convert.ToDouble(maxCats.Item1) + "; " + Convert.ToDouble(maxCats.Item2) + "; " + Convert.ToDouble(maxCats.Item3)) ;
-        //        Console.WriteLine(" Lowest score: " + min);
-        //    }
-
-        //    return new GameStats(agentType, Convert.ToDouble(sum) / Convert.ToDouble(iterations), Convert.ToDouble(buttons) / Convert.ToDouble(iterations), (Convert.ToDouble(cats.Item1) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item2) / Convert.ToDouble(iterations), Convert.ToDouble(cats.Item3) / Convert.ToDouble(iterations)), max, min);
-
-
-        //}
-
-        //private void TestMultiPlayerGame(int numOfPlayers, bool withPrint, bool allResults, int iterations)
-        //{
-        //    List<int> sum = new List<int>();
-        //    List<int> max = new List<int>();
-        //    List<int> min = new List<int>();
-        //    List<int> wins = new List<int>();
-        //    List<int> score = new List<int>();
-        //    List<int> agentOptions = new List<int>();
-
-        //    multiAgents = new List<Agent>();
-
-        //    for (int i = 0; i < numOfPlayers; i++)
-        //    {
-        //        int a = PickAgent(true);
-        //        agentOptions.Add(a);
-        //        sum.Add(0);
-        //        max.Add(0);
-        //        min.Add(-1);
-        //        wins.Add(0);
-        //        score.Add(0);
-        //        multiAgents.Add(null);
-        //    }
-
-        //    for (int j = 0; j < iterations; j++)
-        //    {
-        //        Console.WriteLine(j);
-
-        //        bag = new Bag();
-
-        //        scoring = new Scoring();
-
-        //        gameStatePrinter = new GameStatePrinter(scoring);
-
-        //        for (int i = 0; i < 3; i++)
-        //        {
-        //            Opts[i] = bag.Next();
-        //        }
-        //        for (int i = 0; i < numOfPlayers; i++)
-        //        {
-        //            multiAgents[i] = UseAgent(agentOptions[i]);
-        //            multiAgents[i].ChooseTaskPieces();
-        //        }
-
-        //        for (int i = 0; i < numOfPlayers; i++)
-        //        {
-        //            List<Agent> ops = new List<Agent>();
-        //            for (int k = 0; k < numOfPlayers; k++)
-        //            {
-        //                if (i != k)
-        //                {
-        //                    ops.Add(multiAgents[k]);
-        //                }
-        //            }
-        //            multiAgents[i].SetOpponent(ref ops);
-        //        }
-
-        //        //print empty
-        //        if (withPrint) gameStatePrinter.PrintStateTestMulti(multiAgents[0], multiAgents[1], Opts);
-
-        //        for (int i = 0; i < 22; i++)
-        //        {
-        //            //MakeMove(agent);
-
-        //            //MakeMove(agent2);
-        //            //if (withPrint) gameStatePrinter.PrintStateTestMulti(agent, agent2, Opts);
-
-        //            for (int k = 0; k < numOfPlayers; k++)
-        //            {
-        //                MakeMove(multiAgents[k]);
-        //                if (withPrint) gameStatePrinter.PrintStateTestMulti(multiAgents[0], multiAgents[1], Opts);
-        //            }
-
-        //        }
-
-        //        for (int i = 0;i < numOfPlayers; i++)
-        //        {
-        //            score[i] = multiAgents[i].Board.ScoreCounter.GetScore();
-        //            if (allResults) gameStatePrinter.PrintStats(multiAgents[i]);
-
-        //            sum[i] += score[i];
-        //            if (score[i] > max[i]) max[i] = score[i];
-        //            if (score[i] < min[i] || min[i] == -1) min[i] = score[i];
-        //        }
-
-        //        int max_game_score = score.Max();
-        //        for (int i = 0; i < numOfPlayers; i++)
-        //        {
-        //            if (score[i] == max_game_score)
-        //            {
-        //                wins[i] += 1;
-        //            }
-        //        }
-
-        //    }
-        //    Console.WriteLine();
-        //    if (iterations > 1) 
-        //    {
-        //        for (int i = 0; i < numOfPlayers; i++)
-        //        {
-        //            Console.WriteLine(" Mean " + i + ": " + (Convert.ToDouble(sum[i]) / Convert.ToDouble(iterations)));
-        //            Console.WriteLine(" Best score " + i + ": " + max[i]);
-        //            Console.WriteLine(" Lowest score " + i +": " + min[i]);
-        //            Console.WriteLine(" Wins " + i + ": " + wins[i]);
-        //        }
-        //    }
-        //}
 
         #endregion
         #endregion
@@ -559,7 +365,7 @@ namespace Calico
 
         public void EvolutionGame(bool withPrint, Weights e, (int,int,int) tasks)
         {
-            agent = new EvolutionAgent(scoring, e);
+            agent = new AgentWeightedAdvanced(scoring, e);
             //agent.ChooseTaskPieces();
             agent.AddTaskPieces(tasks.Item1, tasks.Item2, tasks.Item3);
 
