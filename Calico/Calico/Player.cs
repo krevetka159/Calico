@@ -48,7 +48,7 @@ namespace Calico
             {
                 try
                 {
-                    Console.Write(" Choose gamepiece to add: ");
+                    Console.Write(" Vyberte dílek z nabídky (1/2/3): ");
                     gamepiece = Convert.ToInt32(Console.ReadLine());
                     switch (gamepiece)
                     {
@@ -57,14 +57,14 @@ namespace Calico
                         case 3: return 2;
                         default:
                             {
-                                Console.WriteLine(" Choose of of the three pieces (1/2/3).");
+                                Console.WriteLine(" Neplatné číslo");
                                 break;
                             }
                     }
                 }
                 catch
                 {
-                    Console.WriteLine(" Choose of of the three pieces (1/2/3).");
+                    Console.WriteLine(" Neznámý příkaz");
                 }
             }
         }
@@ -85,18 +85,18 @@ namespace Calico
                 {
                     try
                     {
-                        Console.Write(" Choose row: ");
+                        Console.Write(" Vyberte řádek: ");
                         row = Convert.ToInt32(Console.ReadLine());
 
                         if (1 <= row && row <= Board.Size)
                         {
                             break;
                         }
-                        Console.WriteLine(" Row must be an integer between 1 and 7");
+                        Console.WriteLine(" Herní deska obsahuje pouze řádky 1 až 7");
                     }
                     catch
                     {
-                        Console.WriteLine(" Row must be an integer");
+                        Console.WriteLine(" Neznámý příkaz, zadejte celé číslo");
                     }
                 }
 
@@ -104,18 +104,18 @@ namespace Calico
                 {
                     try
                     {
-                        Console.Write(" Choose column: ");
+                        Console.Write(" Vyberte sloupec: ");
                         col = Convert.ToInt32(Console.ReadLine());
 
                         if (1 <= col && col <= Board.Size)
                         {
                             break;
                         }
-                        Console.WriteLine(" Column must be an integer between 1 and 7");
+                        Console.WriteLine(" Herní deska obsahuje pouze sloupce 1 až 7");
                     }
                     catch
                     {
-                        Console.WriteLine(" Column must be an integer");
+                        Console.WriteLine(" Neznámý příkaz, zadejte celé číslo");
                     }
                 }
 
@@ -125,7 +125,7 @@ namespace Calico
                 }
                 else
                 {
-                    Console.WriteLine(" This position is occupied, choose another");
+                    Console.WriteLine(" Tato pozice je již obsazená, vyberte jinou");
                 }
             }
 
@@ -149,7 +149,7 @@ namespace Calico
                 taskAvailable = true;
                 try
                 {
-                    Console.Write(" Choose TaskPiece for row " + (index + 3) + ": ");
+                    Console.Write(" Vyberte úkol pro řádek " + (index + 3) + ": ");
                     gamepiece = Convert.ToInt32(Console.ReadLine());
 
                     for (int i = 0; i < index; i++)
@@ -166,18 +166,18 @@ namespace Calico
                         }
                         else
                         {
-                            Console.WriteLine(" Choose one of the task pieces 1-6. ");
+                            Console.WriteLine(" Vyberte úkol 1-6. ");
                         }
                     }
                     else
                     {
-                        Console.WriteLine($" Task {gamepiece} was already selected, please choose different one. ");
+                        Console.WriteLine($" Úkol {gamepiece} již byl zvolen, vyberte jiný. ");
                     }
                    
                 }
                 catch
                 {
-                    Console.WriteLine(" Choose one of the task pieces 1-6. ");
+                    Console.WriteLine(" Neznámý příkaz, zadejte celé číslo ");
                 }
             }
         }
