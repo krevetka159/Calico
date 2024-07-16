@@ -18,6 +18,7 @@ namespace Calico
 
         private (int, int, int) tasks;
         private bool mixed;
+        private int iterations;
 
         private string outputFileName;
 
@@ -29,6 +30,15 @@ namespace Calico
 
             this.tasks = tasks;
             this.mixed = mixed;
+
+            if (mixed)
+            {
+                iterations = 1200;
+            }
+            else
+            {
+                iterations = 1000;
+            }
 
             this.outputFileName = outputFileName;
 
@@ -224,67 +234,59 @@ namespace Calico
 
             Parallel.For(0, population_size, i =>
             {
-                AverageGameStats gs = Game(population[i], 1000 );
-                fitness[i] = gs.AvgScore;
+                fitness[i] = Game(population[i]);
             });
             return fitness;
         }
 
-        private AverageGameStats Game (Weights e, int iterations)
+        private double Game (Weights weights)
         {
-            List<GameStats> stats = new List<GameStats>(new GameStats[iterations]);
+            double[] stats = new double[iterations];
 
             if (mixed)
             {
                 int part = iterations / 6;
                 for (int j = 0; j < part; j++)
                 {
-                    Game g = new Game();
-                    g.EvolutionGame(false, e, (tasks.Item1, tasks.Item2, tasks.Item3));
-                    stats[j] = g.Stats;
+                    EvolutionGame g = new EvolutionGame(weights,tasks);
+                    stats[j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    Game g = new Game();
-                    g.EvolutionGame(false, e, (tasks.Item1, tasks.Item3, tasks.Item2));
-                    stats[part + j] = g.Stats;
+                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    stats[part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    Game g = new Game();
-                    g.EvolutionGame(false, e, (tasks.Item2, tasks.Item1, tasks.Item3));
-                    stats[2*part + j] = g.Stats;
+                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    stats[2*part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    Game g = new Game();
-                    g.EvolutionGame(false, e, (tasks.Item2, tasks.Item3, tasks.Item1));
-                    stats[3*part + j] = g.Stats;
+                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    stats[3*part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    Game g = new Game();
-                    g.EvolutionGame(false, e, (tasks.Item3, tasks.Item1, tasks.Item2));
-                    stats[4*part + j] = g.Stats;
+                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    stats[4*part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    Game g = new Game();
-                    g.EvolutionGame(false, e, (tasks.Item3, tasks.Item2, tasks.Item1));
-                    stats[5*part + j] = g.Stats;
+                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    stats[5*part + j] = g.Game();
                 }
             }
             else
             {
                 for (int j = 0; j < iterations; j++)
                 {
-                    Game g = new Game();
-                    g.EvolutionGame(false, e, (tasks.Item1, tasks.Item2, tasks.Item3));
-                    stats[j] = g.Stats;
+                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    stats[j] = g.Game();
                 }
             }
 
-            return new AverageGameStats(0, stats.Average(item => item.Score), stats.Average(item => item.Buttons), (stats.Average(item => item.Cats.Item1), stats.Average(item => item.Cats.Item2), stats.Average(item => item.Cats.Item3)), stats.Max(item => item.Score), stats.Min(item => item.Score));
+            return stats.Average();
         }
 
         public double SampleGaussian(double mean, double stddev)
@@ -296,6 +298,25 @@ namespace Calico
 
             double y1 = Math.Sqrt(-2.0 * Math.Log(x1)) * Math.Cos(2.0 * Math.PI * x2);
             return y1 * stddev + mean;
+        }
+    }
+
+    public class EvolutionGame : Game
+    {
+        public EvolutionGame(Weights weights, (int, int, int) tasks) : base()
+        {
+
+            agent = new AgentWeightedAdvanced(scoring, weights);
+            agent.AddTaskPieces(tasks.Item1, tasks.Item2, tasks.Item3);
+        }
+        public double Game()
+        {
+            for (int i = 0; i < agent.Board.EmptySpotsCount; i++)
+            {
+                MakeMove(agent);
+            }
+
+            return agent.Board.ScoreCounter.Score;
         }
     }
 
