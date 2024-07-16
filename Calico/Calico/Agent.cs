@@ -1,6 +1,6 @@
 ﻿namespace Calico
 {
-    // ----------------------------------------------- RANDOM AGENT ------------------------------------------------------------
+    #region Random Agent
 
     public class Agent : Player
     {
@@ -94,19 +94,20 @@
             Board.AddTaskPiece(c, 2);
         }
     }
+    #endregion
 
     #region Basic Evaluation
 
-    public class AgentColor : Agent
+    public class AgentBasicColor : Agent
     {
         /// <summary>
         ///  picks patchtile and position that increases color score the most
         /// </summary>
         /// <param name="scoring"></param>
-        public AgentColor(Scoring scoring) : base(scoring)
+        public AgentBasicColor(Scoring scoring) : base(scoring)
         {
         }
-        public AgentColor(Scoring scoring, int boardId) : base(scoring, boardId)
+        public AgentBasicColor(Scoring scoring, int boardId) : base(scoring, boardId)
         {
         }
 
@@ -141,17 +142,17 @@
             
         }
     }
-    public class AgentPattern : Agent
+    public class AgentBasicPattern : Agent
     {
 
         /// <summary>
         ///  picks patchtile and position that increases pattern score the most
         /// </summary>
         /// <param name="scoring"></param>
-        public AgentPattern(Scoring scoring) : base(scoring)
+        public AgentBasicPattern(Scoring scoring) : base(scoring)
         {
         }
-        public AgentPattern(Scoring scoring, int boardId) : base(scoring, boardId)
+        public AgentBasicPattern(Scoring scoring, int boardId) : base(scoring, boardId)
         {
         }
 
@@ -188,16 +189,16 @@
         }
     }
 
-    public class AgentComplete : Agent
+    public class AgentBasic : Agent
     {
         /// <summary>
         /// picks patchtile and position that increases score the most
         /// </summary>
         /// <param name="scoring"></param>
-        public AgentComplete(Scoring scoring) : base(scoring)
+        public AgentBasic(Scoring scoring) : base(scoring)
         {
         }
-        public AgentComplete(Scoring scoring, int boardId) : base(scoring, boardId)
+        public AgentBasic(Scoring scoring, int boardId) : base(scoring, boardId)
         {
         }
 
@@ -233,17 +234,17 @@
         }
     }
 
-    public class AgentCompleteWithProb : Agent
+    public class AgentAdvancedRandomness : Agent
     {
         /// <summary>
         /// picks patchtile and position that increases score the most, but with a small probability make random move
         /// </summary>
         /// <param name="scoring"></param>
 
-        public AgentCompleteWithProb(Scoring scoring) : base(scoring)
+        public AgentAdvancedRandomness(Scoring scoring) : base(scoring)
         {
         }
-        public AgentCompleteWithProb(Scoring scoring,int boardId) : base(scoring, boardId)
+        public AgentAdvancedRandomness(Scoring scoring,int boardId) : base(scoring, boardId)
         {
         }
 
@@ -287,17 +288,17 @@
 
     #endregion
 
-    #region Utility Evaluation
-    public class AgentCompleteWithUtility : Agent
+    #region Advanced Evaluation
+    public class AgentAdvanced : Agent
     {
         /// <summary>
         /// picks patchtile and position that increases score the most
         /// </summary>
         /// <param name="scoring"></param>
-        public AgentCompleteWithUtility(Scoring scoring) : base(scoring)
+        public AgentAdvanced(Scoring scoring) : base(scoring)
         {
         }
-        public AgentCompleteWithUtility(Scoring scoring, int boardId) : base(scoring,boardId)
+        public AgentAdvanced(Scoring scoring, int boardId) : base(scoring,boardId)
         {
         }
 
@@ -382,25 +383,25 @@
     #endregion
 
 
-    #region Few Steps Ahead
+    #region Tree Search
 
-    public class MinimaxAgent : EvolutionAgent
+    public class AgentTreeSearch : AgentWeightedAdvanced
     {
 
         private int depth;
         private double discount;
-        public MinimaxAgent(Scoring scoring, Weights w) : base(scoring, w) 
+        public AgentTreeSearch(Scoring scoring, Weights w) : base(scoring, w) 
         {
         }
-        public MinimaxAgent(Scoring scoring, Weights w, int boardId) : base(scoring,w,boardId)
+        public AgentTreeSearch(Scoring scoring, Weights w, int boardId) : base(scoring,w,boardId)
         {
         }
 
-        public MinimaxAgent(Scoring scoring, WeightsDict wd) : base(scoring,wd)
+        public AgentTreeSearch(Scoring scoring, WeightsDict wd) : base(scoring,wd)
         { 
         }
 
-        public MinimaxAgent(Scoring scoring, WeightsDict wd, int dpth, double dsc) : base(scoring, wd)
+        public AgentTreeSearch(Scoring scoring, WeightsDict wd, int dpth, double dsc) : base(scoring, wd)
         {
             depth = dpth;
             discount = dsc;
@@ -545,18 +546,16 @@
         }
     }
 
-    #endregion
-
-    public class MonteCarloAgent : MinimaxAgent
+    public class AgentMCTS : AgentTreeSearch
     {
         protected Bag Bag { get; set; }
         protected int SimulationsCount;
-        public MonteCarloAgent(Scoring scoring, Weights w, Bag b, int s) : base(scoring, w)
+        public AgentMCTS(Scoring scoring, Weights w, Bag b, int s) : base(scoring, w)
         {
             Bag = b;
             SimulationsCount = s;
         }
-        public MonteCarloAgent(Scoring scoring, WeightsDict wd, Bag b, int s) : base(scoring, wd)
+        public AgentMCTS(Scoring scoring, WeightsDict wd, Bag b, int s) : base(scoring, wd)
         {
             Bag = b;
             SimulationsCount = s;
@@ -724,21 +723,23 @@
         }
     }
 
+    #endregion
+
     #region Evolution
 
-    public class EvolutionAgent : Agent
+    public class AgentWeightedAdvanced : Agent
     {
         protected Weights weights;
-        public EvolutionAgent(Scoring scoring, Weights e) : base(scoring)
+        public AgentWeightedAdvanced(Scoring scoring, Weights e) : base(scoring)
         {
             weights = e;
         }
-        public EvolutionAgent(Scoring scoring, Weights e, int boardId) : base(scoring, boardId)
+        public AgentWeightedAdvanced(Scoring scoring, Weights e, int boardId) : base(scoring, boardId)
         {
             weights = e;
         }
 
-        public EvolutionAgent(Scoring scoring, WeightsDict wd) : base(scoring)
+        public AgentWeightedAdvanced(Scoring scoring, WeightsDict wd) : base(scoring)
         {
             ChooseTaskPieces();
             weights = wd.GetWeights((TaskIds[0], TaskIds[1], TaskIds[2]));
