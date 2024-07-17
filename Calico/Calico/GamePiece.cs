@@ -106,7 +106,7 @@ namespace Calico
                     ScoreCompletedFully = 15;
                     ScoreCompletedPartly = 10;
                     Task = new int[6] { 1, 1, 1, 1, 1, 1 };
-                    Description = " all different, 10/15 ";
+                    Description = " vše různé, 10/15 ";
                     break;
                 case 2:
                     ScoreCompletedFully = 14;

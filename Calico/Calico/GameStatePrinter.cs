@@ -33,10 +33,10 @@ namespace Calico
             //Console.WriteLine(scoring.PatternScoringToString);
             Console.WriteLine(PrintPartialScoreStats(p));
 
-            Console.WriteLine(" Score: " + p.Board.ScoreCounter.GetScore());
+            Console.WriteLine(" Skóre: " + p.Board.ScoreCounter.GetScore());
             Console.WriteLine();
 
-            Console.Write(" Patch tiles to use: ");
+            Console.Write(" Nabídka: ");
             for (int i = 0; i < 3; i++)
             {
                 Console.Write($" {i + 1}: |{Opts[i].Print}| ");
@@ -58,9 +58,9 @@ namespace Calico
         {
             Console.WriteLine();
 
-            Console.WriteLine(" Task piece options: ");
+            Console.WriteLine(" Možné úkoly: ");
  
-            Console.WriteLine("  1: all different, 10/15");
+            Console.WriteLine("  1: vše různé, 10/15");
             Console.WriteLine("  2: 4:2, 7/14");
             Console.WriteLine("  3: 3:3, 7/13");
             Console.WriteLine("  4: 3:2:1, 7/11");
@@ -105,7 +105,7 @@ namespace Calico
         public void PrintStats(Player p)
         {
             // finální výsledky
-            Console.WriteLine(" Final score: " + p.Board.ScoreCounter.GetScore());
+            Console.WriteLine(" Výsledné skóre: " + p.Board.ScoreCounter.GetScore());
         }
         public void PrintDetailedStatsToCSV(Player p)
         {

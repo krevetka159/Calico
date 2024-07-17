@@ -25,9 +25,9 @@ namespace Calico
         public GameModeController()
         {
             WeightsDict = new WeightsDict();
-            bool inGame = true;
-            string newGame;
-            while (inGame)
+            bool end = false;
+            string endGame;
+            while (!end)
             {
 
                 Console.WriteLine();
@@ -41,18 +41,18 @@ namespace Calico
                 while (true)
                 {
                     Console.WriteLine();
-                    Console.Write(" Start a new game (y/n): ");
-                    newGame = Console.ReadLine();
+                    Console.Write(" Přejete si ukončit program? (y/n): ");
+                    endGame = Console.ReadLine();
 
-                    if (newGame == "n")
+                    if (endGame == "y")
                     {
-                        inGame = false;
+                        end = true;
                         break;
                     }
-                    else if (newGame == "y") { break; }
+                    else if (endGame == "n") { break; }
                     else
                     {
-                        Console.WriteLine(" Invalid expression");
+                        Console.WriteLine(" Neznámý příkaz");
                     }
                 }
             }
@@ -66,13 +66,13 @@ namespace Calico
             {
                 try
                 {
-                    Console.WriteLine(" Mode options: ");
-                    Console.WriteLine("   1. Single agent testing");
-                    Console.WriteLine("   2. Task analysis");
-                    Console.WriteLine("   3. Evolution");
-                    Console.WriteLine("   4. Single player");
+                    Console.WriteLine(" Módy: ");
+                    Console.WriteLine("   1. Testování agentů");
+                    Console.WriteLine("   2. Testování nastavení hry");
+                    Console.WriteLine("   3. Evoluce");
+                    Console.WriteLine("   4. Hra");
 
-                    Console.Write(" Choose game mode: ");
+                    Console.Write(" Vyberte mód: ");
 
                     gameMode = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine();
@@ -103,14 +103,14 @@ namespace Calico
                             }
                         default:
                             {
-                                Console.WriteLine(" " + gameMode + " is not a mode option");
+                                Console.WriteLine(" " + gameMode + " není možnost módu");
                                 break;
                             }
                     }
                 }
                 catch
                 {
-                    Console.WriteLine(" Game mode must be an integer.");
+                    Console.WriteLine(" Neznámý příkaz, zadejte číslo");
                 }
             }
         }
@@ -253,7 +253,7 @@ namespace Calico
 
             while (true)
             {
-                Console.Write(" Zadejte velikost simulace: ");
+                Console.Write(" Zadejte discount faktor: ");
                 try
                 {
                     discountFactor = Convert.ToDouble(Console.ReadLine());
@@ -892,6 +892,9 @@ namespace Calico
             }
         }
 
+        /// <summary>
+        /// Spuštění evoluce pro kombinaci úkolů
+        /// </summary>
         private void Evolution()
         {
             // vybrat tasky
@@ -906,6 +909,9 @@ namespace Calico
 
         }
 
+        /// <summary>
+        /// Vybrání nejlepších vah pro dané umístění úkolů z poslední generace evolu pro kombinaci úkolů bez ohledu na umístění
+        /// </summary>
         private void EvolParamsTesting()
         {
             // název souboru ze kterého beru
@@ -942,8 +948,11 @@ namespace Calico
                             line = reader.ReadLine();
                             values = line.Split(';');
 
+                            // váha pro knoflíky
                             double constB = Convert.ToDouble(values[1]);
+                            // váhy pro žetony koček
                             (double, double, double) constC = (Convert.ToDouble(values[2]), Convert.ToDouble(values[3]), Convert.ToDouble(values[4]));
+                            // váhy pro úkoly
                             double[] constT = new double[]
                                     {
                                         Convert.ToDouble(values[5]),
@@ -955,17 +964,19 @@ namespace Calico
                                     };
 
                             GameStats[] stats = new GameStats[iterations];
-                            for (int s = 0; s < iterations; s++)
+
+                            // test pro dané váhy
+                            for (int s = 0; s < iterations; s++) 
                             {
                                 Game g = new Game();
-                                g.EvolParamsTestAgent(
-                                    constB, 
-                                    constC, 
-                                    constT,
+                                g.EvolutionGame(
+                                    new Weights(constB, constC, constT),
                                     tasks);
                                 stats[s] = g.Stats;
                             }
                             Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3} : {gen} : {stats.Average(item => item.Score)}");
+
+                            // hledání maxima pro dané umístění úkolů
                             if (stats.Average(item => item.Score) > maxScoreAverage)
                             {
                                 maxScoreAverage = stats.Average(item => item.Score);
@@ -1051,6 +1062,12 @@ namespace Calico
 
         #region Helpers
 
+        /// <summary>
+        /// Výpočet průměrného splnění úkolu přes nezáporné hodnoty (pouze přes hry, kdy byl úkol vybrán)
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <param name="stats"></param>
+        /// <returns></returns>
         private string GetTaskAverageScore(int taskId, GameStats[] stats)
         {
             try
