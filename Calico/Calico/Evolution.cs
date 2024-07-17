@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
+    /// <summary>
+    /// Evolutionary algorithm for finding optimal weights for the agent
+    /// </summary>
     internal class Evolution
     {
         private int population_size = 200;
@@ -46,9 +49,12 @@ namespace Calico
             EvolutionRun();
         }
 
+        /// <summary>
+        /// Run of the evolutionary algorithm
+        /// </summary>
         private void EvolutionRun()
         {
-            Weights[] population = RandomPopulation();
+            Weights[] population = InitPopulation();
             double[] fitness = new double[population_size];
 
             double[] avg = new double[generations];
@@ -60,7 +66,7 @@ namespace Calico
             {
                 Console.WriteLine($" Generation {g + 1}");
 
-                fitness = EvolutionGames(population);
+                fitness = PopulationFitness(population);
 
                 population = Mutation(Selection(population, fitness));
 
@@ -72,7 +78,7 @@ namespace Calico
 
             Console.WriteLine($" Generation {generations}");
 
-            fitness = EvolutionGames(population);
+            fitness = PopulationFitness(population);
             Console.WriteLine(fitness.Average());
             avg[generations - 1] = fitness.Average();
             Console.WriteLine(fitness.Max());
@@ -121,8 +127,11 @@ namespace Calico
             }
         }
 
-
-        private Weights[] RandomPopulation()
+        /// <summary>
+        /// Inicialization of the population
+        /// </summary>
+        /// <returns></returns>
+        private Weights[] InitPopulation()
         {
             Weights[] population = new Weights[population_size];
 
@@ -166,6 +175,12 @@ namespace Calico
             return population;
         }
 
+        /// <summary>
+        /// Selection of the best individuals
+        /// </summary>
+        /// <param name="population"></param>
+        /// <param name="fitness"></param>
+        /// <returns></returns>
         private Weights[] Selection(Weights[] population, double[] fitness)
         {
             Weights[] newPopulation = new Weights[population_size];
@@ -202,6 +217,11 @@ namespace Calico
             return newPopulation;
         }
 
+        /// <summary>
+        /// Mutation of the population
+        /// </summary>
+        /// <param name="population"></param>
+        /// <returns></returns>
         private Weights[] Mutation(Weights[] population)
         {
             for (int i = 0; i < population_size; i++)
@@ -210,7 +230,6 @@ namespace Calico
 
                 if (random.NextDouble() < mutation_prob)
                 {
-                    // pro každou proměnnou přidat číslo z normálního rozdělelní
                     e.ButtonW += SampleGaussian(0, 0.01);
 
                     e.CatsW.Item1 += SampleGaussian(0, 0.01);
@@ -223,24 +242,33 @@ namespace Calico
                 }
 
                 population[i] = e; 
-                //Console.WriteLine($" {newPopulation[i].ButtonConst}, {newPopulation[i].CatsConst}, {newPopulation[i].TaskConst}");
             }
 
             return population;
         }
 
-        private double[] EvolutionGames (Weights[] population)
+        /// <summary>
+        /// Fitness evaluation for the whole population
+        /// </summary>
+        /// <param name="population"></param>
+        /// <returns></returns>
+        private double[] PopulationFitness (Weights[] population)
         {
             double[] fitness = new double[population_size];
 
             Parallel.For(0, population_size, i =>
             {
-                fitness[i] = Game(population[i]);
+                fitness[i] = IndividualFitness(population[i]);
             });
             return fitness;
         }
 
-        private double Game (Weights weights)
+        /// <summary>
+        /// Fitness evaluation for individual
+        /// </summary>
+        /// <param name="weights"></param>
+        /// <returns></returns>
+        private double IndividualFitness (Weights weights)
         {
             double[] stats = new double[iterations];
 
@@ -290,10 +318,14 @@ namespace Calico
             return stats.Average();
         }
 
+        /// <summary>
+        /// Sample from Gaussian distribution
+        /// </summary>
+        /// <param name="mean"></param>
+        /// <param name="stddev"></param>
+        /// <returns></returns>
         public double SampleGaussian(double mean, double stddev)
         {
-            // The method requires sampling from a uniform random of (0,1]
-            // but Random.NextDouble() returns a sample of [0,1).
             double x1 = 1 - random.NextDouble();
             double x2 = 1 - random.NextDouble();
 
@@ -302,6 +334,9 @@ namespace Calico
         }
     }
 
+    /// <summary>
+    /// Game for evolutionary algorithm
+    /// </summary>
     public class EvolutionGame : Game
     {
         public EvolutionGame(Weights weights, (int, int, int) tasks) : base()

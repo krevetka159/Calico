@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
+    /// <summary>
+    /// Weights for weighted advanced evaluation function
+    /// </summary>
     public class Weights
     {
         public double ButtonW;
@@ -21,6 +24,10 @@ namespace Calico
         }
     }
 
+
+    /// <summary>
+    /// Dictionary of weights for weighted advanced evaluation function from evolutionary algoritm
+    /// </summary>
     public class WeightsDict
     {
         private Dictionary<(int, int, int), Weights> WDict;
@@ -66,6 +73,11 @@ namespace Calico
             }
         }
 
+        /// <summary>
+        /// Get weights for given tasks
+        /// </summary>
+        /// <param name="tasks"></param>
+        /// <returns></returns>
         public Weights GetWeights((int, int, int) tasks)
         {
             return WDict[tasks];

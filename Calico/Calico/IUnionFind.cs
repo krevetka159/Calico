@@ -48,32 +48,10 @@ namespace Calico
 
         public int Count(T x)
         {
-            //int xCluster = clusters[x];
-            //int cnt = 0;
-            //foreach ((T z, int zCluster) in clusters)
-            //{
-            //    if (zCluster == xCluster)
-            //    {
-            //        cnt++;
-            //    }
-            //}
-
-            //return cnt;
             return clusterSizes[clusters[x]];
         }
         public int Count(int x)
         {
-            //int xCluster = clusters[x];
-            //int cnt = 0;
-            //foreach ((T z, int zCluster) in clusters)
-            //{
-            //    if (zCluster == xCluster)
-            //    {
-            //        cnt++;
-            //    }
-            //}
-
-            //return cnt;
             return clusterSizes[x];
         }
 
@@ -101,24 +79,8 @@ namespace Calico
                     clusterSizes[yCluster] -= 1;
                 }
             }
-           
+
         }
-
-
-        public override string ToString()
-        {
-            StringBuilder sb = new();
-            foreach ((T z, int zColor) in clusters)
-            {
-                sb.Append($"{z}: {zColor}");
-                sb.Append("\n");
-            }
-            return sb.ToString();
-        }
-
-
     }
-
-
   
 }

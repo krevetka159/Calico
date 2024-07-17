@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
+    /// <summary>
+    /// In game scoring counter
+    /// </summary>
     public class ScoreCounter
     {
         public int Score { get; private set; }
@@ -15,10 +18,10 @@ namespace Calico
         private UnionFind<GamePiece> colorUF;
         private UnionFind<GamePiece> patternUF;
 
-        public int[] butts;
-        public int rainbowButtons { get; private set; }
+        public int[] ButtonsCount { get; private set; }
+        public int RainbowButtonsCount { get; private set; }
         
-        public int[] catts;
+        public int[] CatsCount { get; private set; }
 
         public Scoring Scoring { get; private set; }
 
@@ -30,18 +33,18 @@ namespace Calico
             colorUF = new UnionFind<GamePiece>();
             patternUF = new UnionFind<GamePiece>();
 
-            butts = new int[6] {0,0,0,0,0,0};
-            rainbowButtons = 0;
+            ButtonsCount = new int[6] {0,0,0,0,0,0};
+            RainbowButtonsCount = 0;
 
-            catts = new int[3];
-            foreach (PatternScoringPanel panel in Scoring.PatternScoring.ps)
+            CatsCount = new int[3];
+            foreach (PatternScoringPanel panel in Scoring.PatternScoring.PatternScoringPanels)
             {
-                catts[panel.Id] = 0;
+                CatsCount[panel.Id] = 0;
             }
             
         }
 
-        public ScoreCounter(ScoreCounter sc)
+        public ScoreCounter(ScoreCounter sc) // Copy constructor for simulations
         {
 
             Score = sc.Score;
@@ -49,18 +52,28 @@ namespace Calico
             colorUF = new UnionFind<GamePiece>(sc.colorUF);
             patternUF = new UnionFind<GamePiece>(sc.patternUF);
 
-            butts = (int[])sc.butts.Clone();
-            rainbowButtons = sc.rainbowButtons;
+            ButtonsCount = (int[])sc.ButtonsCount.Clone();
+            RainbowButtonsCount = sc.RainbowButtonsCount;
 
-            catts = (int[])sc.catts.Clone();
+            CatsCount = (int[])sc.CatsCount.Clone();
 
         }
 
+        /// <summary>
+        /// Gets id of a cluster from pattern UnionFind containing the patchtile
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <returns></returns>
         public int GetPatternClusterId(GamePiece gp)
         {
             return patternUF.GetClusterId(gp);
         }
 
+        /// <summary>
+        /// Gets id of a cluster from color UnionFind containing the patchtile
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <returns></returns>
         public int GetColorClusterId(GamePiece gp)
         {
             return colorUF.GetClusterId(gp);
@@ -75,7 +88,6 @@ namespace Calico
             patternUF.Add(piece);
             colorUF.Add(piece);
         }
-
        
         /// <summary>
         /// Checks the sizes of neighbours clusters for both color and pattern
@@ -99,7 +111,7 @@ namespace Calico
 
                 if (p.Pattern == n.Pattern)
                 {
-                    if (GetPatternCount(n) >= Scoring.PatternScoring.psDict[(int)n.Pattern-1].ClusterSize)
+                    if (GetPatternCount(n) >= Scoring.PatternScoring.PatternScoringDict[(int)n.Pattern-1].ClusterSize)
                     {
                         possible_cat = false;
                     }
@@ -117,41 +129,22 @@ namespace Calico
                 Score += Scoring.ColorScoring.Points;
                 AddAndUpdateButtons(p.Color);
             }
-            if (possible_cat && GetPatternCount(p) >= Scoring.PatternScoring.psDict[(int)p.Pattern-1].ClusterSize)
+            if (possible_cat && GetPatternCount(p) >= Scoring.PatternScoring.PatternScoringDict[(int)p.Pattern-1].ClusterSize)
             {
-                Score += Scoring.PatternScoring.psDict[(int)p.Pattern-1].Points;
+                Score += Scoring.PatternScoring.PatternScoringDict[(int)p.Pattern-1].Points;
                 AddCat(p.Pattern);
             }
 
         }
 
+        /// <summary>
+        /// Adds score from a task to the total score
+        /// </summary>
+        /// <param name="task"></param>
         public void EvaluateTask(TaskPiece task)
         {
             Score += task.Evaluate();
         }
-
-        /// <summary>
-        /// Checks whether two patchtiles are in the same color cluster
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="n"></param>
-        /// <returns></returns>
-        public bool CheckColorUnion(GamePiece p, GamePiece n)
-        {
-            return colorUF.Find(p, n);
-        }
-
-        /// <summary>
-        /// Checks whether two patchtiles are in the same color cluster
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="n"></param>
-        /// <returns></returns>
-        public bool CheckPatternUnion(GamePiece p, GamePiece n)
-        {
-            return patternUF.Find(p, n);
-        }
-
 
         /// <summary>
         /// Returns size of color cluster that the patchtile is a part of
@@ -173,9 +166,14 @@ namespace Calico
             return patternUF.Count(p);
         }
 
-        public int GetPatternCount(int p)
+        /// <summary>
+        /// Returns size of pattern cluster with id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int GetPatternCount(int id)
         {
-            return patternUF.Count(p);
+            return patternUF.Count(id);
         }
 
         /// <summary>
@@ -194,16 +192,16 @@ namespace Calico
         /// <returns></returns>
         public bool GetsRainbowButton(Color c)
         {
-            int min = butts.Min();
-            for (int i = 0; i<butts.Length; i++)
+            int min = ButtonsCount.Min();
+            for (int i = 0; i<ButtonsCount.Length; i++)
             {
                 if (i == (int)c-1)
                 {
-                    if (butts[i] != min) return false;
+                    if (ButtonsCount[i] != min) return false;
                 }
                 else
                 {
-                    if (butts[i] <= min) return false;
+                    if (ButtonsCount[i] <= min) return false;
                 }
             }
             return true;
@@ -218,24 +216,36 @@ namespace Calico
             if (GetsRainbowButton(c))
             {
                 Score += Scoring.ColorClusterScore;
-                rainbowButtons += 1;
+                RainbowButtonsCount += 1;
             }
-            butts[(int)c-1] += 1;
+            ButtonsCount[(int)c-1] += 1;
         }
         
+        /// <summary>
+        /// Updates cats dictionary while adding a cat for a given pattern.
+        /// </summary>
+        /// <param name="p"></param>
         public void AddCat(Pattern p)
         {
-            catts[Scoring.PatternScoring.psDict[(int)p-1].Id] += 1;
+            CatsCount[Scoring.PatternScoring.PatternScoringDict[(int)p-1].Id] += 1;
         }
 
+        /// <summary>
+        /// Returns the number of buttons
+        /// </summary>
+        /// <returns></returns>
         public int GetButtonsCount()
         {
-            return butts.Sum() + rainbowButtons;
+            return ButtonsCount.Sum() + RainbowButtonsCount;
         }
 
+        /// <summary>
+        /// Returns the number of cat tokens
+        /// </summary>
+        /// <returns></returns>
         public (int, int, int) GetCatsCount()
         {
-            return (catts[0], catts[1], catts[2]);
+            return (CatsCount[0], CatsCount[1], CatsCount[2]);
         }
     }
 }

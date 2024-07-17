@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
+    /// <summary>
+    /// All patchtiles in the game
+    /// </summary>
     public class Bag
 
     {

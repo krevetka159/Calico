@@ -32,10 +32,14 @@ namespace Calico
     public enum Type
     {
         Empty,
-        Blocked,
+        TaskSpot,
         Task,
         PatchTile
     }
+
+    /// <summary>
+    /// Patchtile, Task, spot on the board
+    /// </summary>
     public class GamePiece
     {
         public Color Color { get; private set; }
@@ -46,14 +50,14 @@ namespace Calico
 
         public GamePiece(Type t)
         {
-            // init for Empty and Blocked
+            // init for Empty and TaskSpot
 
             Type = t;
             Color = Color.None;
             Pattern = Pattern.None;
 
             if (t == Type.Empty) Print = " -- ";
-            else if (t == Type.Blocked) Print = " XX ";
+            else if (t == Type.TaskSpot) Print = " XX ";
         }
 
         public GamePiece(Color c, Pattern p) 
@@ -76,7 +80,7 @@ namespace Calico
             Print = $" T{TaskId} ";
         }
 
-        public GamePiece(GamePiece gp)
+        public GamePiece(GamePiece gp) // Copy constructor for simulations
         {
             // init for TaskPiece
 
@@ -87,12 +91,15 @@ namespace Calico
         }
     }
 
+    /// <summary>
+    /// TaskPiece
+    /// </summary>
     public class TaskPiece : GamePiece
     {
         public int Id;
         public int ScoreCompletedFully;
         public int ScoreCompletedPartly;
-        public int[] Task;
+        public int[] Task; // definition of the task conditions
         public int[] Colors = new int[6] { 0, 0, 0, 0, 0, 0 };
         public int[] Patterns = new int[6] { 0, 0, 0, 0, 0, 0 };
         public string Description;
@@ -187,6 +194,10 @@ namespace Calico
             else return 0;
         }
 
+        /// <summary>
+        /// 1 = completed partly, 2 = completed fully, 0 = not completed
+        /// </summary>
+        /// <returns></returns>
         public int Completed()
         {
             bool colorsFailed = false; ;
@@ -218,7 +229,12 @@ namespace Calico
             else return 0;
         }
 
-        public int CheckNeighbours(GamePiece gp)
+        /// <summary>
+        /// Evaluation for basic evaluation function
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <returns></returns>
+        public int EvaluateBasic(GamePiece gp)
         {
             bool colorsFailed = false; ;
             bool patternsFailed = false;
@@ -277,7 +293,12 @@ namespace Calico
             }
         }
 
-        public double CheckNeighboursUtility(GamePiece gp)
+        /// <summary>
+        /// Evaluation for advanced evaluation function
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <returns></returns>
+        public double EvaluateAdvanced(GamePiece gp)
         {
             bool colorsFailed = false;
             bool patternsFailed = false;
@@ -311,44 +332,10 @@ namespace Calico
             else return 0;
         }
 
-        public double CheckNeighboursUtilityMinimax(List<GamePiece> gamePieces)
-        {
-            bool colorsFailed = false; ;
-            bool patternsFailed = false;
-
-            int[] colors = (int[])Colors.Clone();
-            int[] patterns = (int[])Patterns.Clone();
-
-            foreach (GamePiece gp in gamePieces)
-            {
-                colors[(int)gp.Color-1] += 1;
-                patterns[(int)gp.Pattern-1] += 1;
-            }
-
-            Array.Sort(colors);
-            Array.Reverse(colors);
-            Array.Sort(patterns);
-            Array.Reverse(patterns);
-
-            for (int i = 0; i < Task.Count(); i++)
-            {
-                if (colors[i] > Task[i]) // for colors.Sum() == 6 nastane když existuje pokud neplatí rovnosti u všeho
-                {
-                    if (patternsFailed) return 0;
-                    else colorsFailed = true;
-                }
-                if (patterns[i] > Task[i])
-                {
-                    if (colorsFailed) return 0;
-                    else patternsFailed = true;
-                }
-            }
-
-            if (!colorsFailed && !patternsFailed) return (Convert.ToDouble(ScoreCompletedFully) / 6) * colors.Sum();
-            else if (!patternsFailed || !colorsFailed) return (Convert.ToDouble(ScoreCompletedPartly) / 6) * colors.Sum();
-            else return 0;
-        }
-
+        /// <summary>
+        /// Add gamepiece to list of neighbouring gamepieces
+        /// </summary>
+        /// <param name="piece"></param>
         public void AddNeighbor(GamePiece piece)
         {
             Colors[(int)piece.Color-1] += 1;

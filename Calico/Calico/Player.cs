@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
+    /// <summary>
+    /// Human player
+    /// </summary>
     public class Player
     {
         public GameBoard Board { get; set; }

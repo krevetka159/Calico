@@ -8,25 +8,25 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace Calico
 {
+    /// <summary>
+    /// Scoring and scoring rules for colors and patterns
+    /// </summary>
     public class Scoring
     {
         private Random random;
 
         public int ColorClusterScore = 3;
-        //public Dictionary<Pattern, int> PatternClusterScores { get; private set; }
 
-        public int[] pcScores {  get; set; }
+        public int[] PatternClusterScores {  get; private set; }
 
         public int ColorClusterSize = 3;
-        //public Dictionary<Pattern, int> PatternClusterSizes { get; private set; }
-        public int[] pcSizes { get; set; }
+        public int[] PatternClusterSizes { get; private set; }
 
         public ColorScoring ColorScoring { get; private set; }
 
         public PatternScoring PatternScoring {  get; private set; }
 
         public StringBuilder PatternScoringToString { get; private set; }
-        // for printState in game
 
         public Scoring() 
         {
@@ -34,8 +34,7 @@ namespace Calico
 
             List<(int, int)> patternProps = new List<(int, int)>() { (3, 3), (4, 5), (5, 7) };
 
-            // randomly rozdělit patterny na clustersizes a bodíky
-
+            // randomly assign pattern to different scoring panels
             List<Pattern> patterns = new List<Pattern>();
 
             foreach (Pattern i in Enum.GetValues(typeof(Pattern)))
@@ -46,11 +45,8 @@ namespace Calico
                 }
             }
 
-            //PatternClusterScores = new Dictionary<Pattern, int>();
-            //PatternClusterSizes = new Dictionary<Pattern, int>();
-
-            pcScores = new int[6];
-            pcSizes = new int[6];
+            PatternClusterScores = new int[6];
+            PatternClusterSizes = new int[6];
 
             PatternScoringToString = new StringBuilder();
 
@@ -60,11 +56,9 @@ namespace Calico
                 for (int i = 0; i < 2; i++)
                 {
                     int randInt = random.Next(patterns.Count);
-                    //PatternClusterSizes[patterns[randInt]] = size;
-                    //PatternClusterScores[patterns[randInt]] = score;
 
-                    pcSizes[(int)patterns[randInt]-1] = size;
-                    pcScores[(int)patterns[randInt]-1] = score;
+                    PatternClusterSizes[(int)patterns[randInt]-1] = size;
+                    PatternClusterScores[(int)patterns[randInt]-1] = score;
 
                     PatternScoringToString.Append((char)(64+(int)patterns[randInt]));
                     PatternScoringToString.Append(", ");
@@ -79,13 +73,15 @@ namespace Calico
             ColorScoring = new ColorScoring();
         }
     }
+
+    /// <summary>
+    /// Scoring for patterns
+    /// </summary>
     public class PatternScoring
     {
         private Random random;
-        //public Dictionary<Pattern, PatternScoringPanel> PatternScoringDict {  get; private set; }
-        public PatternScoringPanel[] psDict;
-        public PatternScoringPanel[] ps;
-        //public List<PatternScoringPanel> PatternScoringPanels { get; private set; }
+        public PatternScoringPanel[] PatternScoringDict { get; private set; }
+        public PatternScoringPanel[] PatternScoringPanels { get; private set; }
 
         public StringBuilder PatternScoringPrint {  get; private set; }
 
@@ -94,22 +90,11 @@ namespace Calico
             random = new Random();
 
             List<int> patterns = new List<int>(new int[6] { 1, 2, 3, 4, 5, 6 });
-            //int[] patterns = new int[6] {1,2,3,4,5,6};
-
-            //foreach (Pattern i in Enum.GetValues(typeof(Pattern)))
-            //{
-            //    if (i != Pattern.None)
-            //    {
-            //        patterns.Add(i);
-            //    }
-            //}
 
             PatternScoringPrint = new StringBuilder();
 
-            //PatternScoringPanels = new List<PatternScoringPanel>();
-            //PatternScoringDict = new Dictionary<Pattern, PatternScoringPanel>();
-            ps = new PatternScoringPanel[3];
-            psDict = new PatternScoringPanel[6];
+            PatternScoringPanels = new PatternScoringPanel[3];
+            PatternScoringDict = new PatternScoringPanel[6];
 
             for (int i = 0; i <= 2; i++)
             {
@@ -122,15 +107,13 @@ namespace Calico
                 patterns.RemoveAt(randInt);
 
                 PatternScoringPanel panel = new PatternScoringPanel(i, p1, p2);
-                //PatternScoringPanels.Add(panel);
-                ps[i] = panel;
-                psDict[(int)p1-1] = panel;
-                psDict[(int)p2 - 1] = panel;
-                //PatternScoringDict[p1] = panel;
-                //PatternScoringDict[p2] = panel;
+
+                PatternScoringPanels[i] = panel;
+                PatternScoringDict[(int)p1-1] = panel;
+                PatternScoringDict[(int)p2 - 1] = panel;
             }
 
-            foreach ( PatternScoringPanel panel in ps)
+            foreach ( PatternScoringPanel panel in PatternScoringPanels)
             {
                 PatternScoringPrint.Append($" {panel.ClusterSize} patchtiles = {panel.Points} points for patterns {panel.PatternsPrint} \n");
             }
@@ -138,6 +121,9 @@ namespace Calico
         }
     }
 
+    /// <summary>
+    /// Scoring panel for patterns
+    /// </summary>
     public class PatternScoringPanel
     {
         public int Id;
@@ -171,6 +157,9 @@ namespace Calico
         }
     }
 
+    /// <summary>
+    /// Scoring for colors
+    /// </summary>
     public class ColorScoring
     {
         public int Points;

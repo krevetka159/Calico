@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
+    /// <summary>
+    /// Score and other statistics of a game
+    /// </summary>
     public class GameStats
     {
         public int Score;

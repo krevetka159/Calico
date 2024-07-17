@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Calico
 {
+    /// <summary>
+    /// Simulation of a game from a given state untill the end. Used in MCTS based evaluation
+    /// </summary>
     public class SimulationGame : Game
     {
         public SimulationGame(GameBoard gb, GamePiece[] o, Scoring s, Bag b)
