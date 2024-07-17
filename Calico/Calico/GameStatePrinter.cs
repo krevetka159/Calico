@@ -129,15 +129,15 @@ namespace Calico
             {
                 if (c != Color.None)
                 {
-                    partialScore.Append($" {(int)c} : {p.Board.ScoreCounter.butts[(int)c-1]} | ");
+                    partialScore.Append($" {(int)c} : {p.Board.ScoreCounter.ButtonsCount[(int)c-1]} | ");
                 }
             }
-            partialScore.Append($" RB : {p.Board.ScoreCounter.rainbowButtons}");
+            partialScore.Append($" RB : {p.Board.ScoreCounter.RainbowButtonsCount}");
             partialScore.Append('\n');
 
-            foreach (PatternScoringPanel panel in p.Board.ScoreCounter.Scoring.PatternScoring.ps)
+            foreach (PatternScoringPanel panel in p.Board.ScoreCounter.Scoring.PatternScoring.PatternScoringPanels)
             {
-                partialScore.Append($" {(char)(64 + (int)panel.Patterns.Item1)}, {(char)(64 + (int)panel.Patterns.Item2)} : {p.Board.ScoreCounter.catts[panel.Id]} | ");
+                partialScore.Append($" {(char)(64 + (int)panel.Patterns.Item1)}, {(char)(64 + (int)panel.Patterns.Item2)} : {p.Board.ScoreCounter.CatsCount[panel.Id]} | ");
             }
             partialScore.Append('\n');
 
