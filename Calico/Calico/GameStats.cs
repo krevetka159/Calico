@@ -8,7 +8,6 @@ namespace Calico
 {
     public class GameStats
     {
-        public int AgentType;
         public int Score;
         public int Buttons;
         public (int, int, int) Cats;
