@@ -963,23 +963,20 @@ namespace Calico
                                         Convert.ToDouble(values[10]),
                                     };
 
-                            GameStats[] stats = new GameStats[iterations];
+                            double[] stats = new double[iterations];
 
                             // test pro dané váhy
                             for (int s = 0; s < iterations; s++) 
                             {
-                                Game g = new Game();
-                                g.EvolutionGame(
-                                    new Weights(constB, constC, constT),
-                                    tasks);
-                                stats[s] = g.Stats;
+                                EvolutionGame g = new EvolutionGame(new Weights(constB, constC, constT),tasks);
+                                stats[s] = g.Game(); 
                             }
-                            Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3} : {gen} : {stats.Average(item => item.Score)}");
+                            Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3} : {gen} : {stats.Average()}");
 
                             // hledání maxima pro dané umístění úkolů
-                            if (stats.Average(item => item.Score) > maxScoreAverage)
+                            if (stats.Average() > maxScoreAverage)
                             {
-                                maxScoreAverage = stats.Average(item => item.Score);
+                                maxScoreAverage = stats.Average();
                                 maxConstB = constB;
                                 maxConstC = (constC.Item1, constC.Item2, constC.Item3);
 

@@ -48,22 +48,6 @@ namespace Calico
 
             gameStatePrinter = new GameStatePrinter(scoring);
         }
-
-        public Game(int agentType, bool withPrint)
-        {
-            bag = new Bag();
-            for (int i = 0; i < 3; i++)
-            {
-                Opts[i] = bag.Next();
-            }
-
-            scoring = new Scoring();
-
-            gameStatePrinter = new GameStatePrinter(scoring);
-
-            agent = UseAgent(agentType);
-            agent.ChooseTaskPieces();
-        }
         
 
     #region SinglePlayer
@@ -131,11 +115,6 @@ namespace Calico
                         return new Agent(scoring);
                     }
             }
-        }
-
-        public Agent UseEvolParamsAgent(double b, (double,double,double) c, double[] t)
-        {
-            return new AgentCompleteWithUtilityParams(scoring, b, c, t);
         }
 
         public Agent UseAgent(int agentOption, int boardId)
@@ -361,58 +340,7 @@ namespace Calico
         #endregion
         #endregion
 
-        #region Evolution
-
-        public void EvolutionGame(bool withPrint, Weights e, (int,int,int) tasks)
-        {
-            agent = new AgentWeightedAdvanced(scoring, e);
-            //agent.ChooseTaskPieces();
-            agent.AddTaskPieces(tasks.Item1, tasks.Item2, tasks.Item3);
-
-            if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
-
-            for (int i = 0; i < 22; i++)
-            {
-                MakeMove(agent);
-
-                if (withPrint) gameStatePrinter.PrintStateSingle(agent, Opts);
-            }
-
-            if (withPrint) gameStatePrinter.PrintStats(agent);
-
-            int score = agent.Board.ScoreCounter.GetScore();
-
-            int buttons = agent.Board.ScoreCounter.GetButtonsCount();
-            var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
-            (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
-
-            Stats = new GameStats(score, buttons, cats);
-        }
-
-        public void EvolParamsTestAgent(double b, (double,double,double) c, double[] t, (int,int,int) taskSettings)
-        {
-            agent = UseEvolParamsAgent(b, c, t);
-            agent.AddTaskPieces(taskSettings.Item1, taskSettings.Item2, taskSettings.Item3);
-
-            for (int i = 0; i < 22; i++)
-            {
-                MakeMove(agent);
-            }
-
-            int score = agent.Board.ScoreCounter.GetScore();
-
-            int buttons = agent.Board.ScoreCounter.GetButtonsCount();
-            var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
-            (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
-
-            Stats = new GameStats(score, buttons, cats, agent.Board.TasksCompleted());
-        }
-
-        #endregion
-
         #region Move
-
-
         public void MakeMove(Player p)
         {
             
