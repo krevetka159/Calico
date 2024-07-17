@@ -28,25 +28,4 @@ namespace Calico
             Tasks = tasks;
         }
     }
-
-    public class AverageGameStats
-    {
-        public int AgentType;
-        public double AvgScore;
-        public double AvgButtons;
-        public (double, double, double) AvgCats;
-        public double AvgTaskPoints;
-        public int BestScore;
-        public int LowestScore;
-
-        public AverageGameStats(int agentType, double avgScore, double avgButtons, (double, double, double) avgCats, int bestScore, int lowestScore)
-        {
-            AgentType = agentType;
-            AvgScore = avgScore;
-            AvgButtons = avgButtons;
-            AvgCats = avgCats;
-            BestScore = bestScore;
-            LowestScore = lowestScore;
-        }
-    }
 }
