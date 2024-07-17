@@ -283,7 +283,7 @@ namespace Calico
             var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
             (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
 
-            Stats = new GameStats(score, buttons, cats);
+            Stats = new GameStats(score, buttons, cats, agent.Board.TasksCompleted());
         }
 
         public void AgentGameBoardSettings(int agentType, bool withPrint, int boardId)
@@ -308,7 +308,7 @@ namespace Calico
             var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
             (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
 
-            Stats = new GameStats(score, buttons, cats);
+            Stats = new GameStats(score, buttons, cats, agent.Board.TasksCompleted());
         }
 
         public void AgentGameSettings(int agentType, bool withPrint, (int,int,int) taskChoice, int boardId)
@@ -333,7 +333,7 @@ namespace Calico
             var catsTemp = agent.Board.ScoreCounter.GetCatsCount();
             (int, int, int) cats = (catsTemp.Item1, catsTemp.Item2, catsTemp.Item3);
 
-            Stats = new GameStats(score, buttons, cats);
+            Stats = new GameStats(score, buttons, cats, agent.Board.TasksCompleted());
         }
         #endregion
 
