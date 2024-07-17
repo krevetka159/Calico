@@ -13,12 +13,6 @@ namespace Calico
         public (int, int, int) Cats;
         public int[] Tasks;
 
-        public GameStats(int score, int buttons, (int,int,int) cats)
-        {
-            Score = score;
-            Buttons = buttons;
-            Cats = cats;
-        }
         public GameStats(int score, int buttons, (int, int, int) cats, int[] tasks)
         {
             Score = score;
