@@ -8,11 +8,14 @@ using System.Threading.Tasks.Sources;
 
 namespace Calico
 {
+    /// <summary>
+    /// Game board representation
+    /// </summary>
     public class GameBoard
     {
         public List<List<GamePiece>> board;
         private static GamePiece empty = new GamePiece(Type.Empty);
-        private static GamePiece blocked = new GamePiece(Type.Blocked);
+        private static GamePiece taskSpot = new GamePiece(Type.TaskSpot);
         public int Size = 7;
         public List<(int,int)> TaskPieceSpots = new List<(int,int)>() { (2,3),(3,4),(4,2)};
         public Dictionary<(int,int),TaskPiece> TaskPieces = new Dictionary<(int, int), TaskPiece>();
@@ -31,16 +34,16 @@ namespace Calico
             ScoreCounter = new ScoreCounter(scoring);
 
             int randId = random.Next(1, 5);
-            // generování okrajů boardu podle id - 4 možnosti
+            // generate board based on id - 4 options (different borders)
             switch (randId)
             {
                 case 1:
                     board = new List<List<GamePiece>>() { 
                         new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), new GamePiece(Color.Yellow, Pattern.Stripes), new GamePiece(Color.Cyan, Pattern.Vines), new GamePiece(Color.Pink, Pattern.Fern), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Yellow, Pattern.Flowers), new GamePiece(Color.Green, Pattern.Stripes) },
                         new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Dots) },
-                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, blocked, empty, empty, new GamePiece(Color.Purple, Pattern.Vines) },
-                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Fern), empty, empty, empty, blocked, empty, new GamePiece(Color.Yellow, Pattern.Fern) },
-                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Stripes), empty, blocked, empty, empty, empty, new GamePiece(Color.Green, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Purple, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Fern), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Yellow, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Stripes), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Green, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Flowers) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Flowers), new GamePiece(Color.Cyan, Pattern.Quatrefoil), new GamePiece(Color.Pink, Pattern.Flowers), new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Green, Pattern.Vines), new GamePiece(Color.Pink, Pattern.Dots), new GamePiece(Color.Cyan, Pattern.Stripes) }
                     };
@@ -49,9 +52,9 @@ namespace Calico
                     board = new List<List<GamePiece>>() {
                         new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Vines), new GamePiece(Color.Green, Pattern.Fern), new GamePiece(Color.Blue, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Yellow, Pattern.Dots), new GamePiece(Color.Cyan, Pattern.Vines) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Flowers) },
-                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Quatrefoil), empty, empty, blocked, empty, empty, new GamePiece(Color.Purple, Pattern.Fern) },
-                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Stripes), empty, empty, empty, blocked, empty, new GamePiece(Color.Yellow, Pattern.Stripes) },
-                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), empty, blocked, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Quatrefoil), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Purple, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Stripes), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Yellow, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Dots) },
                         new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Stripes), new GamePiece(Color.Blue, Pattern.Dots), new GamePiece(Color.Green, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Stripes), new GamePiece(Color.Cyan, Pattern.Fern), new GamePiece(Color.Blue, Pattern.Flowers), new GamePiece(Color.Green, Pattern.Vines) }
                     };
@@ -60,9 +63,9 @@ namespace Calico
                     board = new List<List<GamePiece>>() {
                         new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), new GamePiece(Color.Purple, Pattern.Dots), new GamePiece(Color.Pink, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Fern), new GamePiece(Color.Cyan, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Green, Pattern.Dots) },
                         new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Quatrefoil), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Vines) },
-                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Stripes), empty, empty, blocked, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
-                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Fern), empty, empty, empty, blocked, empty, new GamePiece(Color.Pink, Pattern.Fern) },
-                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), empty, blocked, empty, empty, empty, new GamePiece(Color.Green, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Stripes), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Fern), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Pink, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Green, Pattern.Stripes) },
                         new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Stripes), new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Green, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Dots) }
                     };
@@ -71,9 +74,9 @@ namespace Calico
                     board = new List<List<GamePiece>>() {
                         new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Quatrefoil), new GamePiece(Color.Blue, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Dots), new GamePiece(Color.Blue, Pattern.Vines), new GamePiece(Color.Green, Pattern.Fern), new GamePiece(Color.Pink, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Fern), empty, empty, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
-                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, blocked, empty, empty, new GamePiece(Color.Blue, Pattern.Stripes) },
-                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, blocked, empty, new GamePiece(Color.Green, Pattern.Dots) },
-                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, blocked, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Blue, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Green, Pattern.Dots) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Vines) },
                         new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Fern) },
                         new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Vines), new GamePiece(Color.Purple, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Vines), new GamePiece(Color.Cyan, Pattern.Dots), new GamePiece(Color.Pink, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Quatrefoil) }
                     };
@@ -104,9 +107,9 @@ namespace Calico
                     board = new List<List<GamePiece>>() {
                         new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), new GamePiece(Color.Yellow, Pattern.Stripes), new GamePiece(Color.Cyan, Pattern.Vines), new GamePiece(Color.Pink, Pattern.Fern), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Yellow, Pattern.Flowers), new GamePiece(Color.Green, Pattern.Stripes) },
                         new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Dots) },
-                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, blocked, empty, empty, new GamePiece(Color.Purple, Pattern.Vines) },
-                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Fern), empty, empty, empty, blocked, empty, new GamePiece(Color.Yellow, Pattern.Fern) },
-                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Stripes), empty, blocked, empty, empty, empty, new GamePiece(Color.Green, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Purple, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Fern), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Yellow, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Stripes), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Green, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Flowers) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Flowers), new GamePiece(Color.Cyan, Pattern.Quatrefoil), new GamePiece(Color.Pink, Pattern.Flowers), new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Green, Pattern.Vines), new GamePiece(Color.Pink, Pattern.Dots), new GamePiece(Color.Cyan, Pattern.Stripes) }
                     };
@@ -115,9 +118,9 @@ namespace Calico
                     board = new List<List<GamePiece>>() {
                         new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Vines), new GamePiece(Color.Green, Pattern.Fern), new GamePiece(Color.Blue, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Yellow, Pattern.Dots), new GamePiece(Color.Cyan, Pattern.Vines) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Flowers) },
-                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Quatrefoil), empty, empty, blocked, empty, empty, new GamePiece(Color.Purple, Pattern.Fern) },
-                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Stripes), empty, empty, empty, blocked, empty, new GamePiece(Color.Yellow, Pattern.Stripes) },
-                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), empty, blocked, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Quatrefoil) },
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Quatrefoil), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Purple, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Stripes), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Yellow, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Dots) },
                         new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Stripes), new GamePiece(Color.Blue, Pattern.Dots), new GamePiece(Color.Green, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Stripes), new GamePiece(Color.Cyan, Pattern.Fern), new GamePiece(Color.Blue, Pattern.Flowers), new GamePiece(Color.Green, Pattern.Vines) }
                     };
@@ -126,9 +129,9 @@ namespace Calico
                     board = new List<List<GamePiece>>() {
                         new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Flowers), new GamePiece(Color.Purple, Pattern.Dots), new GamePiece(Color.Pink, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Fern), new GamePiece(Color.Cyan, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Quatrefoil), new GamePiece(Color.Green, Pattern.Dots) },
                         new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Quatrefoil), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Vines) },
-                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Stripes), empty, empty, blocked, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
-                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Fern), empty, empty, empty, blocked, empty, new GamePiece(Color.Pink, Pattern.Fern) },
-                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), empty, blocked, empty, empty, empty, new GamePiece(Color.Green, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Stripes), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Fern), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Pink, Pattern.Fern) },
+                        new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Vines), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Green, Pattern.Stripes) },
                         new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Dots), empty, empty, empty, empty, empty, new GamePiece(Color.Blue, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Stripes), new GamePiece(Color.Blue, Pattern.Fern), new GamePiece(Color.Green, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Quatrefoil), new GamePiece(Color.Purple, Pattern.Dots) }
                     };
@@ -137,9 +140,9 @@ namespace Calico
                     board = new List<List<GamePiece>>() {
                         new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Quatrefoil), new GamePiece(Color.Blue, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Dots), new GamePiece(Color.Blue, Pattern.Vines), new GamePiece(Color.Green, Pattern.Fern), new GamePiece(Color.Pink, Pattern.Quatrefoil) },
                         new List<GamePiece>() { new GamePiece(Color.Pink, Pattern.Fern), empty, empty, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Flowers) },
-                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, blocked, empty, empty, new GamePiece(Color.Blue, Pattern.Stripes) },
-                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, blocked, empty, new GamePiece(Color.Green, Pattern.Dots) },
-                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, blocked, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Vines) },
+                        new List<GamePiece>() { new GamePiece(Color.Purple, Pattern.Vines), empty, empty, taskSpot, empty, empty, new GamePiece(Color.Blue, Pattern.Stripes) },
+                        new List<GamePiece>() { new GamePiece(Color.Yellow, Pattern.Dots), empty, empty, empty, taskSpot, empty, new GamePiece(Color.Green, Pattern.Dots) },
+                        new List<GamePiece>() { new GamePiece(Color.Green, Pattern.Flowers), empty, taskSpot, empty, empty, empty, new GamePiece(Color.Pink, Pattern.Vines) },
                         new List<GamePiece>() { new GamePiece(Color.Blue, Pattern.Quatrefoil), empty, empty, empty, empty, empty, new GamePiece(Color.Cyan, Pattern.Fern) },
                         new List<GamePiece>() { new GamePiece(Color.Cyan, Pattern.Vines), new GamePiece(Color.Purple, Pattern.Fern), new GamePiece(Color.Yellow, Pattern.Vines), new GamePiece(Color.Cyan, Pattern.Dots), new GamePiece(Color.Pink, Pattern.Stripes), new GamePiece(Color.Purple, Pattern.Flowers), new GamePiece(Color.Yellow, Pattern.Quatrefoil) }
                     };
@@ -155,7 +158,7 @@ namespace Calico
 
         }
 
-        public GameBoard(GameBoard b)
+        public GameBoard(GameBoard b) //copy constructor for simulations
         {
             scoring = b.scoring;
             ScoreCounter = new ScoreCounter(b.ScoreCounter);
@@ -294,7 +297,7 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsBasicColor(GamePiece gp, int row, int col)
+        public int EvaluatePositionBasicColor(GamePiece gp, int row, int col)
         {
             int count = 0;
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -341,7 +344,7 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsBasicPattern(GamePiece gp, int row, int col)
+        public int EvaluatePositionBasicPattern(GamePiece gp, int row, int col)
         {
             int count = 0;
             IEnumerable<(int, int)> n = IterateNeighbors(row, col);
@@ -356,7 +359,7 @@ namespace Calico
                 {
                     if (!clusters.Contains(ScoreCounter.GetPatternClusterId(board[row_i][col_i])))
                     {
-                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return 0;
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern-1].ClusterSize) return 0;
                         count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
 
                         clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
@@ -368,7 +371,7 @@ namespace Calico
 
 
             if (count == 0) return 0;
-            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern-1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points;
+            else if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern-1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].Points;
             else return 1;
         }
 
@@ -387,7 +390,7 @@ namespace Calico
             {
                 if (IsTask(r, c))
                 {
-                    score += TaskPieces[(r, c)].CheckNeighbours(gp);
+                    score += TaskPieces[(r, c)].EvaluateBasic(gp);
                 }
             }
 
@@ -401,15 +404,15 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsBasic(GamePiece gp, int row, int col)
+        public int EvaluatePositionBasic(GamePiece gp, int row, int col)
         {
-            return EvaluateNeighborsBasicColor(gp, row, col) + EvaluateNeighborsBasicPattern(gp, row, col) + EvaluateNeighboringTask(gp, row,col);
+            return EvaluatePositionBasicColor(gp, row, col) + EvaluatePositionBasicPattern(gp, row, col) + EvaluateNeighboringTask(gp, row,col);
             
         }
 
         #endregion
 
-        #region Utility evaluation
+        #region Advanced evaluation
 
         /// <summary>
         /// Part of advanced evaluation function - color
@@ -418,7 +421,7 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsAdvancedColor(GamePiece gp, int row, int col)
+        public int EvaluatePositionAdvancedColor(GamePiece gp, int row, int col)
         {
             int count = 0;
 
@@ -465,7 +468,7 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public int EvaluateNeighborsAdvancedPattern(GamePiece gp, int row, int col)
+        public int EvaluatePositionAdvancedPattern(GamePiece gp, int row, int col)
         {
             int count = 0;
 
@@ -486,11 +489,11 @@ namespace Calico
 
             foreach (int c in clusters.Distinct())
             {
-                if (ScoreCounter.GetPatternCount(c) >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return 0;
+                if (ScoreCounter.GetPatternCount(c) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].ClusterSize) return 0;
                 count += ScoreCounter.GetPatternCount(c);
             }
 
-            if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1;
+            if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].ClusterSize) return ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].Points + 1;
             else return count;
         }
 
@@ -509,7 +512,7 @@ namespace Calico
             {
                 if (IsTask(r, c))
                 {
-                    score += TaskPieces[(r, c)].CheckNeighboursUtility(gp);
+                    score += TaskPieces[(r, c)].EvaluateAdvanced(gp);
                 }
             }
 
@@ -523,9 +526,9 @@ namespace Calico
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public double EvaluateNeighborsAdvanced(GamePiece gp, int row, int col)
+        public double EvaluatePositionAdvanced(GamePiece gp, int row, int col)
         {
-            return EvaluateNeighborsAdvancedColor(gp, row, col) + EvaluateNeighborsAdvancedPattern(gp, row, col) + EvaluateNeighboringTaskAdvanced(gp, row, col);
+            return EvaluatePositionAdvancedColor(gp, row, col) + EvaluatePositionAdvancedPattern(gp, row, col) + EvaluateNeighboringTaskAdvanced(gp, row, col);
 
         }
 
@@ -538,7 +541,7 @@ namespace Calico
         /// <param name="sc"></param>
         /// <param name="weights"></param>
         /// <returns></returns>
-        public double EvaluateNeighborsWeightedAdvancedPattern(GamePiece gp, int row, int col, Weights weights)
+        public double EvaluatePositionWeightedAdvancedPattern(GamePiece gp, int row, int col, Weights weights)
         {
             int count = 0;
 
@@ -554,7 +557,7 @@ namespace Calico
                 {
                     if (!clusters.Contains(ScoreCounter.GetPatternClusterId(board[row_i][col_i])))
                     {
-                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize) return 0;
+                        if (ScoreCounter.GetPatternCount(board[row_i][col_i]) >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].ClusterSize) return 0;
                         count += ScoreCounter.GetPatternCount(board[row_i][col_i]);
 
                         clusters[i] = ScoreCounter.GetPatternClusterId(board[row_i][col_i]);
@@ -565,7 +568,7 @@ namespace Calico
             }
 
             double evol_konst = 0;
-            switch (ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Id)
+            switch (ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].Id)
             {
                 case 0:
                     evol_konst = weights.CatsW.Item1;
@@ -578,9 +581,9 @@ namespace Calico
                     break;
             }
 
-            if (count + 1 >= ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].ClusterSize)
+            if (count + 1 >= ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].ClusterSize)
             {
-                return (ScoreCounter.Scoring.PatternScoring.psDict[(int)gp.Pattern - 1].Points + 1) * evol_konst;
+                return (ScoreCounter.Scoring.PatternScoring.PatternScoringDict[(int)gp.Pattern - 1].Points + 1) * evol_konst;
             }
             else return count * evol_konst;
         }
@@ -601,9 +604,9 @@ namespace Calico
             {
                 if (IsTask(r, c))
                 {
-                    var evol_const = weights.TaskW[TaskPieces[(r,c)].Id - 1];
+                    var task_weight = weights.TaskW[TaskPieces[(r,c)].Id - 1];
                     
-                    score += (TaskPieces[(r, c)].CheckNeighboursUtility(gp)) * evol_const;
+                    score += (TaskPieces[(r, c)].EvaluateAdvanced(gp)) * task_weight;
                 }
             }
 
@@ -618,9 +621,9 @@ namespace Calico
         /// <param name="col"></param>
         /// <param name="weights"></param>
         /// <returns></returns>
-        public double EvaluateNeighborsWeightedAdvanced(GamePiece gp, int row, int col, Weights weights)
+        public double EvaluatePositionWeightedAdvanced(GamePiece gp, int row, int col, Weights weights)
         {
-            return EvaluateNeighborsAdvancedColor(gp, row, col)*weights.ButtonW + EvaluateNeighborsWeightedAdvancedPattern(gp, row, col,weights) + EvaluateNeighboringWeightedAdvancedTask(gp, row, col,weights);
+            return EvaluatePositionAdvancedColor(gp, row, col)*weights.ButtonW + EvaluatePositionWeightedAdvancedPattern(gp, row, col,weights) + EvaluateNeighboringWeightedAdvancedTask(gp, row, col,weights);
         }
 
         #endregion

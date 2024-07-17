@@ -126,10 +126,10 @@
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighborsColorFixed(gp, i, j) > max)
+                            if (Board.EvaluatePositionBasicColor(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighborsColorFixed(gp, i, j);
+                                max = Board.EvaluatePositionBasicColor(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
@@ -171,10 +171,10 @@
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighborsPatternFixed(gp, i, j) > max)
+                            if (Board.EvaluatePositionBasicPattern(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighborsPatternFixed(gp, i, j);
+                                max = Board.EvaluatePositionBasicPattern(gp, i, j);
                                 maxPosition = (i, j);
                             }
 
@@ -217,10 +217,10 @@
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighbors(gp, i, j) > max)
+                            if (Board.EvaluatePositionBasic(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighbors(gp, i, j);
+                                max = Board.EvaluatePositionBasic(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
@@ -263,10 +263,10 @@
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
+                            if (Board.EvaluatePositionAdvanced(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighborsUtility(gp, i, j);
+                                max = Board.EvaluatePositionAdvanced(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
@@ -317,10 +317,10 @@
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
+                            if (Board.EvaluatePositionAdvanced(gp, i, j) > max)
                             {
                                 maxPieceIndex = o;
-                                max = Board.EvaluateNeighborsUtility(gp, i, j);
+                                max = Board.EvaluatePositionAdvanced(gp, i, j);
                                 maxPosition = (i, j);
                             }
                         }
@@ -333,53 +333,7 @@
 
         }
     }
-    public class AgentCompleteWithUtilityParams : Agent
-    {
-        public Weights ep;
-
-        /// <summary>
-        /// picks patchtile and position that increases score the most
-        /// </summary>
-        /// <param name="scoring"></param>
-        public AgentCompleteWithUtilityParams(Scoring scoring, double b, (double,double,double) c, double[] t) : base(scoring)
-        {
-            ep = new Weights(b, c, t);
-        }
-        public AgentCompleteWithUtilityParams(Scoring scoring, int boardId, double b, (double, double, double) c, double[] t) : base(scoring, boardId)
-        {
-            ep = new Weights(b, c, t);
-        }
-
-        public override (int, (int, int)) ChooseNextMove(GamePiece[] Opts)
-        {
-            int maxPieceIndex = RandomGamePiece(Opts);
-            double max = 0;
-            (int, int) maxPosition = RandomPosition();
-
-            for (int o = 0; o < Opts.Length; o++)
-            {
-                GamePiece gp = Opts[o];
-                for (int i = 1; i < Board.Size - 1; i++)
-                {
-                    for (int j = 1; j < Board.Size - 1; j++)
-                    {
-                        if (Board.IsEmpty(i, j))
-                        {
-                            var eval = Board.EvaluateNeighborsUtilityBetter(gp, i, j, ep);
-                            if (eval > max)
-                            {
-                                maxPieceIndex = o;
-                                max = eval;
-                                maxPosition = (i, j);
-                            }
-                        }
-                    }
-                }
-            }
-            return (maxPieceIndex, maxPosition);
-        }
-    }
-
+    
     #endregion
 
 
@@ -418,7 +372,7 @@
                 {
                     if (board.IsEmpty(i, j))
                     {
-                        positions[index] = ((i,j), board.EvaluateNeighborsUtilityBetter(gp, i, j, weights));
+                        positions[index] = ((i,j), board.EvaluatePositionWeightedAdvanced(gp, i, j, weights));
                         index++;
                     }
                 }
@@ -453,7 +407,7 @@
                             if (Board.IsEmpty(i1, j1))
                             {
                                 
-                                double eval = Board.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item1], i1, j1, weights);
+                                double eval = Board.EvaluatePositionWeightedAdvanced(Opts[optPermutation.Item1], i1, j1, weights);
                                 GameBoard gb_new = new GameBoard(Board);
                                 gb_new.AddPiece(Opts[optPermutation.Item1], i1, j1);
 
@@ -464,7 +418,7 @@
                                         (int i2, int j2) = pos2;
 
                                         
-                                        double eval2 = eval + (gb_new.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item2], i2, j2, weights) * discount);
+                                        double eval2 = eval + (gb_new.EvaluatePositionWeightedAdvanced(Opts[optPermutation.Item2], i2, j2, weights) * discount);
 
                                         GameBoard gb_new2 = new GameBoard(gb_new);
                                         gb_new2.AddPiece(Opts[optPermutation.Item2], i2, j2);
@@ -475,7 +429,7 @@
                                             {
                                                 if (Board.IsEmpty(i3, j3) && ((i1, j1) != (i3, j3)) && ((i2, j2) != (i3, j3)))
                                                 {
-                                                    double eval3 = eval2 + (gb_new2.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item3], i3, j3, weights) * discount * discount);
+                                                    double eval3 = eval2 + (gb_new2.EvaluatePositionWeightedAdvanced(Opts[optPermutation.Item3], i3, j3, weights) * discount * discount);
 
                                                     if (eval3 > max)
                                                     {
@@ -497,7 +451,7 @@
                                         {
                                             if (gb_new.IsEmpty(i2, j2))
                                             {
-                                                double eval2 = eval + (gb_new.EvaluateNeighborsUtilityBetter(Opts[optPermutation.Item2], i2, j2, weights) * discount);
+                                                double eval2 = eval + (gb_new.EvaluatePositionWeightedAdvanced(Opts[optPermutation.Item2], i2, j2, weights) * discount);
                                                 if (eval2 > max)
                                                 {
                                                     max = eval2;
@@ -529,7 +483,7 @@
                         {
                             if (Board.IsEmpty(i, j))
                             {
-                                var temp = Board.EvaluateNeighborsUtilityBetter(gp, i, j, weights);
+                                var temp = Board.EvaluatePositionWeightedAdvanced(gp, i, j, weights);
                                 if (temp > max)
                                 {
                                     pieceIndex = o;
@@ -572,7 +526,7 @@
                 {
                     if (board.IsEmpty(i, j))
                     {
-                        positions[index] = ((i, j), board.EvaluateNeighborsUtility(gp, i, j));
+                        positions[index] = ((i, j), board.EvaluatePositionAdvanced(gp, i, j));
                         index++;
                     }
                 }
@@ -647,7 +601,7 @@
                                                 }
                                                 else
                                                 {
-                                                    double eval = gb_new2.EvaluateNeighborsUtility(Opts[optPermutation.Item3], i3, j3);
+                                                    double eval = gb_new2.EvaluatePositionAdvanced(Opts[optPermutation.Item3], i3, j3);
                                                     if (eval > max)
                                                     {
                                                         pieceIndex = optPermutation.Item1;
@@ -671,7 +625,7 @@
 
                                     else
                                     {
-                                        double eval = gb_new.EvaluateNeighborsUtility(Opts[optPermutation.Item2], i2, j2);
+                                        double eval = gb_new.EvaluatePositionAdvanced(Opts[optPermutation.Item2], i2, j2);
                                         if (eval > max)
                                         {
                                             pieceIndex = optPermutation.Item1;
@@ -707,10 +661,10 @@
                         {
                             if (Board.IsEmpty(i, j))
                             {
-                                if (Board.EvaluateNeighborsUtility(gp, i, j) > max)
+                                if (Board.EvaluatePositionAdvanced(gp, i, j) > max)
                                 {
                                     pieceIndex = o;
-                                    max = Board.EvaluateNeighborsUtility(gp, i, j);
+                                    max = Board.EvaluatePositionAdvanced(gp, i, j);
                                     maxPosition = (i, j);
                                 }
                             }
@@ -730,13 +684,13 @@
     public class AgentWeightedAdvanced : Agent
     {
         protected Weights weights;
-        public AgentWeightedAdvanced(Scoring scoring, Weights e) : base(scoring)
+        public AgentWeightedAdvanced(Scoring scoring, Weights w) : base(scoring)
         {
-            weights = e;
+            weights = w;
         }
-        public AgentWeightedAdvanced(Scoring scoring, Weights e, int boardId) : base(scoring, boardId)
+        public AgentWeightedAdvanced(Scoring scoring, Weights w, int boardId) : base(scoring, boardId)
         {
-            weights = e;
+            weights = w;
         }
 
         public AgentWeightedAdvanced(Scoring scoring, WeightsDict wd) : base(scoring)
@@ -760,7 +714,7 @@
                     {
                         if (Board.IsEmpty(i, j))
                         {
-                            double eval = Board.EvaluateNeighborsEvolution(gp, i, j, weights);
+                            double eval = Board.EvaluatePositionWeightedAdvanced(gp, i, j, weights);
                             if (eval > max)
                             {
                                 maxPieceIndex = o;
