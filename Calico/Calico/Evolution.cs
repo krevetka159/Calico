@@ -289,27 +289,27 @@ namespace Calico
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    EvolutionGame g = new EvolutionGame(weights, (tasks.Item1,tasks.Item3,tasks.Item2));
                     stats[part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    EvolutionGame g = new EvolutionGame(weights, (tasks.Item2,tasks.Item1, tasks.Item3));
                     stats[2*part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    EvolutionGame g = new EvolutionGame(weights, (tasks.Item2,tasks.Item3,tasks.Item1));
                     stats[3*part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    EvolutionGame g = new EvolutionGame(weights, (tasks.Item3,tasks.Item1,tasks.Item2));
                     stats[4*part + j] = g.Game();
                 }
                 for (int j = 0; j < part; j++)
                 {
-                    EvolutionGame g = new EvolutionGame(weights, tasks);
+                    EvolutionGame g = new EvolutionGame(weights, (tasks.Item3,tasks.Item2,tasks.Item1));
                     stats[5*part + j] = g.Game();
                 }
             }
