@@ -18,8 +18,6 @@ namespace Calico
             (9, " Stromové prohledávání se simulacemi"), // Karel
         };
 
-        private AverageGameStats avgStats;
-
         public WeightsDict WeightsDict;
 
         public GameModeController()
@@ -345,7 +343,7 @@ namespace Calico
 
         #endregion
 
-        #region TestingAgents - fixed
+        #region TestingAgents
 
         private void TestingAgent()
         {
@@ -363,7 +361,7 @@ namespace Calico
             GameStats[] stats = null;
 
 
-            if(agentType < 7) // rand, základní a rozšířené ohodnocení
+            if(agentType < 7) // rand, basic and advanced evaluation
             {
                 iterations = 5000;
                 stats = new GameStats[iterations];
@@ -373,10 +371,9 @@ namespace Calico
                     Game g = new Game();
                     g.AgentGame(agentType, false);
                     stats[i] = g.Stats;
-                    Console.WriteLine($" {i} : {g.Stats.Score}");
                 }
             }
-            else if(agentType == 7) // vážená rozšířená funkce
+            else if(agentType == 7) // weighted advanced evaluation
             {
                 iterations = 5000;
                 stats = new GameStats[iterations];
@@ -386,10 +383,9 @@ namespace Calico
                     Game g = new Game();
                     g.WeightedAgentGame(WeightsDict, false);
                     stats[i] = g.Stats;
-                    Console.WriteLine($" {i} : {g.Stats.Score}");
                 }
             }
-            else if(agentType == 8) // stromové prohledávání
+            else if(agentType == 8) // tree search
             {
                 iterations = 5000;
                 stats = new GameStats[iterations];
@@ -402,10 +398,9 @@ namespace Calico
                     Game g = new Game();
                     g.TreeSearchAgentGame(WeightsDict, false, depth, discountFactor);
                     stats[i] = g.Stats;
-                    Console.WriteLine($" {i} : {g.Stats.Score}");
                 }
             }
-            else if (agentType == 9) // MCTS inspired prohledávání
+            else if (agentType == 9) // MCTS inspired evaluation
             {
                 iterations = 250;
                 stats = new GameStats[iterations];
@@ -417,7 +412,6 @@ namespace Calico
                     Game g = new Game();
                     g.SimulationTSAgentGame(WeightsDict, false, simulationSize);
                     stats[i] = g.Stats;
-                    Console.WriteLine($" {i} : {g.Stats.Score}");
                 }
             }
 
@@ -427,7 +421,7 @@ namespace Calico
                 {
                     using (StreamWriter outputFile = new StreamWriter(fileName))
                     {
-                        outputFile.WriteLine("score;Buttons;C1;C2;C3;T1;T2;T3;T4;T5;T6");
+                        outputFile.WriteLine("score;B;C1;C2;C3;T1;T2;T3;T4;T5;T6");
 
                         foreach (GameStats gs in stats)
                         {
@@ -454,8 +448,6 @@ namespace Calico
             }
             else
             {
-                Console.WriteLine(stats.Max(item => item.Score));
-                Console.WriteLine(stats.Min(item => item.Score));
                 Console.WriteLine(
                             $"{Math.Round(stats.Average(item => item.Score), 3, MidpointRounding.AwayFromZero).ToString("0.000")}, " +
                             $"{Math.Round(stats.Average(item => item.Buttons), 3, MidpointRounding.AwayFromZero).ToString("0.000")} " +
@@ -877,9 +869,11 @@ namespace Calico
             }
         }
 
+        /// <summary>
+        /// 2 modes - optimizing using evolution or getting weights from final population
+        /// </summary>
         private void ChooseEvolutionMode()
         {
-            // jestli spustím evoluci nebo získání vah z poslední generace
             int mode = GetEvolMode();
 
             if (mode == 1)
@@ -1009,7 +1003,7 @@ namespace Calico
 
             using (StreamWriter outputFile = new StreamWriter(outputFileName))
             {
-                outputFile.WriteLine("tasks;score;b;c1;c2;c3;t1;t2;t3;t4;t5;t6");
+                outputFile.WriteLine("tasks;score;B;C1;C2;C3;T1;T2;T3;T4;T5;T6");
                 foreach (var line in lines)
                 {
                     outputFile.WriteLine(line);

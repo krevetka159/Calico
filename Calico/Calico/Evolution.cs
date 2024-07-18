@@ -60,7 +60,6 @@ namespace Calico
             double[] avg = new double[generations];
             double[] max = new double[generations];
 
-            Console.WriteLine($"{tasks.Item1}{tasks.Item2}{tasks.Item3}");
 
             for (int g = 0; g < generations - 1; g++)
             {
@@ -76,8 +75,6 @@ namespace Calico
                 max[g] = fitness.Max();
             }
 
-            Console.WriteLine($" Generation {generations}");
-
             fitness = PopulationFitness(population);
             Console.WriteLine(fitness.Average());
             avg[generations - 1] = fitness.Average();
@@ -91,40 +88,50 @@ namespace Calico
             }
             results.Sort((x, y) => y.Item1.CompareTo(x.Item1));
 
-            using (StreamWriter outputFile = new StreamWriter(outputFileName))
+            try
             {
-                outputFile.WriteLine("fitness;buttons;c1;c2;c3;t1;t2;t3;t4;t5;t6");
-                foreach ((double, Weights) res in results)
+                using (StreamWriter outputFile = new StreamWriter(outputFileName))
                 {
-                    double normSum =
-                        (res.Item2.ButtonW +
-                        res.Item2.CatsW.Item1 +
-                        res.Item2.CatsW.Item2 +
-                        res.Item2.CatsW.Item3 +
-                        res.Item2.TaskW[tasks.Item1 - 1] +
-                        res.Item2.TaskW[tasks.Item2 - 1] +
-                        res.Item2.TaskW[tasks.Item3 - 1]
-                        )/7;
+                    outputFile.WriteLine("fitness;B;C1;C2;C3;T1;T2;T3;T4;T5;T6");
+                    foreach ((double, Weights) res in results)
+                    {
+                        double normSum =
+                            (res.Item2.ButtonW +
+                            res.Item2.CatsW.Item1 +
+                            res.Item2.CatsW.Item2 +
+                            res.Item2.CatsW.Item3 +
+                            res.Item2.TaskW[tasks.Item1 - 1] +
+                            res.Item2.TaskW[tasks.Item2 - 1] +
+                            res.Item2.TaskW[tasks.Item3 - 1]
+                            ) / 7;
 
-                    double[] temp = new double[6] {1,1,1,1,1,1};
-                    temp[tasks.Item1 - 1] = res.Item2.TaskW[tasks.Item1 - 1] / normSum;
-                    temp[tasks.Item2 - 1] = res.Item2.TaskW[tasks.Item2 - 1] / normSum;
-                    temp[tasks.Item3 - 1] = res.Item2.TaskW[tasks.Item3 - 1] / normSum;   
-                    
-                    outputFile.WriteLine(
-                        $"{Math.Round(res.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
-                        $"{Math.Round(res.Item2.ButtonW / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsW.Item1 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsW.Item2 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(res.Item2.CatsW.Item3 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(temp[0], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(temp[1], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(temp[2], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(temp[3], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(temp[4], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
-                        $"{Math.Round(temp[5], 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
+                        double[] temp = new double[6] { 1, 1, 1, 1, 1, 1 };
+                        temp[tasks.Item1 - 1] = res.Item2.TaskW[tasks.Item1 - 1] / normSum;
+                        temp[tasks.Item2 - 1] = res.Item2.TaskW[tasks.Item2 - 1] / normSum;
+                        temp[tasks.Item3 - 1] = res.Item2.TaskW[tasks.Item3 - 1] / normSum;
+
+                        outputFile.WriteLine(
+                            $"{Math.Round(res.Item1, 3, MidpointRounding.AwayFromZero).ToString("0.000")};" +
+                            $"{Math.Round(res.Item2.ButtonW / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(res.Item2.CatsW.Item1 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(res.Item2.CatsW.Item2 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(res.Item2.CatsW.Item3 / normSum, 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(temp[0], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(temp[1], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(temp[2], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(temp[3], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(temp[4], 5, MidpointRounding.AwayFromZero).ToString("0.00000")};" +
+                            $"{Math.Round(temp[5], 5, MidpointRounding.AwayFromZero).ToString("0.00000")}");
+                    }
                 }
+
             }
+            catch
+            {
+                Console.WriteLine("Zápis do souboru selhal.");
+            }
+        
+
         }
 
         /// <summary>
