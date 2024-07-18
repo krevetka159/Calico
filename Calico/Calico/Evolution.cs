@@ -354,12 +354,11 @@ namespace Calico
         }
         public double Game()
         {
-            for (int i = 0; i < agent.Board.EmptySpotsCount; i++)
+            for (int i = 0; i < 22; i++)
             {
                 MakeMove(agent);
             }
-
-            return agent.Board.ScoreCounter.Score;
+            return agent.Board.ScoreCounter.GetScore();
         }
     }
 }
