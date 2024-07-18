@@ -480,7 +480,7 @@ namespace Calico
             if(testTasks)
             {
                 tasks = GetTasksInput();
-                mixedPlacement = GetYesNo(" Otestovat kombinaci bez konkrétního umístění? (y/n): ");
+                mixedPlacement = !GetYesNo(" Otestovat kombinaci pro konkrétní umístění? (y/n): ");
             }
 
             bool testBoards = GetYesNo(" Testování konkrétní desky? (y/n): ");
@@ -505,7 +505,7 @@ namespace Calico
             }
             else
             {
-                mixedPlacement = GetYesNo(" Testovat kombinace úkolů bez konkrétního umístění? (y/n): ");
+                mixedPlacement = !GetYesNo(" Testovat kombinace úkolů pro konkrétní umístění? (y/n): ");
                 TestAllSettings(mixedPlacement);
             }
         }
@@ -894,7 +894,7 @@ namespace Calico
             // vybrat tasky
             (int,int, int) tasks = GetTasksInput();
             // vybrat jestli mixed placement
-            bool mixedPlacement = GetYesNo(" Chcete testovat kombinace bez konkrétního umístění? (y/n): ");
+            bool mixedPlacement = !GetYesNo(" Chcete testovat kombinace pro konkrétního umístění? (y/n): ");
 
             // název souboru
             string outputFileName = GetOutputFileName();
